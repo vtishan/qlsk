@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đặt địa điểm — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css"><link rel="stylesheet" href="../../css/content.css">
+</head>
+<body data-allow="BanToChuc,QuanLySuKien,QuanTriVien">
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../dia-diem/danh-sach.html">Địa điểm</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="../auth/dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="../auth/dang-ky.html">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../dia-diem/danh-sach.html">Địa điểm</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a><a href="../auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side"><div class="content" style="max-width:960px;margin:0 auto;width:100%">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<section class="hero" style="margin-bottom:16px">
+<img class="bg" src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=60" alt="Đặt không gian sự kiện" onerror="this.src='../../assets/images/placeholder-venue.svg'">
+<div class="hero-inner">
+<p class="badge b-info">Địa điểm • Giữ khung giờ</p>
+<h1>Đặt địa điểm cho sự kiện</h1>
+<p>Chọn sự kiện của bạn, địa điểm và khung giờ thuê. Hệ thống tự kiểm tra giờ kết thúc phải sau giờ bắt đầu và cảnh báo trùng lịch.</p>
+<div class="hero-tags"><span class="catchip">Chỉ Ban tổ chức</span><span class="catchip">Chống trùng giờ</span><span class="catchip">Chờ duyệt nhanh</span></div>
+</div>
+</section>
+<div class="demo-strip" aria-label="Minh họa đặt chỗ">
+<span class="pill">Chọn <b>sự kiện + địa điểm</b></span>
+<span class="pill">Chọn <b>giờ bắt đầu – kết thúc</b></span>
+<span class="pill">Nhận trạng thái <b>Chờ xác nhận</b></span>
+</div>
+<div class="lock-card" data-khoa hidden><div class="lock-ic">Khóa</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
+<div data-noi-dung-chinh>
+<div class="grid g2">
+<div class="card"><h2>Phiếu đặt địa điểm</h2>
+<p class="muted">Dành cho Ban tổ chức: chọn sự kiện của bạn, địa điểm và khung giờ thuê. <a href="danh-sach.html">Xem danh sách địa điểm</a> • <a href="lich-dat.html">Xem lịch đặt</a>.</p>
+<div class="grid g2">
+<div><label class="lbl">Chọn sự kiện của bạn</label><input id="dat-sk" type="number" min="1" placeholder="vd: 3"></div>
+<div><label class="lbl">Chọn địa điểm</label><input id="dat-dd" type="number" min="1" placeholder="vd: 2"></div>
+<div><label class="lbl">Thời gian bắt đầu</label><input id="dat-bd" type="datetime-local"></div>
+<div><label class="lbl">Thời gian kết thúc</label><input id="dat-kt" type="datetime-local"></div>
+</div>
+<div class="toolbar"><button class="chinh" onclick="datDiaDiem()">Đặt địa điểm</button><a class="phu btn" href="lich-dat.html">Xem lịch đặt</a></div>
+<p class="muted">Lưu ý: thời gian <b>Kết thúc phải sau Bắt đầu</b> (hệ thống tự kiểm tra). Hãy đối chiếu <b>sức chứa địa điểm</b> với số vé dự kiến của sự kiện trước khi đặt.</p>
+<!-- api-line (kỹ thuật): POST /api/venue-bookings — Body: { DiaDiemId, SuKienId, BatDau, KetThuc, TienCoc } -->
+</div>
+<div>
+<div class="card"><h3>Hướng dẫn đặt đúng khung giờ</h3>
+<div class="howto"><ol>
+<li><b>Bước 1:</b> Mở trang danh sách và chọn địa điểm còn trống.</li>
+<li><b>Bước 2:</b> Chọn sự kiện của bạn (chỉ sự kiện bạn làm Ban tổ chức).</li>
+<li><b>Bước 3:</b> Chọn giờ bắt đầu và giờ kết thúc, cộng thêm thời gian chuẩn bị.</li>
+<li><b>Bước 4:</b> Nhấn <b>Đặt địa điểm</b>, rồi sang trang lịch đặt để theo dõi.</li>
+</ol></div>
+<img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=60" alt="Không gian hội thảo" style="border-radius:12px;margin-top:10px" onerror="this.src='../../assets/images/placeholder-venue.svg'">
+</div>
+<div class="card giup-su-co"><h3>Gặp sự cố? Xem tại đây</h3><p class="muted small">Bạn nhập thiếu thông tin.</p><p class="muted small">Bạn chưa đăng nhập.</p><p class="muted small">Tài khoản này đang bị khóa.</p><p class="muted small">Không tìm thấy thông tin.</p><p class="muted small">Vé vừa hết / thông tin vừa đổi.</p></div>
+</div>
+</div>
+<div class="card" style="margin-top:16px"><div class="row"><img src="../../assets/images/placeholder-venue.svg" alt="Minh họa địa điểm" style="max-width:220px;border-radius:8px" onerror="this.src='../../assets/images/placeholder-venue.svg'"><div style="flex:1;min-width:240px"><b>Sau khi đặt, yêu cầu chuyển sang chờ duyệt</b><p class="muted">Theo dõi tại trang lịch đặt. Quản trị sẽ xác nhận hoặc từ chối kèm lý do, bạn có thể hủy phiếu khi còn chờ.</p><div class="toolbar"><a class="phu btn sm" href="lich-dat.html">Sang lịch đặt</a><a class="phu btn sm" href="danh-sach.html">Chọn địa điểm khác</a></div></div></div></div>
+</div>
+</div></div>
+<footer class="footer-grid">
+<div class="footer-col"><div class="logo" style="display:flex;align-items:center;gap:8px"><img src="../../assets/icons/logo.svg" alt="" style="width:28px;height:28px" onerror="this.style.display='none'"><div><div style="font-weight:700">SựKiện Hub</div><div class="muted small" style="font-size:12px">Nền tảng đặt vé và tổ chức sự kiện.</div></div></div><p class="muted small" style="margin-top:8px">Hotline: 1900 6868</p><p class="muted small">hotro@sukienhub.vn</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a class="muted small" href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a class="muted small" href="danh-sach.html">Địa điểm</a><a class="muted small" href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a class="muted small" href="../ve/tra-cuu-check-in.html">Vé của tôi</a></div>
+<div class="footer-col"><h4>Dành cho Ban tổ chức</h4><a class="muted small" href="../to-chuc/gui-xac-thuc.html">Trở thành Ban tổ chức</a><a class="muted small" href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a class="muted small" href="dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Hỗ trợ</h4><a class="muted small" href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a><a class="muted small" href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a><a class="muted small" href="../../index.html">Liên hệ</a></div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}</script>
+</body></html>

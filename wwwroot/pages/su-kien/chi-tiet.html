@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chi tiết sự kiện — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="../auth/dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="../auth/dang-ky.html">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a><a href="../auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side"><div class="content">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<section class="card hero">
+<div class="grid g2">
+<div>
+<p class="muted">Thông tin minh bạch trước khi đặt vé</p>
+<h2>Chi tiết sự kiện</h2>
+<p class="muted">Xem đầy đủ mô tả, thời gian, địa điểm tổ chức, sơ đồ chỗ ngồi và các loại vé đang mở bán. Nhập mã sự kiện nếu bạn được chia sẻ đường dẫn rút gọn.</p>
+<div class="demo-strip">
+<span class="pill">Mô tả <b>chi tiết</b></span>
+<span class="pill">Lịch trình <b>rõ ràng</b></span>
+<span class="pill">Vé <b>nhiều hạng</b></span>
+<span class="pill">Check-in <b>QR</b></span>
+</div>
+<div class="row"><input id="ct-sk-id" type="number" placeholder="Nhập mã sự kiện" style="max-width:240px"><button class="chinh" onclick="xemChiTietSuKien(document.getElementById('ct-sk-id').value)">Xem chi tiết</button><a class="phu btn" href="danh-sach.html">← Danh sách</a></div>
+<!-- api-line (kỹ thuật): GET /api/events/{id} -->
+</div>
+<div>
+<img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=60" alt="Sân khấu sự kiện với ánh đèn" style="width:100%;border-radius:12px" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<p class="muted"><small>Ảnh minh họa sân khấu. Nguồn ảnh: Unsplash.</small></p>
+</div>
+</div>
+</section>
+<div id="sk-chitiet" class="card"><p class="muted">Nhập ID sự kiện rồi bấm “Xem chi tiết”, hoặc mở trang này từ danh sách sự kiện để xem nội dung đầy đủ.</p></div>
+<div class="grid g3" style="margin-top:16px">
+<div class="card"><h3>Thời gian &amp; địa điểm</h3><p class="muted">Kiểm tra giờ mở cửa, giờ bắt đầu và địa chỉ chính xác. Hãy đến sớm 30 phút để check-in thuận lợi.</p></div>
+<div class="card"><h3>Chính sách vé</h3><p class="muted">Mỗi hạng vé ghi rõ quyền lợi, khu vực chỗ ngồi và điều kiện đổi trả. Giá hiển thị đã gồm phí dịch vụ.</p></div>
+<div class="card"><h3>Hỗ trợ khách hàng</h3><p class="muted">Cần đổi vé hoặc hỗ trợ đoàn đông? Liên hệ ban tổ chức qua thông tin hiển thị trong phần chi tiết.</p></div>
+</div>
+<div class="card"><h3>Loại vé của sự kiện</h3>
+<p class="muted">Nhập mã sự kiện để xem tất cả hạng vé: giá, số lượng còn lại và trạng thái mở bán theo thời gian thực.</p>
+<div class="row"><input id="lv-xem-sk" type="number" placeholder="Nhập mã sự kiện để xem loại vé" style="max-width:280px"><button class="chinh" onclick="taiLoaiVeTheoSuKien(document.getElementById('lv-xem-sk').value)">Xem loại vé</button></div>
+<!-- api-line (kỹ thuật): GET /api/events/{id}/ticket-types -->
+<div id="ds-loaive-sk" class="grid" style="margin-top:12px"></div>
+<div id="ds-loaive" class="grid" style="margin-top:12px"></div>
+</div>
+<section class="card howto">
+<h3>Hướng dẫn xem và chọn vé (4 bước)</h3>
+<ol>
+<li><b>Bước 1 — Mở chi tiết:</b> nhập ID sự kiện hoặc bấm vào sự kiện từ trang danh sách.</li>
+<li><b>Bước 2 — Đọc kỹ thông tin:</b> xem mô tả, thời gian, địa điểm và lưu ý của ban tổ chức.</li>
+<li><b>Bước 3 — Xem loại vé:</b> nhập lại mã vào ô “Loại vé của sự kiện” rồi bấm “Xem loại vé”.</li>
+<li><b>Bước 4 — Đặt vé:</b> chọn hạng vé phù hợp và hoàn tất đơn hàng để nhận mã QR.</li>
+</ol>
+</section>
+<section class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<p>Bạn nhập thiếu thông tin — hãy kiểm tra lại các ô vừa điền.</p>
+<p>Bạn chưa đăng nhập — hãy đăng nhập để xem hạng vé đầy đủ.</p>
+<p>Tài khoản này đang bị khóa — hãy liên hệ người quản lý.</p>
+<p>Không tìm thấy thông tin — sự kiện có thể đã kết thúc hoặc bị gỡ.</p>
+<p>Vé vừa hết — hãy thử hạng vé khác hoặc quay lại sau.</p>
+</section>
+</div></div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SựKiện Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SựKiện Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}</script>
+</body></html>

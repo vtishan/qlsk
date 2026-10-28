@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra cứu và Check-in — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body data-allow="BanToChuc,QuanLySuKien,QuanTriVien">
+<div id="spinner"></div>
+<div id="toast-wrap"></div>
+<header class="topbar">
+<div class="topbar-main">
+<a class="logo" href="../../index.html">
+<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
+<span class="brand-content">
+<span class="brand-name">SựKiện Hub</span>
+<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
+</span>
+</a>
+<nav class="mainnav">
+<a href="../../index.html">Sự kiện</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../thanh-toan/thanh-toan.html">Thanh toán</a>
+<a href="../ve/ve-theo-don.html">Vé</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+</nav>
+<div class="userbox">
+<div class="avatar" id="avatar-chu">SK</div>
+<span id="nd-user">Chào bạn, hãy đăng nhập</span>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a>
+<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+<button id="btn-menu" class="phu sm">☰</button>
+</div>
+</div>
+<nav class="menu-mobile" id="menu-mobile" hidden>
+<a href="../../index.html">Sự kiện</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../thanh-toan/thanh-toan.html">Thanh toán</a>
+<a href="../ve/ve-theo-don.html">Vé</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a>
+<button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+</nav>
+</header>
+<input type="hidden" id="sk-tukhoa">
+<input type="hidden" id="sk-tukhoa-hero">
+<input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side">
+<div class="content">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="lock-card" data-khoa hidden>
+<div class="lock-ic">Khóa</div>
+<h3>Bạn cần đăng nhập để xem mục này</h3>
+<p>Vui lòng đăng nhập để tiếp tục.</p>
+<a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a>
+</div>
+<div data-noi-dung-chinh>
+<section class="hero">
+<div class="hero-text">
+<h1>Tra cứu và check-in tại cổng</h1>
+<p class="muted">Dành cho Ban tổ chức: quét mã vé, xác thực nhanh và điểm danh khán giả chỉ trong vài giây.</p>
+<div class="demo-strip">
+<span class="pill">Quét mã QR</span>
+<span class="pill">Nhập mã vé</span>
+<span class="pill">Xác thực 1 lần</span>
+<span class="pill">Chống vé giả</span>
+</div>
+</div>
+<div class="hero-media">
+<img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=60" alt="Check-in sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-venue.svg'">
+</div>
+</section>
+<section class="card howto">
+<h2>Quy trình check-in (4 bước)</h2>
+<ol>
+<li><b>Bước 1:</b> Khán giả đưa mã vé hoặc mã QR trên vé điện tử.</li>
+<li><b>Bước 2:</b> Nhập mã vé hoặc mã QR rồi bấm <b>Tra cứu</b> để xác thực.</li>
+<li><b>Bước 3:</b> Kiểm tra trạng thái vé — chỉ vé hợp lệ và chưa dùng mới được qua cổng.</li>
+<li><b>Bước 4:</b> Nhập mã vé rồi bấm <b>Check-in</b> để điểm danh, mỗi vé chỉ check-in 1 lần.</li>
+</ol>
+</section>
+<div class="card">
+<h2>Tra cứu vé</h2>
+<p class="muted">Nhập mã vé hoặc mã QR để tra cứu thông tin vé.</p>
+<div class="row">
+<input id="ci-ma" type="text" placeholder="Mã vé" style="max-width:220px">
+<input id="ci-qr" type="text" placeholder="Mã QR" style="max-width:220px">
+<button class="chinh" onclick="traCuuVe()">Tra cứu</button>
+</div>
+<div id="kq-tracuu" style="margin-top:12px"></div>
+<!-- GET /api/tickets/by-code/{code} -->
+</div>
+<div class="card">
+<h2>Check-in vé</h2>
+<p class="muted">Nhập mã vé để điểm danh. Lưu ý: mỗi vé chỉ check-in được 1 lần — check-in lần 2 sẽ bị từ chối.</p>
+<div class="row">
+<input id="ci-ve" type="number" placeholder="Nhập mã vé của bạn" style="max-width:240px">
+<button class="chinh" onclick="checkIn()">Check-in</button>
+</div>
+<div id="kq-checkin" style="margin-top:12px"></div>
+<!-- POST /api/check-in — Body: { ma } -->
+</div>
+<section class="grid g2" style="margin-top:16px">
+<div class="card">
+<h3>Mẹo vận hành cổng</h3>
+<p class="muted">Bố trí 2 làn: một làn tra cứu nhanh bằng QR, một làn xử lý vé lỗi. Luôn bật mạng dự phòng cho giờ cao điểm check-in.</p>
+</div>
+<div class="card">
+<h3>Xử lý vé báo lỗi</h3>
+<p class="muted">Vé báo đã check-in nghĩa là mã đã qua cổng — hãy đối chiếu giấy tờ hoặc lịch sử xuất vé trước khi quyết định cho vào.</p>
+</div>
+</section>
+<section class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<ul>
+<li>Bạn nhập thiếu thông tin</li>
+<li>Bạn chưa đăng nhập</li>
+<li>Tài khoản này đang bị khóa</li>
+<li>Không tìm thấy thông tin</li>
+<li>Vé vừa hết / thông tin vừa đổi</li>
+</ul>
+</section>
+</div>
+</div>
+</div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/sukien.js"></script>
+<script src="../../js/tochuc.js"></script>
+<script src="../../js/diadiem.js"></script>
+<script src="../../js/donve.js"></script>
+<script src="../../js/checkin.js"></script>
+<script src="../../js/quantri.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script>try{lucide.createIcons()}catch(e){}</script>
+</body>
+</html>

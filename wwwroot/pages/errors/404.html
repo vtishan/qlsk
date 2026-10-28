@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lỗi — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../thanh-toan/thanh-toan.html">Thanh toán</a><a href="../ve/ve-theo-don.html">Vé</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../thanh-toan/thanh-toan.html">Thanh toán</a><a href="../ve/ve-theo-don.html">Vé</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side"><div class="content">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="hero hero-sm">
+<img class="bg" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=60&auto=format&fit=crop" alt="Trang không tồn tại" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<div class="hero-inner"><h2>Rất tiếc, đã có lỗi xảy ra</h2><p>Đừng lo — chọn một hướng xử lý bên dưới để tiếp tục trải nghiệm SựKiện Hub.</p></div>
+</div>
+<div class="demo-strip"><span class="pill">Lỗi <b>có hướng dẫn</b></span><span class="pill">Về trang chủ <b>1 chạm</b></span><span class="pill">Đăng nhập <b>đúng vai trò</b></span></div>
+<div class="card howto-card"><h3>Cách xử lý nhanh trong 3 bước</h3>
+<div class="howto"><ol>
+<li><b>Bước 1:</b> Xác định tình huống: trang không tồn tại, hết phiên đăng nhập hay thiếu quyền truy cập.</li>
+<li><b>Bước 2:</b> Bấm nút gợi ý: về trang chủ, đăng nhập lại hoặc đổi tài khoản.</li>
+<li><b>Bước 3:</b> Nếu lỗi lặp lại, chụp màn hình và liên hệ quản trị viên.</li>
+</ol></div>
+<!-- api-line: GET /api/events • POST /api/auth/login -->
+</div>
+<div class="card"><h2>Không tìm thấy trang</h2>
+<p class="muted">Trang bạn yêu cầu không tồn tại hoặc đã bị di chuyển.</p>
+<div class="toolbar"><a class="chinh btn" href="../../index.html">Về trang chủ</a><a class="phu btn" href="../auth/dang-nhap.html">Đăng nhập</a></div>
+<p class="muted">Địa chỉ này không còn tồn tại. Hãy kiểm tra lại đường dẫn hoặc quay về trang chủ.</p>
+</div>
+<div class="card"><h3>Hết phiên đăng nhập</h3>
+<p class="muted">Phiên đăng nhập đã hết hạn hoặc bạn chưa đăng nhập. Vui lòng đăng nhập lại để tiếp tục.</p>
+<div class="toolbar"><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập lại</a><a class="phu btn" href="../../index.html">Về trang chủ</a></div>
+<p class="muted">Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục.</p>
+</div>
+<div class="card"><h3>Thiếu quyền truy cập</h3>
+<p class="muted">Tài khoản của bạn không có quyền xem trang này. Vui lòng đăng nhập đúng vai trò (Ban tổ chức / Quản lý / Quản trị viên).</p>
+<div class="toolbar"><a class="chinh btn" href="../auth/dang-nhap.html">Đổi tài khoản</a><a class="phu btn" href="../../index.html">Về trang chủ</a></div>
+<p class="muted">Vai trò hiện tại chưa đủ quyền. Liên hệ quản trị viên để được cấp quyền phù hợp.</p>
+</div>
+<div class="card"><h3>Dữ liệu chưa hợp lệ</h3>
+<p class="muted">Thông tin gửi lên chưa đúng. Kiểm tra các trường bắt buộc và định dạng đã nhập.</p>
+<p class="muted">Thông tin đã tồn tại hoặc vừa bị thay đổi. Hãy tải lại trang và thử lại.</p>
+</div>
+</div></div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}</script>
+</body></html>

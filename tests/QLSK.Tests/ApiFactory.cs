@@ -1,0 +1,129 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using QLSK.Common.Auth;
+using QLSK.Data;
+using QLSK.Infrastructure.Email;
+
+namespace QLSK.Tests;
+
+public sealed class ApiFactory : WebApplicationFactory<Program>
+{
+    public const string JwtKey = "QLSK_TEST_ONLY_KEY_NOT_FOR_DEPLOYMENT_32_BYTES";
+    private readonly string databaseName = $"QLSK_Test_{Guid.NewGuid():N}";
+    private string ConnectionString => $"Server=.\\SQL2022EXP;Database={databaseName};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True";
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Testing");
+        builder.UseSetting("ConnectionStrings:Default", ConnectionString);
+        builder.UseSetting("Jwt:Issuer", "QLSK");
+        builder.UseSetting("Jwt:Audience", "QLSK.Client");
+        builder.UseSetting("Jwt:Key", JwtKey);
+        builder.UseSetting("PayOS:ClientId", "");
+        builder.UseSetting("PayOS:ApiKey", "");
+        builder.UseSetting("PayOS:ChecksumKey", "test-checksum-key");
+        builder.UseSetting("Email:Host", "");
+
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<IHostedService>();
+            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
+            services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
+            services.RemoveAll<EmailService>();
+            services.AddScoped<EmailService, TestEmailService>();
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(ConnectionString));
+        });
+    }
+
+    public HttpClient CreateAuthenticatedClient(int userId, string role, string? passwordHashOverride = null)
+    {
+        var passwordHash = passwordHashOverride;
+        if (passwordHash is null)
+        {
+            using var scope = Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            passwordHash = db.TaiKhoans.AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => x.MatKhau)
+                .Single();
+        }
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", CreateToken(userId, role, passwordHash));
+        return client;
+    }
+
+    public async Task WithDb(Func<ApplicationDbContext, Task> action)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await action(db);
+    }
+
+    public async Task<T> WithDb<T>(Func<ApplicationDbContext, Task<T>> action)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        return await action(db);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            try
+            {
+                using var scope = Services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.EnsureDeleted();
+            }
+            catch
+            {
+                // The test database may not have been created when host startup fails.
+            }
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private static string CreateToken(int userId, string role, string passwordHash)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Name, $"Test {role}"),
+            new Claim(ClaimTypes.Email, $"test-{userId}@local.test"),
+            new Claim(ClaimTypes.Role, role),
+            new Claim(JwtService.PasswordFingerprintClaim, JwtService.PasswordFingerprint(passwordHash))
+        };
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
+        var token = new JwtSecurityToken(
+            "QLSK",
+            "QLSK.Client",
+            claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}
+
+public sealed class TestEmailService() : EmailService(Options.Create(new EmailOptions()))
+{
+    public override Task Gui(
+        string to,
+        string subject,
+        string body,
+        byte[]? attachment = null) => Task.CompletedTask;
+}

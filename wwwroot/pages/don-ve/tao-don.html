@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tạo đơn vé — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div>
+<div id="toast-wrap"></div>
+<header class="topbar">
+<div class="topbar-main">
+<a class="logo" href="../../index.html">
+<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
+<span class="brand-content">
+<span class="brand-name">SựKiện Hub</span>
+<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
+</span>
+</a>
+<nav class="mainnav">
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+</nav>
+<div class="userbox">
+<div class="avatar" id="avatar-chu">SK</div>
+<span id="nd-user">Chào bạn, hãy đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="../auth/dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="../auth/dang-ky.html">Đăng ký</a>
+<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+<button id="btn-menu" class="phu sm">☰</button>
+</div>
+</div>
+<nav class="menu-mobile" id="menu-mobile" hidden>
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+<a href="../auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+</nav>
+</header>
+<input type="hidden" id="sk-tukhoa">
+<input type="hidden" id="sk-tukhoa-hero">
+<input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side">
+<div class="content" style="max-width:960px;margin:0 auto;width:100%">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<section class="hero">
+<div class="hero-text">
+<h1>Tạo đơn đặt vé</h1>
+<p class="muted">Chỉ cần chọn hạng vé và số lượng, hệ thống tự tính tổng tiền theo giá hiện hành — nhanh gọn trong 30 giây.</p>
+<div class="demo-strip">
+<span class="pill">Chọn hạng vé</span>
+<span class="pill">Nhập số lượng</span>
+<span class="pill">Tạo đơn</span>
+<span class="pill">Thanh toán</span>
+</div>
+</div>
+<div class="hero-media">
+<img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=60" alt="Khán giả sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+</div>
+</section>
+<section class="card howto">
+<h2>Hướng dẫn đặt vé (3 bước)</h2>
+<ol>
+<li><b>Bước 1:</b> Xem hạng vé tại trang <a href="../ve/loai-ve.html">Loại vé</a> hoặc trang chi tiết sự kiện.</li>
+<li><b>Bước 2:</b> Nhập loại vé và số lượng vào biểu mẫu bên dưới.</li>
+<li><b>Bước 3:</b> Bấm <b>Tạo đơn</b>, sau đó sang <a href="don-cua-toi.html">Đơn của tôi</a> để thanh toán và phát hành vé.</li>
+</ol>
+</section>
+<div class="lock-card" data-khoa hidden><div class="lock-ic">Khóa</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
+<div data-noi-dung-chinh>
+<div class="card">
+<h2>Tạo đơn vé</h2>
+<p class="muted">Chọn hạng vé rồi nhập số lượng để tạo đơn. Xem hạng vé tại trang <a href="../ve/loai-ve.html">Loại vé</a> hoặc trang chi tiết sự kiện.</p>
+<div class="grid g2">
+<div>
+<label class="lbl">Chọn loại vé</label>
+<input id="don-loai" type="number" min="1" placeholder="Ví dụ: 10">
+</div>
+<div>
+<label class="lbl">Số lượng</label>
+<input id="don-sl" type="number" min="1" placeholder="Ví dụ: 2">
+</div>
+</div>
+<div class="toolbar">
+<button class="chinh" onclick="taoDon()">Tạo đơn</button>
+<a class="phu btn" href="don-cua-toi.html">Xem đơn của tôi →</a>
+</div>
+<p class="muted">Ghi chú: bạn chỉ cần gửi loại vé + số lượng, <b>hệ thống sẽ tính lại tổng tiền</b> theo giá vé hiện hành nên không cần nhập thành tiền.</p>
+<!-- api-line (kỹ thuật): POST /api/orders · GET /api/events/{id}/ticket-types -->
+</div>
+<div id="ds-don" style="margin-top:16px"></div>
+<div class="card" style="margin-top:16px">
+<img src="../../assets/images/placeholder-event.svg" alt="Minh họa đặt vé" style="max-width:100%;border-radius:8px" onerror="this.src='../../assets/images/placeholder-event.svg'">
+<p class="muted">Sau khi tạo đơn, sang trang Đơn của tôi để thanh toán và phát hành vé.</p>
+<div class="row">
+<a class="phu btn sm" href="don-cua-toi.html">Đơn của tôi</a>
+<a class="phu btn sm" href="../thanh-toan/thanh-toan.html">Thanh toán</a>
+<a class="phu btn sm" href="../ve/ve-theo-don.html">Vé của đơn</a>
+</div>
+</div>
+<section class="grid g2" style="margin-top:16px">
+<div class="card">
+<h3>Lưu ý số lượng</h3>
+<p class="muted">Mỗi hạng vé giới hạn số vé tối đa cho mỗi đơn. Nếu vượt quá, hãy chia thành nhiều đơn.</p>
+</div>
+<div class="card">
+<h3>Đơn chưa thanh toán</h3>
+<p class="muted">Đơn mới tạo ở trạng thái chờ thanh toán. Hãy thanh toán sớm vì vé có thể hết trước khi bạn quay lại.</p>
+</div>
+</section>
+</div>
+<div class="card giup-su-co"><h3>Gặp sự cố? Xem tại đây</h3><p class="muted small">Bạn nhập thiếu thông tin.</p><p class="muted small">Bạn chưa đăng nhập.</p><p class="muted small">Tài khoản này đang bị khóa.</p><p class="muted small">Không tìm thấy thông tin.</p><p class="muted small">Vé vừa hết / thông tin vừa đổi.</p></div>
+</div>
+</div>
+<footer class="footer-grid">
+<div class="footer-col"><div class="logo" style="display:flex;align-items:center;gap:8px"><img src="../../assets/icons/logo.svg" alt="" style="width:28px;height:28px" onerror="this.style.display='none'"><div><div style="font-weight:700">SựKiện Hub</div><div class="muted small" style="font-size:12px">Nền tảng đặt vé và tổ chức sự kiện.</div></div></div><p class="muted small" style="margin-top:8px">Hotline: 1900 6868</p><p class="muted small">hotro@sukienhub.vn</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a class="muted small" href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a class="muted small" href="../dia-diem/danh-sach.html">Địa điểm</a><a class="muted small" href="don-cua-toi.html">Đơn của tôi</a><a class="muted small" href="../ve/tra-cuu-check-in.html">Vé của tôi</a></div>
+<div class="footer-col"><h4>Dành cho Ban tổ chức</h4><a class="muted small" href="../to-chuc/gui-xac-thuc.html">Trở thành Ban tổ chức</a><a class="muted small" href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a class="muted small" href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Hỗ trợ</h4><a class="muted small" href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a><a class="muted small" href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a><a class="muted small" href="../../index.html">Liên hệ</a></div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/sukien.js"></script>
+<script src="../../js/tochuc.js"></script>
+<script src="../../js/diadiem.js"></script>
+<script src="../../js/donve.js"></script>
+<script src="../../js/checkin.js"></script>
+<script src="../../js/quantri.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script>try{lucide.createIcons()}catch(e){}</script>
+</body>
+</html>

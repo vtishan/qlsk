@@ -1,0 +1,43 @@
+# .NET build output
+**/bin/
+**/obj/
+artifacts/
+publish/
+TestResults/
+**/TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# IDE and user-specific settings
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets and credentials
+appsettings.Production.json
+appsettings.Local.json
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Local databases, logs and temporary files
+*.mdf
+*.ldf
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.tmp
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db

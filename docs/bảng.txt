@@ -1,0 +1,874 @@
+THIẾT KẾ CƠ SỞ DỮ LIỆU WEBSITE QUẢN LÝ SỰ KIỆN
+
+Hệ quản trị cơ sở dữ liệu: SQL Server
+Tổng số bảng: 15
+
+
+==================================================
+QUY ƯỚC
+==================================================
+
+- PK: Khóa chính.
+- FK: Khóa ngoại.
+- UQ: Giá trị duy nhất.
+- NN: Không được để trống.
+- NULL: Được phép để trống.
+- DF: Giá trị mặc định.
+- CHECK: Điều kiện kiểm tra dữ liệu.
+
+
+==================================================
+NHÓM 1. TÀI KHOẢN VÀ PHÂN QUYỀN
+==================================================
+
+
+1. Bảng VaiTro
+
+Thuộc tính:
+- VaiTroID: INT, PK, IDENTITY(1,1)
+- TenVaiTro: NVARCHAR(50), UQ, NN
+
+Các vai trò:
+- NguoiDung
+- BanToChuc
+- QuanLySuKien
+- QuanTriVien
+
+Quan hệ:
+- Một vai trò có nhiều tài khoản.
+- Mỗi tài khoản có đúng một vai trò thông qua TaiKhoan.VaiTroID.
+
+
+--------------------------------------------------
+
+
+2. Bảng TaiKhoan
+
+Thuộc tính:
+- TaiKhoanID: INT, PK, IDENTITY(1,1)
+- VaiTroID: INT, FK -> VaiTro.VaiTroID, NN
+- HoTen: NVARCHAR(100), NN
+- Email: NVARCHAR(255), UQ, NN
+- MatKhauHash: NVARCHAR(255), NN
+- SoDienThoai: NVARCHAR(20), NULL
+- TrangThai: BIT, NN, DF = 1
+- NgayTao: DATETIME2, NN, DF = SYSDATETIME()
+
+Quan hệ:
+- Một tài khoản thuộc đúng một vai trò.
+- Một tài khoản có tối đa một yêu cầu xác thực tổ chức hiện hành.
+- Một tài khoản có thể có nhiều bản ghi lịch sử xác thực.
+- Một tài khoản có tối đa một hồ sơ BanToChuc.
+- Một tài khoản đủ quyền có thể tạo nhiều sự kiện.
+- Một tài khoản quản lý có thể duyệt nhiều sự kiện.
+- Một tài khoản có thể tạo nhiều đơn vé.
+- Một tài khoản có quyền check-in có thể check-in nhiều vé.
+- Một tài khoản có thể thực hiện nhiều lần xuất vé.
+
+
+==================================================
+NHÓM 2. XÁC THỰC BAN TỔ CHỨC VÀ QUẢN LÝ SỰ KIỆN
+==================================================
+
+
+3. Bảng YeuCauXacThucToChuc
+
+Thuộc tính:
+- YeuCauID: INT, PK, IDENTITY(1,1)
+- TaiKhoanID: INT, FK -> TaiKhoan.TaiKhoanID, UQ, NN
+- SoCCCD: NVARCHAR(20), NN
+- NgaySinh: DATE, NN
+- GioiTinh: NVARCHAR(10), NULL
+- DiaChiThuongTru: NVARCHAR(300), NN
+- AnhCCCDMatTruoc: NVARCHAR(500), NN
+- AnhCCCDMatSau: NVARCHAR(500), NN
+- TrangThai: NVARCHAR(20), NN, DF = N'ChoDuyet'
+- NguoiDuyetID: INT, FK -> TaiKhoan.TaiKhoanID, NULL
+- NgayDuyet: DATETIME2, NULL
+- LyDoTuChoi: NVARCHAR(500), NULL
+- NgayTao: DATETIME2, NN, DF = SYSDATETIME()
+
+CHECK:
+- CHECK (TrangThai IN (N'ChoDuyet', N'DaDuyet', N'TuChoi'))
+
+- CHECK (
+    (TrangThai = N'ChoDuyet'
+        AND NguoiDuyetID IS NULL
+        AND NgayDuyet IS NULL
+        AND LyDoTuChoi IS NULL)
+    OR
+    (TrangThai = N'DaDuyet'
+        AND NguoiDuyetID IS NOT NULL
+        AND NgayDuyet IS NOT NULL
+        AND LyDoTuChoi IS NULL)
+    OR
+    (TrangThai = N'TuChoi'
+        AND NguoiDuyetID IS NOT NULL
+        AND NgayDuyet IS NOT NULL
+        AND LyDoTuChoi IS NOT NULL)
+  )
+
+Trạng thái:
+- ChoDuyet
+- DaDuyet
+- TuChoi
+
+Quy tắc:
+- Mỗi tài khoản có tối đa một yêu cầu xác thực hiện hành.
+- TaiKhoanID phải UNIQUE để bảo đảm quan hệ TaiKhoan 1 - 0..1 YeuCauXacThucToChuc.
+- Khi yêu cầu đang ở trạng thái ChoDuyet, tài khoản không được tạo yêu cầu khác.
+- Khi yêu cầu bị từ chối, dữ liệu audit cần thiết được sao chép sang LichSuYeuCauXacThucToChuc.
+- Sau khi lưu lịch sử, yêu cầu hiện hành có thể được xóa để tài khoản gửi lại.
+- Khi yêu cầu được duyệt, tạo hồ sơ BanToChuc chính thức.
+- Sau khi tạo BanToChuc, yêu cầu hiện hành có thể được xóa theo chính sách lưu trữ.
+- Không lưu ảnh CCCD lâu dài nếu không cần thiết.
+- Việc một CCCD có được phép gửi xác thực qua nhiều tài khoản hay không phải được kiểm tra tại backend theo nghiệp vụ hệ thống.
+
+
+--------------------------------------------------
+
+
+4. Bảng LichSuYeuCauXacThucToChuc
+
+Thuộc tính:
+- LichSuYeuCauID: INT, PK, IDENTITY(1,1)
+- TaiKhoanID: INT, FK -> TaiKhoan.TaiKhoanID, NN
+- NguoiDuyetID: INT, FK -> TaiKhoan.TaiKhoanID, NULL
+- TrangThaiKetQua: NVARCHAR(20), NN
+- LyDoTuChoi: NVARCHAR(500), NULL
+- NgayGui: DATETIME2, NN
+- NgayDuyet: DATETIME2, NULL
+- NgayLuuTru: DATETIME2, NN, DF = SYSDATETIME()
+
+CHECK:
+- CHECK (TrangThaiKetQua IN (N'TuChoi', N'DaDuyet'))
+
+- CHECK (
+    TrangThaiKetQua <> N'TuChoi'
+    OR LyDoTuChoi IS NOT NULL
+  )
+
+Quy tắc:
+- Một tài khoản có thể có nhiều bản ghi lịch sử xác thực.
+- Bảng này chỉ phục vụ audit/lịch sử xử lý.
+- Không dùng bảng này thay cho yêu cầu hiện hành.
+- Không nên lưu lâu dài ảnh CCCD hoặc dữ liệu định danh không cần thiết.
+- Nếu cần lưu thông tin nhận diện tối thiểu để đối soát thì phải tuân thủ chính sách bảo mật và thời hạn lưu trữ.
+
+
+--------------------------------------------------
+
+
+5. Bảng BanToChuc
+
+Thuộc tính:
+- BanToChucID: INT, PK, IDENTITY(1,1)
+- TaiKhoanID: INT, FK -> TaiKhoan.TaiKhoanID, UQ, NN
+- SoCCCD: NVARCHAR(20), UQ, NN
+- TenToChuc: NVARCHAR(200), NULL
+- NgayXacThuc: DATETIME2, NN, DF = SYSDATETIME()
+- TrangThai: BIT, NN, DF = 1
+
+Quy tắc:
+- Mỗi tài khoản có tối đa một hồ sơ BanToChuc.
+- Một CCCD chỉ được sử dụng cho một hồ sơ BanToChuc.
+- TenToChuc có thể NULL nếu hệ thống cho phép cá nhân đứng ra tổ chức.
+- Chỉ BanToChuc đã xác thực và đang hoạt động mới được tạo sự kiện.
+- Không liên kết FK trực tiếp đến YeuCauXacThucToChuc vì yêu cầu hiện hành có thể bị xóa theo chính sách lưu trữ.
+
+
+--------------------------------------------------
+
+
+6. Bảng LoaiSuKien
+
+Thuộc tính:
+- LoaiSuKienID: INT, PK, IDENTITY(1,1)
+- TenLoai: NVARCHAR(100), UQ, NN
+- MoTa: NVARCHAR(500), NULL
+- TrangThai: BIT, NN, DF = 1
+
+Quy tắc:
+- Một loại sự kiện có thể được sử dụng cho nhiều sự kiện.
+- Quản trị viên quản lý danh mục loại sự kiện.
+- Không cho tạo sự kiện mới với loại sự kiện đã ngừng hoạt động.
+
+
+--------------------------------------------------
+
+
+7. Bảng SuKien
+
+Thuộc tính:
+- SuKienID: INT, PK, IDENTITY(1,1)
+- NguoiTaoID: INT, FK -> TaiKhoan.TaiKhoanID, NN
+- LoaiSuKienID: INT, FK -> LoaiSuKien.LoaiSuKienID, NN
+- TenSuKien: NVARCHAR(200), NN
+- MoTa: NVARCHAR(MAX), NULL
+- AnhBia: NVARCHAR(500), NULL
+- ThoiGianBatDau: DATETIME2, NN
+- ThoiGianKetThuc: DATETIME2, NN
+- SoLuongNguoiDuKien: INT, NN
+- TrangThai: NVARCHAR(30), NN, DF = N'ChoDuyet'
+- NguoiDuyetID: INT, FK -> TaiKhoan.TaiKhoanID, NULL
+- NgayDuyet: DATETIME2, NULL
+- LyDoTuChoi: NVARCHAR(500), NULL
+- NgayTao: DATETIME2, NN, DF = SYSDATETIME()
+
+CHECK:
+- CHECK (SoLuongNguoiDuKien > 0)
+- CHECK (ThoiGianKetThuc > ThoiGianBatDau)
+
+- CHECK (
+    TrangThai IN (
+        N'ChoDuyet',
+        N'DaDuyet',
+        N'TuChoi',
+        N'DangDienRa',
+        N'DaKetThuc',
+        N'DaHuy'
+    )
+  )
+
+- CHECK (
+    NguoiDuyetID IS NULL
+    OR NguoiDuyetID <> NguoiTaoID
+  )
+
+Trạng thái:
+- ChoDuyet
+- DaDuyet
+- TuChoi
+- DangDienRa
+- DaKetThuc
+- DaHuy
+
+Quy tắc:
+- NguoiTaoID là tài khoản tạo sự kiện.
+- NguoiDuyetID là tài khoản duyệt sự kiện.
+- Chỉ BanToChuc đã xác thực và đang hoạt động mới được tạo sự kiện.
+- Người tạo không được tự duyệt sự kiện của mình.
+- ThoiGianKetThuc phải lớn hơn ThoiGianBatDau.
+- Khi từ chối sự kiện nên có LyDoTuChoi.
+- Chỉ sự kiện đã được duyệt mới được mở bán vé.
+- Các chuyển đổi trạng thái phức tạp được kiểm soát tại backend.
+
+
+==================================================
+NHÓM 3. ĐỊA ĐIỂM VÀ ĐẶT ĐỊA ĐIỂM
+==================================================
+
+
+8. Bảng DiaDiem
+
+Thuộc tính:
+- DiaDiemID: INT, PK, IDENTITY(1,1)
+- TenDiaDiem: NVARCHAR(200), NN
+- DiaChi: NVARCHAR(500), NN
+- SucChua: INT, NN
+- GiaThue: DECIMAL(18,2), NN
+- MoTa: NVARCHAR(MAX), NULL
+- TrangThai: BIT, NN, DF = 1
+
+Ràng buộc:
+- UNIQUE (TenDiaDiem, DiaChi)
+
+CHECK:
+- CHECK (SucChua > 0)
+- CHECK (GiaThue >= 0)
+
+Quy tắc:
+- Một địa điểm có thể được đặt nhiều lần ở các khoảng thời gian khác nhau.
+- Không cho đặt địa điểm đã ngừng hoạt động.
+- UNIQUE (TenDiaDiem, DiaChi) giúp hạn chế tạo trùng cùng một địa điểm.
+
+
+--------------------------------------------------
+
+
+9. Bảng DatDiaDiem
+
+Thuộc tính:
+- DatDiaDiemID: INT, PK, IDENTITY(1,1)
+- SuKienID: INT, FK -> SuKien.SuKienID, NN
+- DiaDiemID: INT, FK -> DiaDiem.DiaDiemID, NN
+- ThoiGianBatDau: DATETIME2, NN
+- ThoiGianKetThuc: DATETIME2, NN
+- TongTien: DECIMAL(18,2), NN
+- TienCoc: DECIMAL(18,2), NN
+- TrangThai: NVARCHAR(30), NN, DF = N'ChoXacNhan'
+- NgayDat: DATETIME2, NN, DF = SYSDATETIME()
+- RowVersion: ROWVERSION, NN
+
+CHECK:
+- CHECK (ThoiGianKetThuc > ThoiGianBatDau)
+- CHECK (TongTien >= 0)
+- CHECK (TienCoc >= 0 AND TienCoc <= TongTien)
+
+- CHECK (
+    TrangThai IN (
+        N'ChoXacNhan',
+        N'DaXacNhan',
+        N'TuChoi',
+        N'DaHuy',
+        N'HoanThanh'
+    )
+  )
+
+Trạng thái:
+- ChoXacNhan
+- DaXacNhan
+- TuChoi
+- DaHuy
+- HoanThanh
+
+Quy tắc:
+- Một sự kiện có thể có nhiều lần đặt địa điểm.
+- Một địa điểm có thể được đặt nhiều lần ở các khoảng thời gian khác nhau.
+- ThoiGianKetThuc phải lớn hơn ThoiGianBatDau.
+- TienCoc không được lớn hơn TongTien.
+- TongTien là số tiền thuê được xác định tại thời điểm đặt.
+- Không cho đặt trùng lịch tại cùng một địa điểm khi các lượt đặt đều đang có hiệu lực.
+- Kiểm tra trùng lịch phải thực hiện bằng backend kết hợp transaction SQL Server.
+- Không cho đặt địa điểm đã ngừng hoạt động.
+- RowVersion hỗ trợ optimistic concurrency nhưng không thay thế transaction trong kiểm tra trùng lịch.
+
+
+==================================================
+NHÓM 4. QUẢN LÝ VÉ, ĐƠN VÉ VÀ THANH TOÁN
+==================================================
+
+
+10. Bảng LoaiVe
+
+Thuộc tính:
+- LoaiVeID: INT, PK, IDENTITY(1,1)
+- SuKienID: INT, FK -> SuKien.SuKienID, NN
+- TenLoai: NVARCHAR(100), NN
+- GiaVe: DECIMAL(18,2), NN
+- SoLuongToiDa: INT, NN
+- SoLuongDaBan: INT, NN, DF = 0
+- SoLuongDangGiu: INT, NN, DF = 0
+- SoLuongToiDaMoiDon: INT, NN, DF = 5
+- ThoiGianMoBan: DATETIME2, NN
+- ThoiGianDongBan: DATETIME2, NN
+- TrangThai: BIT, NN, DF = 1
+- RowVersion: ROWVERSION, NN
+
+Ràng buộc:
+- UNIQUE (SuKienID, TenLoai)
+
+CHECK:
+- CHECK (GiaVe >= 0)
+- CHECK (SoLuongToiDa > 0)
+- CHECK (SoLuongDaBan >= 0)
+- CHECK (SoLuongDangGiu >= 0)
+- CHECK (SoLuongToiDaMoiDon > 0)
+- CHECK (SoLuongDaBan + SoLuongDangGiu <= SoLuongToiDa)
+- CHECK (ThoiGianDongBan > ThoiGianMoBan)
+
+Quy tắc:
+- Một sự kiện có nhiều loại vé.
+- Trong cùng một sự kiện không được có hai loại vé trùng TenLoai.
+- ThoiGianDongBan phải lớn hơn ThoiGianMoBan.
+- SoLuongDaBan + SoLuongDangGiu không được vượt SoLuongToiDa.
+- SoLuongDangGiu biểu thị số vé đang được giữ trong các đơn chưa hoàn tất thanh toán.
+- Khi đơn hết hạn hoặc bị hủy phải giải phóng số lượng vé đang giữ.
+- Khi thanh toán thành công, số lượng giữ được chuyển sang số lượng đã bán.
+- Backend phải kiểm tra và cập nhật số lượng vé trong transaction để tránh bán vượt số lượng.
+- RowVersion hỗ trợ phát hiện cạnh tranh cập nhật nhưng không thay thế transaction/locking ở luồng giữ vé.
+
+
+--------------------------------------------------
+
+
+11. Bảng DonVe
+
+Thuộc tính:
+- DonVeID: INT, PK, IDENTITY(1,1)
+- TaiKhoanID: INT, FK -> TaiKhoan.TaiKhoanID, NN
+- SuKienID: INT, FK -> SuKien.SuKienID, NN
+- MaDonHang: NVARCHAR(50), UQ, NN
+- TongTienGoc: DECIMAL(18,2), NN
+- TongTienGiam: DECIMAL(18,2), NN, DF = 0
+- TongTienThanhToan: DECIMAL(18,2), NN
+- TrangThaiThanhToan: NVARCHAR(30), NN, DF = N'ChuaThanhToan'
+- TrangThaiDon: NVARCHAR(30), NN, DF = N'ChoThanhToan'
+- ThoiGianHetHanThanhToan: DATETIME2, NN
+- NgayDat: DATETIME2, NN, DF = SYSDATETIME()
+- RowVersion: ROWVERSION, NN
+
+CHECK:
+- CHECK (TongTienGoc >= 0)
+- CHECK (TongTienGiam >= 0 AND TongTienGiam <= TongTienGoc)
+- CHECK (TongTienThanhToan = TongTienGoc - TongTienGiam)
+
+- CHECK (
+    TrangThaiThanhToan IN (
+        N'ChuaThanhToan',
+        N'DaThanhToan',
+        N'HoanTienMotPhan',
+        N'DaHoanTien'
+    )
+  )
+
+- CHECK (
+    TrangThaiDon IN (
+        N'ChoThanhToan',
+        N'ThanhCong',
+        N'BiHetHan',
+        N'DaHuy',
+        N'YeuCauHoanTien',
+        N'DaHoanTien'
+    )
+  )
+
+Trạng thái thanh toán:
+- ChuaThanhToan
+- DaThanhToan
+- HoanTienMotPhan
+- DaHoanTien
+
+Trạng thái đơn:
+- ChoThanhToan
+- ThanhCong
+- BiHetHan
+- DaHuy
+- YeuCauHoanTien
+- DaHoanTien
+
+Quy tắc:
+- Một tài khoản có thể tạo nhiều đơn vé.
+- Mỗi đơn vé thuộc đúng một sự kiện thông qua SuKienID.
+- Tất cả LoaiVe trong ChiTietDonVe của cùng một đơn phải thuộc SuKienID của DonVe.
+- Một đơn có nhiều chi tiết đơn vé.
+- Một đơn có thể phát sinh nhiều giao dịch thanh toán, thử lại hoặc hoàn tiền.
+- TongTienThanhToan = TongTienGoc - TongTienGiam.
+- Backend tự tính TongTienGoc, TongTienGiam và TongTienThanhToan.
+- Không tin giá tiền hoặc tổng tiền gửi trực tiếp từ client.
+- Đơn quá hạn phải được xử lý tự động và giải phóng vé đang giữ.
+- Hai trạng thái TrangThaiDon và TrangThaiThanhToan phải được chuyển đổi đồng bộ theo nghiệp vụ.
+- Nếu hệ thống chưa triển khai mã giảm giá thì không cần lưu MaGiamGia trong DonVe.
+- Nếu sau này bổ sung voucher/khuyến mãi thì nên tạo bảng nghiệp vụ riêng thay vì chỉ lưu một chuỗi mã.
+
+
+--------------------------------------------------
+
+
+12. Bảng ChiTietDonVe
+
+Thuộc tính:
+- ChiTietDonVeID: INT, PK, IDENTITY(1,1)
+- DonVeID: INT, FK -> DonVe.DonVeID, NN
+- LoaiVeID: INT, FK -> LoaiVe.LoaiVeID, NN
+- SoLuong: INT, NN
+- DonGia: DECIMAL(18,2), NN
+- ThanhTien: DECIMAL(18,2), NN
+
+Ràng buộc:
+- UNIQUE (DonVeID, LoaiVeID)
+
+CHECK:
+- CHECK (SoLuong > 0)
+- CHECK (DonGia >= 0)
+- CHECK (ThanhTien = SoLuong * DonGia)
+
+Quy tắc:
+- Một đơn có thể mua nhiều loại vé.
+- Mỗi loại vé chỉ có một dòng chi tiết trong một đơn.
+- DonGia là giá vé tại thời điểm đặt mua.
+- Không lấy lại giá hiện tại của LoaiVe để thay thế DonGia của đơn cũ.
+- Backend kiểm tra LoaiVe có thuộc đúng SuKien của DonVe hay không.
+- Backend kiểm tra tổng số lượng mua không vượt giới hạn SoLuongToiDaMoiDon.
+
+
+--------------------------------------------------
+
+
+13. Bảng ThanhToan
+
+Thuộc tính:
+- ThanhToanID: INT, PK, IDENTITY(1,1)
+- DonVeID: INT, FK -> DonVe.DonVeID, NN
+- GiaoDichGocID: INT, FK -> ThanhToan.ThanhToanID, NULL
+- PhuongThucThanhToan: NVARCHAR(50), NN
+- MaGiaoDichCongThanhToan: NVARCHAR(100), UQ, NULL
+- MaGiaoDichNganHang: NVARCHAR(100), NULL
+- SoTien: DECIMAL(18,2), NN
+- LoaiGiaoDich: NVARCHAR(30), NN, DF = N'ThanhToan'
+- TrangThai: NVARCHAR(30), NN, DF = N'DangXuLy'
+- NoiDungThanhToan: NVARCHAR(255), NULL
+- NgayTao: DATETIME2, NN, DF = SYSDATETIME()
+- NgayHoanThanh: DATETIME2, NULL
+- RowVersion: ROWVERSION, NN
+
+CHECK:
+- CHECK (SoTien > 0)
+
+- CHECK (
+    LoaiGiaoDich IN (
+        N'ThanhToan',
+        N'HoanTien'
+    )
+  )
+
+- CHECK (
+    TrangThai IN (
+        N'DangXuLy',
+        N'ThanhCong',
+        N'ThatBai',
+        N'NghiVanLoi'
+    )
+  )
+
+Phương thức thanh toán tham khảo:
+- PayOS
+- VNPAY
+- MoMo
+- ZaloPay
+- ChuyenKhoan
+
+Loại giao dịch:
+- ThanhToan
+- HoanTien
+
+Trạng thái:
+- DangXuLy
+- ThanhCong
+- ThatBai
+- NghiVanLoi
+
+Quy tắc:
+- Một đơn có thể có nhiều giao dịch thanh toán hoặc hoàn tiền.
+- MaGiaoDichCongThanhToan có thể NULL khi bản ghi nội bộ được tạo trước khi cổng thanh toán trả mã giao dịch.
+- Khi đã có mã giao dịch từ cổng thì mã phải duy nhất.
+- Với giao dịch LoaiGiaoDich = HoanTien, GiaoDichGocID phải trỏ đến giao dịch ThanhToan thành công cần hoàn.
+- Với giao dịch LoaiGiaoDich = ThanhToan thì GiaoDichGocID phải để NULL.
+- Chỉ xác nhận thanh toán thành công sau khi xác minh kết quả từ cổng thanh toán.
+- Không hoàn tiền vượt quá tổng số tiền đã thanh toán thành công.
+- Phải chống xử lý lặp webhook/thông báo từ cổng thanh toán.
+- NgayHoanThanh chỉ được gán khi giao dịch kết thúc thành công hoặc theo chính sách nghiệp vụ cụ thể.
+- Self-FK GiaoDichGocID nên dùng ON DELETE NO ACTION để bảo toàn lịch sử giao dịch.
+
+
+--------------------------------------------------
+
+
+14. Bảng Ve
+
+Thuộc tính:
+- VeID: INT, PK, IDENTITY(1,1)
+- DonVeID: INT, FK -> DonVe.DonVeID, NN
+- LoaiVeID: INT, FK -> LoaiVe.LoaiVeID, NN
+- MaVe: NVARCHAR(100), UQ, NN
+- MaQR: NVARCHAR(255), UQ, NN
+- HoTenNguoiSuDung: NVARCHAR(100), NULL
+- EmailNguoiSuDung: NVARCHAR(255), NULL
+- GiaThucTe: DECIMAL(18,2), NN
+- TrangThai: NVARCHAR(30), NN, DF = N'ChuaSuDung'
+- ThoiGianCheckIn: DATETIME2, NULL
+- NguoiCheckInID: INT, FK -> TaiKhoan.TaiKhoanID, NULL
+- NgayHuy: DATETIME2, NULL
+- RowVersion: ROWVERSION, NN
+
+CHECK:
+- CHECK (GiaThucTe >= 0)
+
+- CHECK (
+    TrangThai IN (
+        N'ChuaSuDung',
+        N'DaCheckIn',
+        N'DaHuy',
+        N'DaHoanTien'
+    )
+  )
+
+- CHECK (
+    TrangThai <> N'DaCheckIn'
+    OR ThoiGianCheckIn IS NOT NULL
+  )
+
+Trạng thái:
+- ChuaSuDung
+- DaCheckIn
+- DaHuy
+- DaHoanTien
+
+Quy tắc:
+- Mỗi bản ghi Ve tương ứng với một vé cụ thể.
+- Không tạo bản ghi Ve khi đơn mới chỉ giữ chỗ hoặc đang chờ thanh toán.
+- Chỉ tạo và phát hành Ve sau khi DonVe thanh toán thành công.
+- Mỗi vé chỉ được check-in một lần.
+- Khi TrangThai = DaCheckIn thì ThoiGianCheckIn phải có giá trị.
+- NguoiCheckInID có thể NULL trước khi check-in.
+- Backend kiểm tra quyền của tài khoản thực hiện check-in.
+- LoaiVeID phải thuộc đúng sự kiện tương ứng với DonVe.
+- GiaThucTe là giá thực tế phân bổ cho từng vé tại thời điểm phát hành.
+- Nếu có giảm giá ở cấp đơn thì backend phải xác định cách phân bổ giảm giá xuống từng vé để tính GiaThucTe nhất quán.
+
+
+--------------------------------------------------
+
+
+15. Bảng XuatVe
+
+Thuộc tính:
+- XuatVeID: INT, PK, IDENTITY(1,1)
+- VeID: INT, FK -> Ve.VeID, NN
+- NguoiXuatID: INT, FK -> TaiKhoan.TaiKhoanID, NULL
+- HinhThucXuat: NVARCHAR(50), NN
+- MaSoPhoiVe: NVARCHAR(100), NULL
+- FileVeURL: NVARCHAR(500), NULL
+- TrangThai: NVARCHAR(30), NN, DF = N'ThanhCong'
+- ThoiGianXuat: DATETIME2, NN, DF = SYSDATETIME()
+
+CHECK:
+- CHECK (
+    HinhThucXuat IN (
+        N'ExportPDF',
+        N'InVeGiayTaiQuay',
+        N'GuiEmail',
+        N'InQuaKiosk'
+    )
+  )
+
+- CHECK (
+    TrangThai IN (
+        N'ThanhCong',
+        N'ThatBai'
+    )
+  )
+
+Hình thức xuất:
+- ExportPDF
+- InVeGiayTaiQuay
+- GuiEmail
+- InQuaKiosk
+
+Quy tắc:
+- Một vé có thể có nhiều bản ghi lịch sử xuất.
+- Mỗi bản ghi XuatVe tương ứng với một lần xuất vé.
+- Không cần cột LanXuat vì số lần xuất có thể xác định bằng COUNT(*) theo VeID.
+- NguoiXuatID có thể NULL khi hệ thống tự động xuất vé.
+- Xuất lại vé không tạo MaVe hoặc MaQR mới.
+- Lưu lịch sử xuất/in lại để phục vụ audit và hạn chế gian lận.
+- FileVeURL có thể NULL với các hình thức không tạo file.
+
+
+==================================================
+NHÓM 5. TỔNG HỢP QUAN HỆ GIỮA CÁC BẢNG
+==================================================
+
+1. VaiTro -> TaiKhoan: 1-N
+   - Một vai trò có nhiều tài khoản.
+   - Mỗi tài khoản thuộc đúng một vai trò.
+
+2. TaiKhoan -> YeuCauXacThucToChuc: 1-0..1
+   - Một tài khoản có thể chưa có hoặc có tối đa một yêu cầu xác thực hiện hành.
+   - TaiKhoanID trong YeuCauXacThucToChuc là UNIQUE.
+
+3. TaiKhoan -> LichSuYeuCauXacThucToChuc: 1-N
+   - Một tài khoản có thể có nhiều bản ghi lịch sử xác thực.
+
+4. TaiKhoan -> YeuCauXacThucToChuc qua NguoiDuyetID: 1-N
+   - Một tài khoản có quyền duyệt có thể xử lý nhiều yêu cầu.
+
+5. TaiKhoan -> LichSuYeuCauXacThucToChuc qua NguoiDuyetID: 1-N
+   - Một người duyệt có thể xuất hiện trong nhiều bản ghi lịch sử.
+
+6. TaiKhoan -> BanToChuc: 1-0..1
+   - Một tài khoản có tối đa một hồ sơ BanToChuc.
+
+7. LoaiSuKien -> SuKien: 1-N
+   - Một loại sự kiện có nhiều sự kiện.
+
+8. TaiKhoan -> SuKien qua NguoiTaoID: 1-N
+   - Một tài khoản đủ quyền có thể tạo nhiều sự kiện.
+
+9. TaiKhoan -> SuKien qua NguoiDuyetID: 1-N
+   - Một tài khoản quản lý có thể duyệt nhiều sự kiện.
+
+10. SuKien -> DatDiaDiem: 1-N
+    - Một sự kiện có thể có nhiều lần đặt địa điểm.
+
+11. DiaDiem -> DatDiaDiem: 1-N
+    - Một địa điểm có thể được đặt nhiều lần ở các thời điểm khác nhau.
+
+12. SuKien -> LoaiVe: 1-N
+    - Một sự kiện có nhiều loại vé.
+
+13. TaiKhoan -> DonVe: 1-N
+    - Một tài khoản có thể tạo nhiều đơn vé.
+
+14. SuKien -> DonVe: 1-N
+    - Một sự kiện có nhiều đơn vé.
+    - Mỗi DonVe thuộc đúng một SuKien.
+
+15. DonVe -> ChiTietDonVe: 1-N
+    - Một đơn có nhiều dòng chi tiết vé.
+
+16. LoaiVe -> ChiTietDonVe: 1-N
+    - Một loại vé có thể xuất hiện trong nhiều đơn.
+
+17. DonVe -> ThanhToan: 1-N
+    - Một đơn có thể phát sinh nhiều giao dịch thanh toán, thử lại hoặc hoàn tiền.
+
+18. ThanhToan -> ThanhToan qua GiaoDichGocID: 1-N self-reference
+    - Một giao dịch thanh toán gốc có thể có nhiều giao dịch hoàn tiền.
+
+19. DonVe -> Ve: 1-N
+    - Một đơn thanh toán thành công có thể phát hành nhiều vé.
+
+20. LoaiVe -> Ve: 1-N
+    - Một loại vé có nhiều vé cụ thể.
+
+21. TaiKhoan -> Ve qua NguoiCheckInID: 1-N
+    - Một tài khoản có quyền check-in có thể check-in nhiều vé.
+
+22. Ve -> XuatVe: 1-N
+    - Một vé có thể được xuất hoặc in nhiều lần.
+
+23. TaiKhoan -> XuatVe qua NguoiXuatID: 1-N
+    - Một tài khoản có thể thực hiện nhiều lần xuất vé.
+
+
+==================================================
+NHÓM 6. QUY TẮC NGHIỆP VỤ BẮT BUỘC
+==================================================
+
+1. Tài khoản phải hoạt động và có quyền phù hợp mới được thực hiện thao tác được bảo vệ.
+
+2. Mỗi tài khoản có tối đa một YeuCauXacThucToChuc hiện hành.
+
+3. Khi yêu cầu xác thực bị từ chối, phải lưu thông tin audit cần thiết vào LichSuYeuCauXacThucToChuc trước khi xóa yêu cầu hiện hành.
+
+4. Khi yêu cầu xác thực được duyệt, phải tạo hồ sơ BanToChuc chính thức trước khi xóa yêu cầu hiện hành.
+
+5. Chỉ BanToChuc đã xác thực và đang hoạt động mới được tạo sự kiện.
+
+6. Người tạo sự kiện không được tự duyệt sự kiện của mình.
+
+7. Thời gian kết thúc sự kiện và đặt địa điểm phải lớn hơn thời gian bắt đầu.
+
+8. Không cho phép hai lượt đặt địa điểm có hiệu lực bị trùng thời gian tại cùng một địa điểm.
+
+9. Một loại vé phải có thời gian đóng bán lớn hơn thời gian mở bán.
+
+10. SoLuongDaBan + SoLuongDangGiu không được vượt SoLuongToiDa.
+
+11. Trong cùng một sự kiện không được có hai LoaiVe trùng TenLoai.
+
+12. Backend phải tự tính tổng tiền, kiểm tra giá vé, giới hạn số lượng mua và bảo đảm tất cả LoaiVe trong một DonVe thuộc đúng DonVe.SuKienID.
+
+13. Không tin các giá trị tiền gửi từ client; backend phải tự tính lại trước khi lưu.
+
+14. Đơn hết hạn phải được tự động xử lý và giải phóng vé đang giữ.
+
+15. Chỉ xác nhận thanh toán sau khi xác minh kết quả từ cổng thanh toán.
+
+16. Webhook/thông báo từ cổng thanh toán phải được xử lý idempotent để tránh cộng tiền hoặc phát hành vé nhiều lần.
+
+17. Không tạo bản ghi Ve khi đơn chưa thanh toán thành công.
+
+18. Chỉ phát hành Ve sau khi thanh toán thành công.
+
+19. Không cho phép một vé check-in nhiều lần.
+
+20. Khi vé đã check-in thì phải có ThoiGianCheckIn.
+
+21. Không hoàn tiền vượt quá số tiền đã thanh toán thành công.
+
+22. Giao dịch hoàn tiền phải tham chiếu giao dịch thanh toán gốc qua GiaoDichGocID.
+
+23. Không xóa tùy tiện lịch sử thanh toán, hoàn tiền hoặc vé đã phát hành.
+
+24. Phải kiểm tra quyền sở hữu DonVe và dữ liệu đầu vào tại backend.
+
+25. Dữ liệu định danh và ảnh xác thực phải được xóa theo chính sách lưu trữ.
+
+26. Bảng lịch sử xác thực không nên lưu lâu dài ảnh CCCD hoặc thông tin định danh không cần thiết.
+
+27. Các quy tắc liên bảng như LoaiVe thuộc đúng SuKien của DonVe phải được kiểm tra tại backend/transaction.
+
+28. Các cột RowVersion chỉ hỗ trợ optimistic concurrency; transaction/locking vẫn bắt buộc ở các luồng nhạy cảm như giữ vé và đặt địa điểm.
+
+29. Các trạng thái của DonVe và TrangThaiThanhToan phải được thay đổi đồng bộ theo luồng nghiệp vụ.
+
+30. Khi có giảm giá cấp đơn, phải xác định rõ cách phân bổ giảm giá để tính GiaThucTe của từng vé.
+
+
+==================================================
+NHÓM 7. LƯU Ý TRIỂN KHAI SQL SERVER
+==================================================
+
+- Các quan hệ FK phải được khai báo trực tiếp trong CREATE TABLE hoặc bằng ALTER TABLE.
+
+- UNIQUE trên YeuCauXacThucToChuc.TaiKhoanID dùng để bảo đảm quan hệ:
+  TaiKhoan 1 - 0..1 YeuCauXacThucToChuc.
+
+- UNIQUE (SuKienID, TenLoai) trên LoaiVe ngăn hai loại vé cùng tên trong một sự kiện.
+
+- UNIQUE (TenDiaDiem, DiaChi) giúp hạn chế tạo trùng địa điểm.
+
+- Các CHECK chỉ nên áp dụng cho các điều kiện có thể xác định trong cùng một hàng dữ liệu.
+
+- Những quy tắc liên quan nhiều bảng, quyền người dùng, chống trùng lịch và tổng số lượng phải kiểm tra tại backend hoặc transaction.
+
+- Khi giữ vé:
+  + Bắt đầu transaction.
+  + Kiểm tra số lượng còn lại.
+  + Cập nhật SoLuongDangGiu.
+  + Tạo DonVe và ChiTietDonVe.
+  + Commit transaction.
+  + Nếu lỗi thì rollback.
+
+- Khi đơn hết hạn hoặc bị hủy:
+  + Giảm SoLuongDangGiu.
+  + Cập nhật trạng thái DonVe.
+  + Thực hiện trong transaction.
+
+- Khi thanh toán thành công:
+  + Xác minh callback/webhook từ cổng thanh toán.
+  + Chống xử lý lặp.
+  + Giảm SoLuongDangGiu.
+  + Tăng SoLuongDaBan.
+  + Cập nhật DonVe.
+  + Phát hành Ve.
+  + Thực hiện trong transaction.
+
+- Khi đặt địa điểm:
+  + Kiểm tra các lượt đặt đang có hiệu lực.
+  + Không cho phép khoảng thời gian bị giao nhau.
+  + Dùng transaction và cơ chế khóa phù hợp để tránh hai request đặt cùng lúc.
+
+- Các cột RowVersion dùng cho optimistic concurrency.
+- RowVersion không thay thế transaction/locking ở luồng giữ vé hoặc đặt địa điểm.
+
+- Với self-FK ThanhToan.GiaoDichGocID nên cấu hình ON DELETE NO ACTION.
+
+- Không dùng FK để thay thế kiểm tra quyền nghiệp vụ.
+
+- Không nên cascade delete các bảng lịch sử thanh toán, vé hoặc dữ liệu audit quan trọng.
+
+- Các mã như MaDonHang, MaVe, MaQR, MaGiaoDichCongThanhToan nên được sinh ở backend và bảo đảm tính duy nhất.
+
+
+==================================================
+DANH SÁCH 15 BẢNG CUỐI CÙNG
+==================================================
+
+1. VaiTro
+2. TaiKhoan
+3. YeuCauXacThucToChuc
+4. LichSuYeuCauXacThucToChuc
+5. BanToChuc
+6. LoaiSuKien
+7. SuKien
+8. DiaDiem
+9. DatDiaDiem
+10. LoaiVe
+11. DonVe
+12. ChiTietDonVe
+13. ThanhToan
+14. Ve
+15. XuatVe

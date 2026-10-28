@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loại vé — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body data-allow="BanToChuc,QuanLySuKien,QuanTriVien">
+<div id="spinner"></div>
+<div id="toast-wrap"></div>
+<header class="topbar">
+<div class="topbar-main">
+<a class="logo" href="../../index.html">
+<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
+<span class="brand-content">
+<span class="brand-name">SựKiện Hub</span>
+<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
+</span>
+</a>
+<nav class="mainnav">
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+</nav>
+<div class="userbox">
+<div class="avatar" id="avatar-chu">SK</div>
+<span id="nd-user">Chào bạn, hãy đăng nhập</span>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a>
+<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+<button id="btn-menu" class="phu sm">☰</button>
+</div>
+</div>
+<nav class="menu-mobile" id="menu-mobile" hidden>
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a>
+<button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+</nav>
+</header>
+<input type="hidden" id="sk-tukhoa">
+<input type="hidden" id="sk-tukhoa-hero">
+<input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side">
+<div class="content" style="max-width:960px;margin:0 auto;width:100%">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="lock-card" data-khoa hidden>
+<div class="lock-ic">Khóa</div>
+<h3>Bạn cần đăng nhập để xem mục này</h3>
+<p>Vui lòng đăng nhập để tiếp tục.</p>
+<a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a>
+</div>
+<div data-noi-dung-chinh>
+<section class="hero">
+<div class="hero-text">
+<h1>Quản lý hạng vé sự kiện</h1>
+<p class="muted">Tạo hạng vé Thường, VIP, Early Bird với giá, số lượng và khung giờ mở bán rõ ràng để khách hàng dễ lựa chọn.</p>
+<div class="demo-strip">
+<span class="pill">Vé thường</span>
+<span class="pill">Vé VIP</span>
+<span class="pill">Early Bird</span>
+<span class="pill">Combo nhóm</span>
+</div>
+</div>
+<div class="hero-media">
+<img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=60" alt="Sân khấu sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+</div>
+</section>
+<section class="card howto">
+<h2>Hướng dẫn tạo hạng vé (4 bước)</h2>
+<ol>
+<li><b>Bước 1:</b> Chọn sự kiện mà bạn có quyền Ban tổ chức.</li>
+<li><b>Bước 2:</b> Đặt tên hạng vé, giá tiền, tổng số lượng và giới hạn mỗi đơn.</li>
+<li><b>Bước 3:</b> Chọn thời gian mở bán và đóng bán — giờ đóng phải sau giờ mở.</li>
+<li><b>Bước 4:</b> Bấm <b>Thêm loại vé</b>, hoặc nhập hạng vé rồi bấm <b>Cập nhật</b> khi cần sửa.</li>
+</ol>
+</section>
+<div class="card">
+<h2>Thêm / cập nhật loại vé</h2>
+<p class="muted">Dành cho Ban tổ chức. Tạo hạng vé cho sự kiện của bạn. Thời gian đóng bán phải sau thời gian mở bán.</p>
+<div class="grid g2">
+<div>
+<label class="lbl">Chọn sự kiện của bạn</label>
+<input id="lv-sk" type="number" min="1" placeholder="vd: 3">
+</div>
+<div>
+<label class="lbl">Hạng vé cần sửa (chỉ khi cập nhật)</label>
+<input id="lv-id" type="number" min="1" placeholder="vd: 10">
+</div>
+</div>
+<label class="lbl">Tên hạng vé</label>
+<input id="lv-ten" type="text" placeholder="vd: Vé VIP, Vé thường...">
+<div class="grid g3">
+<div>
+<label class="lbl">Giá vé</label>
+<input id="lv-gia" type="number" min="0" step="1000" placeholder="vd: 150000">
+</div>
+<div>
+<label class="lbl">Số lượng tối đa</label>
+<input id="lv-slmax" type="number" min="1" placeholder="vd: 200">
+</div>
+<div>
+<label class="lbl">Tối đa mỗi đơn</label>
+<input id="lv-slmoi" type="number" min="1" placeholder="vd: 5">
+</div>
+</div>
+<div class="grid g2">
+<div>
+<label class="lbl">Mở bán</label>
+<input id="lv-mo" type="datetime-local">
+</div>
+<div>
+<label class="lbl">Đóng bán</label>
+<input id="lv-dong" type="datetime-local">
+</div>
+</div>
+<div class="toolbar">
+<button class="chinh" onclick="themLoaiVe()">Thêm loại vé</button>
+<button class="phu" onclick="capNhatLoaiVe()">Cập nhật loại vé</button>
+</div>
+<!-- POST /api/events/{eventId}/ticket-types · PUT /api/ticket-types/{id} · GET /api/events/{id}/ticket-types -->
+</div>
+<div class="card" style="margin-top:16px">
+<h2>Xem hạng vé theo sự kiện</h2>
+<p class="muted">Nhập mã sự kiện để xem toàn bộ hạng vé đang mở bán và đã đóng bán.</p>
+<div class="searchbar">
+<input id="lv-xem-sk" type="number" min="1" placeholder="Nhập mã sự kiện để xem hạng vé...">
+<button class="chinh" onclick="taiLoaiVeTheoSuKien()">Xem hạng vé</button>
+</div>
+<div id="ds-loaive" style="margin-top:12px"></div>
+<div id="ds-loaive-sk" style="margin-top:12px"></div>
+</div>
+<section class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<ul>
+<li>Bạn nhập thiếu thông tin</li>
+<li>Bạn chưa đăng nhập</li>
+<li>Tài khoản này đang bị khóa</li>
+<li>Không tìm thấy thông tin</li>
+<li>Vé vừa hết / thông tin vừa đổi</li>
+</ul>
+</section>
+<section class="grid g2" style="margin-top:16px">
+<div class="card">
+<h3>Mẹo định giá vé</h3>
+<p class="muted">Mở bán Early Bird giá thấp cho 50 vé đầu tiên để tạo hiệu ứng, sau đó mở giá Standard và VIP kèm quyền lợi check-in riêng, quà tặng.</p>
+</div>
+<div class="card">
+<h3>Giới hạn mỗi đơn</h3>
+<p class="muted">Đặt tối đa 2–5 vé mỗi đơn với hạng hot để chống đầu cơ, đảm bảo nhiều khán giả mua được vé.</p>
+</div>
+</section>
+</div>
+</div>
+</div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/sukien.js"></script>
+<script src="../../js/tochuc.js"></script>
+<script src="../../js/diadiem.js"></script>
+<script src="../../js/donve.js"></script>
+<script src="../../js/checkin.js"></script>
+<script src="../../js/quantri.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script>try{lucide.createIcons()}catch(e){}</script>
+</body>
+</html>

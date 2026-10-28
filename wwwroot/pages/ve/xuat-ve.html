@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xuất vé — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div>
+<div id="toast-wrap"></div>
+<header class="topbar">
+<div class="topbar-main">
+<a class="logo" href="../../index.html">
+<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
+<span class="brand-content">
+<span class="brand-name">SựKiện Hub</span>
+<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
+</span>
+</a>
+<nav class="mainnav">
+<a href="../../index.html">Sự kiện</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../thanh-toan/thanh-toan.html">Thanh toán</a>
+<a href="../ve/ve-theo-don.html">Vé</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+</nav>
+<div class="userbox">
+<div class="avatar" id="avatar-chu">SK</div>
+<span id="nd-user">Chào bạn, hãy đăng nhập</span>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a>
+<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+<button id="btn-menu" class="phu sm">☰</button>
+</div>
+</div>
+<nav class="menu-mobile" id="menu-mobile" hidden>
+<a href="../../index.html">Sự kiện</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../thanh-toan/thanh-toan.html">Thanh toán</a>
+<a href="../ve/ve-theo-don.html">Vé</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a>
+<button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+</nav>
+</header>
+<input type="hidden" id="sk-tukhoa">
+<input type="hidden" id="sk-tukhoa-hero">
+<input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side">
+<div class="content">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="lock-card" data-khoa hidden>
+<div class="lock-ic">Khóa</div>
+<h3>Bạn cần đăng nhập để xem mục này</h3>
+<p>Vui lòng đăng nhập để tiếp tục.</p>
+<a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a>
+</div>
+<div data-noi-dung-chinh>
+<section class="hero">
+<div class="hero-text">
+<h1>Xuất vé đa hình thức</h1>
+<p class="muted">Xuất vé PDF, gửi email, in tại quầy hoặc qua kiosk — linh hoạt cho mọi kịch bản đón khách.</p>
+<div class="demo-strip">
+<span class="pill">Export PDF</span>
+<span class="pill">Gửi Email</span>
+<span class="pill">In tại quầy</span>
+<span class="pill">In qua Kiosk</span>
+</div>
+</div>
+<div class="hero-media">
+<img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&q=60" alt="Xuất vé sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+</div>
+</section>
+<section class="card howto">
+<h2>Hướng dẫn xuất vé (4 bước)</h2>
+<ol>
+<li><b>Bước 1:</b> Lấy mã vé từ trang <a href="ve-theo-don.html">Vé theo đơn</a> sau khi đơn đã thanh toán.</li>
+<li><b>Bước 2:</b> Nhập mã vé của bạn và chọn hình thức xuất: PDF, email, in tại quầy hoặc kiosk.</li>
+<li><b>Bước 3:</b> Bấm <b>Xuất vé</b> để ghi nhận lần xuất.</li>
+<li><b>Bước 4:</b> Dùng khung lịch sử bên dưới để tra cứu các lần xuất của một mã vé.</li>
+</ol>
+</section>
+<div class="card">
+<h2>Xuất vé</h2>
+<p class="muted">Chọn hình thức xuất vé cho từng mã vé.</p>
+<div class="row">
+<input id="xv-ve" type="number" placeholder="Nhập mã vé của bạn" style="max-width:220px">
+<select id="xv-ht" style="max-width:240px">
+<option value="">-- Hình thức xuất --</option>
+<option value="ExportPDF">Xuất file PDF</option>
+<option value="InVeGiayTaiQuay">In vé giấy tại quầy</option>
+<option value="GuiEmail">Gửi qua email</option>
+<option value="InQuaKiosk">In qua kiosk</option>
+</select>
+<button class="chinh" onclick="xuatVe()">Xuất vé</button>
+</div>
+<!-- POST /api/tickets/{id}/export -->
+</div>
+<div class="card">
+<h3>Lịch sử xuất vé</h3>
+<p class="muted">Theo dõi mỗi lần vé được xuất: ai xuất, khi nào và bằng hình thức nào.</p>
+<div class="row">
+<input id="xv-lichsu-ve" type="number" placeholder="Nhập mã vé của bạn" style="max-width:240px">
+<button class="chinh" onclick="taiLichSuXuat()">Xem lịch sử</button>
+</div>
+<div id="ds-xuatve" style="margin-top:12px"></div>
+<!-- GET /api/orders/{id} (lịch sử vé) -->
+</div>
+<section class="grid g2" style="margin-top:16px">
+<div class="card">
+<h3>Chọn hình thức phù hợp</h3>
+<p class="muted">Gửi email cho khách ở xa, xuất PDF để lưu điện thoại, in tại quầy cho khách đến sớm và kiosk tự phục vụ giờ cao điểm.</p>
+</div>
+<div class="card">
+<h3>Lưu ý khi in lại</h3>
+<p class="muted">Mỗi lần xuất đều ghi lịch sử. In lại nhiều lần không tạo vé mới nên không ảnh hưởng check-in, nhưng hãy kiểm tra kỹ trước khi in.</p>
+</div>
+</section>
+<section class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<ul>
+<li>Bạn nhập thiếu thông tin</li>
+<li>Bạn chưa đăng nhập</li>
+<li>Tài khoản này đang bị khóa</li>
+<li>Không tìm thấy thông tin</li>
+<li>Vé vừa hết / thông tin vừa đổi</li>
+</ul>
+</section>
+</div>
+</div>
+</div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/sukien.js"></script>
+<script src="../../js/tochuc.js"></script>
+<script src="../../js/diadiem.js"></script>
+<script src="../../js/donve.js"></script>
+<script src="../../js/checkin.js"></script>
+<script src="../../js/quantri.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script>try{lucide.createIcons()}catch(e){}</script>
+</body>
+</html>

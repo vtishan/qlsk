@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yêu cầu của tôi — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css"><link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="gui-xac-thuc.html">Gửi xác thực</a><a href="yeu-cau-cua-toi.html" class="active">Yêu cầu của tôi</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="gui-xac-thuc.html">Gửi xác thực</a><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell"><aside class="sidebar"><h4>Tổ chức</h4><a href="gui-xac-thuc.html">Gửi xác thực CCCD</a><a href="yeu-cau-cua-toi.html" class="active">Yêu cầu của tôi</a><h4>Ban tổ chức</h4><a href="../ban-to-chuc/su-kien-cua-toi.html">Sự kiện của tôi</a><a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a></aside>
+<div class="content"><div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="lock-card" data-khoa hidden>
+<div class="lock-ic">Khóa</div>
+<h3>Bạn cần đăng nhập để xem mục này</h3>
+<p>Vui lòng đăng nhập để tiếp tục.</p>
+<a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a>
+</div>
+<div data-noi-dung-chinh>
+<section class="hero" style="margin-bottom:16px">
+<img class="bg" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=60" alt="Theo dõi hồ sơ" onerror="this.src='../../assets/images/placeholder-avatar.svg'">
+<div class="hero-inner">
+<p class="badge b-info">Tổ chức • Theo dõi hồ sơ</p>
+<h1>Yêu cầu xác thực của tôi</h1>
+<p>Theo dõi trạng thái Chờ duyệt, Đã duyệt hoặc Từ chối. Nếu bị từ chối, bạn có thể bổ sung hồ sơ và gửi lại ngay bên dưới.</p>
+<div class="hero-tags"><span class="catchip">Chờ duyệt</span><span class="catchip">Đã duyệt</span><span class="catchip">Từ chối</span></div>
+</div>
+</section>
+<div class="demo-strip" aria-label="Minh họa trạng thái">
+<span class="pill">Trạng thái <b>Chờ duyệt</b> được sửa</span>
+<span class="pill">Trạng thái <b>Từ chối</b> được gửi lại</span>
+<span class="pill">Trạng thái <b>Đã duyệt</b> khóa chỉnh sửa</span>
+</div>
+<div class="card"><h2>Danh sách yêu cầu đã gửi</h2><div class="toolbar"><button class="chinh sm" onclick="taiYeuCauCuaToi()">Tải danh sách</button><a class="phu btn sm" href="gui-xac-thuc.html">Gửi yêu cầu mới</a></div><div id="ds-yeucau"></div>
+<p class="muted small">Mẹo: nhấn Tải danh sách sau khi gửi lại để xem trạng thái mới nhất. Mỗi thẻ hiển thị CCCD, ngày tạo và lý do từ chối (nếu có).</p>
+<!-- api-line: GET /api/organizer-verifications/me — cần đăng nhập -->
+</div>
+<div class="card" style="margin-top:14px"><h2>Cập nhật / gửi lại yêu cầu</h2>
+<p class="muted">Nhập ID yêu cầu đang Chờ duyệt hoặc bị Từ chối, chỉnh lại thông tin rồi nhấn Cập nhật &amp; gửi lại.</p>
+<div class="grid g2"><div><label class="lbl">ID yêu cầu *</label><input id="tc-id" type="number" placeholder="vd: 1"></div><div><label class="lbl">Số CCCD</label><input id="tc-cccd" type="text" placeholder="vd: 001200123456"></div><div><label class="lbl">Ngày sinh</label><input id="tc-ns" type="date"></div><div><label class="lbl">Giới tính</label><select id="tc-gt"><option value="">-- Chọn --</option><option>Nam</option><option>Nữ</option><option>Khác</option></select></div></div>
+<label class="lbl">Địa chỉ thường trú</label><textarea id="tc-dc" placeholder="vd: 123 Nguyễn Huệ, Q.1, TP.HCM"></textarea>
+<div class="grid g2"><div><label class="lbl">Ảnh CCCD mặt trước</label><input id="tc-truoc" type="text" placeholder="https://..."></div><div><label class="lbl">Ảnh CCCD mặt sau</label><input id="tc-sau" type="text" placeholder="https://..."></div></div>
+<div class="toolbar"><button class="chinh sm" onclick="capNhatYeuCau()">Cập nhật &amp; gửi lại</button></div>
+<p class="muted small">Chỉ sửa được khi còn Chờ duyệt hoặc bị Từ chối.</p>
+<!-- Backend không có PUT organizer-verifications/{id}; duyệt/từ chối qua POST /api/organizer-verifications/{id}/approve|reject -->
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card">
+<h3>Hướng dẫn xử lý kết quả</h3>
+<div class="howto"><ol>
+<li><b>Bước 1:</b> Nhấn <b>Tải danh sách</b> để xem toàn bộ yêu cầu của bạn.</li>
+<li><b>Bước 2:</b> Nếu trạng thái là <b>Từ chối</b>, đọc kỹ lý do từ chối.</li>
+<li><b>Bước 3:</b> Sao chép ID yêu cầu xuống khung cập nhật, sửa thông tin cho đúng.</li>
+<li><b>Bước 4:</b> Nhấn <b>Cập nhật &amp; gửi lại</b> và tải lại danh sách để kiểm tra.</li>
+</ol></div>
+<img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=60" alt="Rà soát hồ sơ" style="border-radius:12px;margin-top:10px" onerror="this.src='../../assets/images/placeholder-avatar.svg'">
+</div>
+<section class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<ul>
+<li>Bạn nhập thiếu thông tin</li>
+<li>Bạn chưa đăng nhập</li>
+<li>Tài khoản này đang bị khóa</li>
+<li>Không tìm thấy thông tin</li>
+<li>Vé vừa hết / thông tin vừa đổi</li>
+</ul>
+</section>
+</div>
+</div></div></div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diên, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}window.addEventListener('DOMContentLoaded',function(){try{if(sessionStorage.getItem('sk_token')&&typeof taiYeuCauCuaToi==='function')taiYeuCauCuaToi();}catch(e){}});</script>
+</body></html>

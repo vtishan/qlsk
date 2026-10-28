@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duyệt sự kiện — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body data-allow="QuanLySuKien,QuanTriVien">
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Quản trị hệ thống</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="tong-quan.html" data-trang="quantri">Tổng quan</a><a href="duyet-su-kien.html" class="active">Duyệt sự kiện</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="tong-quan.html">Tổng quan</a><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell"><aside class="sidebar"><h4>Quản trị</h4>
+<a href="tong-quan.html">Tổng quan</a><a href="tai-khoan.html">Tài khoản</a><a href="su-kien-don-theo-tai-khoan.html">Sự kiện &amp; đơn theo tài khoản</a><a href="duyet-to-chuc.html">Duyệt tổ chức</a><a href="duyet-su-kien.html" class="active">Duyệt sự kiện</a><a href="loai-su-kien.html">Loại sự kiện</a><a href="dia-diem.html">Địa điểm</a><a href="duyet-dat-dia-diem.html">Duyệt đặt địa điểm</a><a href="bao-cao.html">Báo cáo</a></aside>
+<div class="content"><div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="lock-card" data-khoa hidden><div class="lock-ic">Khóa</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
+<div data-noi-dung-chinh>
+<div class="hero hero-sm">
+<img class="bg" src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=60&auto=format&fit=crop" alt="Sân khấu sự kiện chờ duyệt" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<div class="hero-inner"><h2>Kiểm duyệt sự kiện chờ duyệt</h2><p>Đảm bảo nội dung, thời gian và địa điểm hợp lệ trước khi mở bán vé.</p></div>
+</div>
+<div class="demo-strip"><span class="pill">Kiểm tra <b>nội dung</b></span><span class="pill">Xác minh <b>thời gian</b></span><span class="pill">Chống <b>tự duyệt</b></span></div>
+<div class="card"><h2>Duyệt sự kiện chờ duyệt</h2>
+<div class="toolbar"><button class="chinh sm" onclick="taiDanhSachSuKien()">Tải danh sách</button><a class="phu btn sm" href="loai-su-kien.html">Quản lý loại sự kiện</a></div>
+<p class="muted small">Nút Duyệt / Từ chối trên từng thẻ (từ chối bắt buộc nhập lý do). Bạn không thể tự duyệt sự kiện do chính mình tạo.</p>
+<!-- GET /api/events/manage &nbsp;•&nbsp; POST /api/events/{id}/approve|reject -->
+</div>
+<div class="card howto-card" style="margin-top:14px"><h3>Quy trình kiểm duyệt trong 4 bước</h3>
+<div class="howto"><ol>
+<li><b>Bước 1:</b> Bấm <b>Tải danh sách</b> để xem các sự kiện đang chờ duyệt.</li>
+<li><b>Bước 2:</b> Mở từng thẻ để kiểm tra tiêu đề, mô tả, thời gian và địa điểm.</li>
+<li><b>Bước 3:</b> Bấm <b>Duyệt</b> nếu mọi thông tin hợp lệ và đúng thuần phong mỹ tục.</li>
+<li><b>Bước 4:</b> Bấm <b>Từ chối</b> kèm lý do rõ ràng để ban tổ chức chỉnh sửa.</li>
+</ol></div></div>
+<div id="ds-sukien" style="margin-top:14px"><p class="muted">Đăng nhập quản trị rồi bấm “Tải danh sách” để xem sự kiện chờ duyệt.</p></div>
+<div id="sk-chitiet" style="margin-top:14px"></div>
+<div class="card" style="margin-top:14px"><h3>Lưu ý kiểm duyệt</h3>
+<p class="muted">Ưu tiên xử lý sự kiện sắp diễn ra trong 7 ngày tới.</p>
+<p class="muted small">Khi từ chối, ghi lý do cụ thể kèm hướng dẫn sửa để ban tổ chức gửi lại nhanh.</p>
+<p class="muted small">Sự kiện sau khi duyệt sẽ hiển thị công khai tại trang danh sách.</p>
+<!-- POST /api/events/{id}/approve &nbsp;•&nbsp; POST /api/events/{id}/reject -->
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=60&auto=format&fit=crop" alt="Lễ hội âm nhạc" style="border-radius:12px" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'"><h3>Tiêu chí nội dung</h3><p class="muted">Tên rõ ràng, mô tả chi tiết, ảnh bìa phù hợp, không vi phạm bản quyền.</p></div>
+<div class="card"><img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=60&auto=format&fit=crop" alt="Sân khấu biểu diễn" style="border-radius:12px" onerror="this.onerror=null;this.src='../../assets/images/placeholder-venue.svg'"><h3>Tiêu chí tổ chức</h3><p class="muted">Thời gian hợp lý, địa điểm có sức chứa phù hợp, giá vé minh bạch.</p></div>
+</div>
+<div class="card giup-su-co" style="margin-top:14px"><h3>Gặp sự cố? Xem tại đây</h3>
+<ul class="muted">
+<li>Bạn nhập thiếu thông tin</li>
+<li>Bạn chưa đăng nhập</li>
+<li>Tài khoản này đang bị khóa</li>
+<li>Không tìm thấy thông tin</li>
+<li>Vé vừa hết / thông tin vừa đổi</li>
+</ul>
+</div>
+<div class="card" style="margin-top:14px"><p class="muted small">Ghi chú: Tài khoản quản trị do kỹ thuật tạo sẵn ở hệ thống, không đăng ký trên web. Quản lý do quản trị viên bổ nhiệm ở trang quản trị.</p></div>
+</div></div></div>
+<footer>
+<div class="footer-grid">
+<div class="footer-col">
+<div class="footer-logo">SuKien Hub</div>
+<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
+<p class="footer-hotline">Hotline: 1900 6868</p>
+<p class="footer-email">hotro@sukienhub.vn</p>
+</div>
+<div class="footer-col">
+<h4>Khám phá</h4>
+<a href="../../index.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/ve-theo-don.html">Vé của tôi</a>
+</div>
+<div class="footer-col">
+<h4>Dành cho Ban tổ chức</h4>
+<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
+<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
+<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
+</div>
+<div class="footer-col">
+<h4>Hỗ trợ</h4>
+<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
+<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
+<a href="../../index.html">Liên hệ</a>
+</div>
+</div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}window.addEventListener('DOMContentLoaded',function(){try{if(sessionStorage.getItem('sk_token')&&typeof taiDanhSachSuKien==='function')taiDanhSachSuKien();}catch(e){}});</script>
+</body></html>

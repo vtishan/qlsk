@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đơn của tôi — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/app.css">
+<link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div>
+<div id="toast-wrap"></div>
+<header class="topbar">
+<div class="topbar-main">
+<a class="logo" href="../../index.html">
+<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
+<span class="brand-content">
+<span class="brand-name">SựKiện Hub</span>
+<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
+</span>
+</a>
+<nav class="mainnav">
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html" class="active">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+</nav>
+<div class="userbox">
+<div class="avatar" id="avatar-chu">SK</div>
+<span id="nd-user">Chào bạn, hãy đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="../auth/dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="../auth/dang-ky.html">Đăng ký</a>
+<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+<button id="btn-menu" class="phu sm">☰</button>
+</div>
+</div>
+<nav class="menu-mobile" id="menu-mobile" hidden>
+<a href="../../index.html">Sự kiện</a>
+<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
+<a href="../dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
+<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
+<a href="../auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
+</nav>
+</header>
+<input type="hidden" id="sk-tukhoa">
+<input type="hidden" id="sk-tukhoa-hero">
+<input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side">
+<div class="content" style="max-width:1080px;margin:0 auto;width:100%">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+
+<!-- Hero -->
+<section class="hero">
+<img class="bg" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=60&auto=format&fit=crop" alt="Quản lý đơn vé" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<div class="hero-inner">
+<div class="hero-tags">
+<button class="catchip active" type="button">Đơn của tôi</button>
+<button class="catchip" type="button" onclick="locNhanhDon('cho')">Chờ thanh toán</button>
+<button class="catchip" type="button" onclick="locNhanhDon('paid')">Đã thanh toán</button>
+<button class="catchip" type="button" onclick="locNhanhDon('all')">Tất cả</button>
+</div>
+<h1>Đơn vé của tôi</h1>
+<p>Theo dõi trạng thái đơn, thanh toán và vé điện tử — mọi thứ gói gọn trong một trang duy nhất.</p>
+<div class="row">
+<button class="chinh btn" type="button" onclick="taiDonCuaToi()">Tải đơn của tôi</button>
+<a class="phu btn" href="tao-don.html">+ Tạo đơn mới</a>
+<a class="phu btn" href="chi-tiet-don.html">Tra chi tiết đơn</a>
+</div>
+</div>
+</section>
+
+<!-- Lock card -->
+<div class="lock-card" data-khoa hidden><div class="lock-ic">🔒</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục theo dõi đơn vé của bạn.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
+
+<!-- Noi dung chinh -->
+<div data-noi-dung-chinh>
+
+<!-- Thong ke nhanh -->
+<section class="grid g4" style="margin-top:16px" id="qs-don">
+<div class="card"><div class="kpi"><div class="ic">📦</div><div><div class="n" id="qs-tong">—</div><div class="muted">Tổng đơn</div></div></div></div>
+<div class="card"><div class="kpi"><div class="ic">⏳</div><div><div class="n" id="qs-chothanhtoan">—</div><div class="muted">Chờ thanh toán</div></div></div></div>
+<div class="card"><div class="kpi"><div class="ic">✅</div><div><div class="n" id="qs-dathanhtoan">—</div><div class="muted">Đã thanh toán</div></div></div></div>
+<div class="card"><div class="kpi"><div class="ic">💸</div><div><div class="n" id="qs-hoantien">—</div><div class="muted">Hoàn tiền / Đã hủy</div></div></div></div>
+</section>
+
+<!-- Bo loc + danh sach -->
+<div class="card" style="margin-top:16px">
+<h2 style="margin:0 0 4px">Danh sách đơn</h2>
+<p class="muted" style="margin:0 0 12px">Bấm vào từng đơn để xem chi tiết dòng vé. Đơn chưa thanh toán cần hoàn tất sớm để giữ chỗ.</p>
+<div class="don-filter">
+<input id="loc-tukhoa" type="text" placeholder="Tìm theo mã đơn, ví dụ: DH...">
+<select id="loc-trangthai">
+<option value="all">Tất cả trạng thái</option>
+<option value="cho">Chờ thanh toán</option>
+<option value="paid">Đã thanh toán / Thành công</option>
+<option value="refund">Hoàn tiền</option>
+<option value="huy">Đã hủy / Hết hạn</option>
+</select>
+<button class="chinh sm" type="button" onclick="taiDonCuaToi()">Tải lại</button>
+</div>
+<!-- api-line (kỹ thuật): GET /api/orders/me · GET /api/orders/{id} -->
+</div>
+
+<div id="ds-don" style="margin-top:16px"></div>
+<div id="ds-chitiet" style="margin-top:16px"></div>
+<div id="ds-ve" style="margin-top:16px"></div>
+
+<!-- Quy trinh -->
+<section class="grid g3" style="margin-top:16px">
+<div class="card howto-card">
+<h3>1. Đặt đơn</h3>
+<p class="muted">Chọn hạng vé và số lượng tại trang <a href="tao-don.html">Tạo đơn</a>. Hệ thống tự tính tổng tiền theo giá hiện hành.</p>
+</div>
+<div class="card howto-card">
+<h3>2. Thanh toán</h3>
+<p class="muted">Đơn mới ở trạng thái chờ thanh toán (giữ chỗ 15 phút). Sang trang <a href="../thanh-toan/thanh-toan.html">Thanh toán</a> để hoàn tất.</p>
+</div>
+<div class="card howto-card">
+<h3>3. Nhận vé</h3>
+<p class="muted">Đơn đã thanh toán có thể phát hành vé điện tử, rồi xem tại <a href="../ve/ve-theo-don.html">Vé theo đơn</a> để check-in.</p>
+</div>
+</section>
+</div>
+
+<!-- Ho tro -->
+<div class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<p class="muted small">Bạn nhập thiếu thông tin — kiểm tra lại mã đơn và ô tìm kiếm.</p>
+<p class="muted small">Bạn chưa đăng nhập — hãy đăng nhập rồi bấm “Tải đơn của tôi”.</p>
+<p class="muted small">Tài khoản này đang bị khóa — liên hệ quản trị viên.</p>
+<p class="muted small">Không tìm thấy thông tin — đơn có thể thuộc tài khoản khác.</p>
+<p class="muted small">Vé vừa hết / thông tin vừa đổi — tải lại danh sách để cập nhật.</p>
+</div>
+
+</div>
+</div>
+<footer class="footer-grid">
+<div class="footer-col"><div class="logo" style="display:flex;align-items:center;gap:8px"><img src="../../assets/icons/logo.svg" alt="" style="width:28px;height:28px" onerror="this.style.display='none'"><div><div style="font-weight:700">SựKiện Hub</div><div class="muted small" style="font-size:12px">Nền tảng đặt vé và tổ chức sự kiện.</div></div></div><p class="muted small" style="margin-top:8px">Hotline: 1900 6868</p><p class="muted small">hotro@sukienhub.vn</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a class="muted small" href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a class="muted small" href="../dia-diem/danh-sach.html">Địa điểm</a><a class="muted small" href="don-cua-toi.html">Đơn của tôi</a><a class="muted small" href="../ve/tra-cuu-check-in.html">Vé của tôi</a></div>
+<div class="footer-col"><h4>Dành cho Ban tổ chức</h4><a class="muted small" href="../to-chuc/gui-xac-thuc.html">Trở thành Ban tổ chức</a><a class="muted small" href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a class="muted small" href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Hỗ trợ</h4><a class="muted small" href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a><a class="muted small" href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a><a class="muted small" href="../../index.html">Liên hệ</a></div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/sukien.js"></script>
+<script src="../../js/tochuc.js"></script>
+<script src="../../js/diadiem.js"></script>
+<script src="../../js/donve.js"></script>
+<script src="../../js/checkin.js"></script>
+<script src="../../js/quantri.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<script>try{lucide.createIcons()}catch(e){}</script>
+<script>window.addEventListener('DOMContentLoaded',function(){try{var t=null;try{t=localStorage.getItem('token')||localStorage.getItem('accessToken')||localStorage.getItem('sukienhub_token')||sessionStorage.getItem('token')||sessionStorage.getItem('sk_token');}catch(e){}if(t&&typeof taiDonCuaToi==='function'){taiDonCuaToi();}}catch(e){}});</script>
+</body>
+</html>

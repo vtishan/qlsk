@@ -1,0 +1,2136 @@
+# TÀI LIỆU TRIỂN KHAI NGẮN GỌN
+# HỆ THỐNG QUẢN LÝ SỰ KIỆN
+
+---
+
+# 1. PHẠM VI HỆ THỐNG
+
+## 1.1. Vai trò
+
+Hệ thống có 4 vai trò:
+
+- `NguoiDung`
+- `BanToChuc`
+- `QuanLySuKien`
+- `QuanTriVien`
+
+## 1.2. Nhóm chức năng
+
+1. Tài khoản và phân quyền.
+2. Xác thực ban tổ chức.
+3. Loại sự kiện và sự kiện.
+4. Địa điểm và đặt địa điểm.
+5. Loại vé.
+6. Đơn vé.
+7. Thanh toán và hoàn tiền.
+8. Phát hành vé.
+9. Check-in.
+10. Xuất và gửi vé.
+11. Quản trị và thống kê.
+
+## 1.3. Database
+
+Hệ thống gồm 15 bảng:
+
+```text
+VaiTro
+TaiKhoan
+YeuCauXacThucToChuc
+LichSuYeuCauXacThucToChuc
+BanToChuc
+LoaiSuKien
+SuKien
+DiaDiem
+DatDiaDiem
+LoaiVe
+DonVe
+ChiTietDonVe
+ThanhToan
+Ve
+XuatVe
+```
+
+---
+
+# 2. KIẾN TRÚC DỰ ÁN
+
+Sử dụng:
+
+```text
+Feature-first Modular Monolith
++ MVC/API
++ Service Layer
++ Entity Framework Core
+```
+
+Mục tiêu:
+
+- Dễ đọc.
+- Dễ tìm file.
+- Dễ bảo trì.
+- Dễ mở rộng.
+- Không chia nhỏ quá mức.
+- Không đặt tên dài dòng.
+- Không nhét nghiệp vụ vào Controller.
+
+## 2.1. Cấu trúc thư mục
+
+```text
+Project/
+│
+├── Common/
+│   ├── Auth/
+│   ├── Exceptions/
+│   ├── Filters/
+│   └── Helpers/
+│
+├── Data/
+│   ├── ApplicationDbContext.cs
+│   ├── Migrations/
+│   └── Seed/
+│
+├── Domain/
+│   ├── Entities/
+│   │   ├── VaiTro.cs
+│   │   ├── TaiKhoan.cs
+│   │   ├── YeuCauXacThucToChuc.cs
+│   │   ├── LichSuYeuCauXacThucToChuc.cs
+│   │   ├── BanToChuc.cs
+│   │   ├── LoaiSuKien.cs
+│   │   ├── SuKien.cs
+│   │   ├── DiaDiem.cs
+│   │   ├── DatDiaDiem.cs
+│   │   ├── LoaiVe.cs
+│   │   ├── DonVe.cs
+│   │   ├── ChiTietDonVe.cs
+│   │   ├── ThanhToan.cs
+│   │   ├── Ve.cs
+│   │   └── XuatVe.cs
+│   │
+│   └── Enums/
+│       ├── TrangThaiTaiKhoan.cs
+│       ├── TrangThaiYeuCau.cs
+│       ├── TrangThaiSuKien.cs
+│       ├── TrangThaiDatCho.cs
+│       ├── TrangThaiDon.cs
+│       ├── TrangThaiThanhToan.cs
+│       └── TrangThaiVe.cs
+│
+├── Features/
+│   ├── TaiKhoan/
+│   ├── XacThucToChuc/
+│   ├── SuKien/
+│   ├── DiaDiem/
+│   ├── LoaiVe/
+│   ├── DonVe/
+│   ├── ThanhToan/
+│   ├── Ve/
+│   ├── CheckIn/
+│   └── ThongKe/
+│
+└── Infrastructure/
+    ├── PayOS/
+    ├── Email/
+    ├── QR/
+    └── File/
+```
+
+## 2.2. Quy tắc xử lý
+
+```text
+Controller
+    ↓
+Service
+    ↓
+DbContext
+    ↓
+Database
+```
+
+Controller:
+
+- Nhận request.
+- Kiểm tra dữ liệu cơ bản.
+- Gọi Service.
+- Trả response.
+
+Service:
+
+- Xử lý nghiệp vụ.
+- Kiểm tra trạng thái.
+- Kiểm tra quyền.
+- Xử lý transaction khi cần.
+- Gọi DbContext.
+
+DbContext:
+
+- Đọc dữ liệu.
+- Ghi dữ liệu.
+- Quản lý Entity Framework.
+
+Không viết nghiệp vụ phức tạp trực tiếp trong Controller.
+
+---
+
+# 3. QUY TẮC ĐẶT TÊN
+
+## 3.1. Tên file
+
+Tên file phải ngắn và đúng đối tượng.
+
+Dùng:
+
+```text
+TaiKhoan.cs
+SuKien.cs
+DonVe.cs
+ThanhToan.cs
+Ve.cs
+```
+
+Không dùng nếu không cần:
+
+```text
+TaiKhoanEntity.cs
+TaiKhoanModel.cs
+TaiKhoanDataModel.cs
+SuKienEntityModel.cs
+```
+
+## 3.2. Tên class
+
+Tên class trùng với tên đối tượng.
+
+Ví dụ:
+
+```csharp
+public class TaiKhoan
+{
+}
+```
+
+```csharp
+public class SuKien
+{
+}
+```
+
+```csharp
+public class DonVe
+{
+}
+```
+
+## 3.3. Tên thuộc tính
+
+Tên thuộc tính phải:
+
+- Ngắn.
+- Rõ nghĩa.
+- Không lặp tên bảng khi không cần.
+- Dùng PascalCase.
+
+Ví dụ:
+
+Không nên:
+
+```csharp
+public int IDTaiKhoan { get; set; }
+public string TenTaiKhoanNguoiDung { get; set; }
+public string DiaChiEmailTaiKhoan { get; set; }
+```
+
+Nên dùng:
+
+```csharp
+public int Id { get; set; }
+public string HoTen { get; set; }
+public string Email { get; set; }
+```
+
+Ví dụ `TaiKhoan.cs`:
+
+```csharp
+public class TaiKhoan
+{
+    public int Id { get; set; }
+
+    public string HoTen { get; set; } = "";
+
+    public string Email { get; set; } = "";
+
+    public string MatKhau { get; set; } = "";
+
+    public int VaiTroId { get; set; }
+
+    public bool HoatDong { get; set; }
+
+    public DateTime NgayTao { get; set; }
+}
+```
+
+## 3.4. Khóa ngoại
+
+Khóa ngoại viết theo dạng:
+
+```text
+<TenDoiTuong>Id
+```
+
+Ví dụ:
+
+```csharp
+public int TaiKhoanId { get; set; }
+
+public int SuKienId { get; set; }
+
+public int LoaiVeId { get; set; }
+
+public int DonVeId { get; set; }
+```
+
+Không dùng:
+
+```text
+IDTaiKhoanNguoiDung
+IDSuKienCuaBanToChuc
+MaDinhDanhLoaiVe
+```
+
+## 3.5. Navigation Property
+
+Dùng tên đối tượng trực tiếp.
+
+Ví dụ:
+
+```csharp
+public TaiKhoan TaiKhoan { get; set; } = null!;
+```
+
+Quan hệ nhiều:
+
+```csharp
+public ICollection<SuKien> SuKiens { get; set; } = [];
+```
+
+## 3.6. Tên biến trong hàm
+
+Dùng camelCase.
+
+Ví dụ:
+
+```csharp
+var taiKhoan = await db.TaiKhoans.FindAsync(id);
+```
+
+```csharp
+var suKien = await db.SuKiens.FindAsync(id);
+```
+
+```csharp
+var don = await db.DonVes.FindAsync(id);
+```
+
+Không dùng:
+
+```csharp
+var taiKhoanNguoiDungHienTai;
+var thongTinChiTietDonVeCuaNguoiDung;
+var duLieuSuKienCanDuocCapNhat;
+```
+
+Nên dùng:
+
+```csharp
+var user;
+var don;
+var suKien;
+var ve;
+var thanhToan;
+```
+
+Nếu cần rõ hơn:
+
+```csharp
+var donHienTai;
+var veConLai;
+var tongTien;
+var soLuong;
+```
+
+## 3.7. Tên hàm
+
+Tên hàm cần ngắn và thể hiện hành động.
+
+Ví dụ:
+
+```csharp
+DangNhap()
+DangKy()
+DoiMatKhau()
+
+TaoSuKien()
+SuaSuKien()
+DuyetSuKien()
+TuChoiSuKien()
+
+TaoDon()
+HuyDon()
+
+ThanhToan()
+HoanTien()
+
+TaoVe()
+CheckIn()
+```
+
+Không cần dùng kiểu:
+
+```csharp
+ThucHienXuLyTaoMoiSuKienChoBanToChuc()
+```
+
+Chỉ cần:
+
+```csharp
+TaoSuKien()
+```
+
+## 3.8. Tên Service
+
+Có thể dùng hậu tố `Service` vì cần phân biệt với Entity.
+
+Ví dụ:
+
+```text
+TaiKhoanService.cs
+SuKienService.cs
+DonVeService.cs
+ThanhToanService.cs
+VeService.cs
+```
+
+Tên class:
+
+```csharp
+public class SuKienService
+{
+}
+```
+
+Đây là hậu tố cần thiết vì:
+
+```text
+SuKien
+```
+
+là Entity, còn:
+
+```text
+SuKienService
+```
+
+là lớp nghiệp vụ.
+
+## 3.9. Controller
+
+Dùng tên đối tượng + `Controller`.
+
+Ví dụ:
+
+```text
+TaiKhoanController.cs
+SuKienController.cs
+DonVeController.cs
+ThanhToanController.cs
+VeController.cs
+```
+
+---
+
+# 4. PHÂN QUYỀN
+
+## 4.1. NguoiDung
+
+Có quyền:
+
+- Quản lý tài khoản cá nhân.
+- Gửi yêu cầu xác thực ban tổ chức.
+- Xem sự kiện.
+- Mua vé.
+- Xem đơn của mình.
+- Xem vé của mình.
+
+## 4.2. BanToChuc
+
+Có toàn bộ quyền của `NguoiDung`.
+
+Ngoài ra:
+
+- Tạo sự kiện.
+- Sửa sự kiện của mình.
+- Quản lý sự kiện của mình.
+- Đặt địa điểm.
+- Tạo loại vé.
+- Quản lý loại vé.
+- Theo dõi đơn vé của sự kiện mình quản lý.
+- Theo dõi vé của sự kiện mình quản lý.
+
+## 4.3. QuanLySuKien
+
+Có quyền:
+
+- Xem yêu cầu xác thực.
+- Duyệt yêu cầu xác thực.
+- Từ chối yêu cầu xác thực.
+- Xem sự kiện chờ duyệt.
+- Duyệt sự kiện.
+- Từ chối sự kiện.
+- Theo dõi sự kiện.
+- Check-in vé theo quyền được cấp.
+
+## 4.4. QuanTriVien
+
+Có quyền:
+
+- Quản lý tài khoản.
+- Quản lý vai trò.
+- Khóa tài khoản.
+- Mở khóa tài khoản.
+- Quản lý loại sự kiện.
+- Quản lý địa điểm.
+- Theo dõi toàn hệ thống.
+- Xem thống kê.
+- Quản trị dữ liệu.
+
+## 4.5. Quy tắc bắt buộc
+
+Backend phải kiểm tra:
+
+```text
+Tài khoản đang hoạt động
+        ↓
+Đúng vai trò
+        ↓
+Đúng quyền
+        ↓
+Đúng chủ sở hữu dữ liệu
+        ↓
+Mới cho phép thao tác
+```
+
+Không được chỉ kiểm tra quyền ở frontend.
+
+---
+
+# 5. STATE MACHINE
+
+# 5.1. Yêu cầu xác thực ban tổ chức
+
+Trạng thái:
+
+```text
+ChoDuyet
+├── DaDuyet
+└── TuChoi
+```
+
+Nếu từ chối:
+
+```text
+Yêu cầu
+    ↓
+TuChoi
+    ↓
+Lưu lịch sử
+    ↓
+Xóa yêu cầu hiện hành
+    ↓
+Cho phép gửi lại
+```
+
+Nếu duyệt:
+
+```text
+Yêu cầu
+    ↓
+DaDuyet
+    ↓
+Tạo BanToChuc
+    ↓
+Xử lý yêu cầu hiện hành
+```
+
+Một tài khoản chỉ được có tối đa một yêu cầu hiện hành.
+
+---
+
+# 5.2. Sự kiện
+
+```text
+ChoDuyet
+├── DaDuyet
+└── TuChoi
+
+DaDuyet
+├── DangDienRa
+├── DaHuy
+└── DaKetThuc
+```
+
+Chỉ sự kiện `DaDuyet` mới được bán vé.
+
+Không cho phép Ban tổ chức tự duyệt sự kiện của mình.
+
+---
+
+# 5.3. Đặt địa điểm
+
+```text
+ChoXacNhan
+├── DaXacNhan
+├── TuChoi
+└── DaHuy
+
+DaXacNhan
+├── HoanThanh
+└── DaHuy
+```
+
+---
+
+# 5.4. Đơn vé
+
+```text
+ChoThanhToan
+├── ThanhCong
+├── HetHan
+└── DaHuy
+```
+
+Sau khi thanh toán:
+
+```text
+ThanhCong
+├── YeuCauHoanTien
+└── DaHoanTien
+```
+
+Không cho phép cập nhật trạng thái tùy ý.
+
+Mọi trạng thái phải thay đổi thông qua nghiệp vụ tương ứng.
+
+---
+
+# 5.5. Thanh toán
+
+```text
+DangXuLy
+├── ThanhCong
+├── ThatBai
+└── NghiVan
+```
+
+---
+
+# 5.6. Vé
+
+```text
+ChuaSuDung
+├── DaCheckIn
+├── DaHuy
+└── DaHoanTien
+```
+
+Một vé chỉ được check-in một lần.
+
+---
+
+# 6. QUY TẮC NGHIỆP VỤ
+
+1. Một tài khoản chỉ được có tối đa một yêu cầu xác thực hiện hành.
+
+2. Chỉ `BanToChuc` đã xác thực và tài khoản đang hoạt động mới được tạo sự kiện.
+
+3. Người tạo sự kiện không được tự duyệt sự kiện.
+
+4. Thời gian kết thúc sự kiện phải lớn hơn thời gian bắt đầu.
+
+5. Không được đặt cùng một địa điểm bị trùng thời gian.
+
+6. Chỉ sự kiện đã duyệt mới được bán vé.
+
+7. Thời gian đóng bán phải sau thời gian mở bán.
+
+8. Số vé đã bán và đang giữ không được vượt số lượng tối đa.
+
+```text
+DaBan + DangGiu <= ToiDa
+```
+
+9. Backend tự tính toàn bộ tiền của đơn.
+
+10. Không tin giá hoặc tổng tiền do frontend gửi.
+
+11. Giữ vé phải dùng transaction.
+
+12. Đơn hết hạn hoặc bị hủy phải trả lại số lượng vé đang giữ.
+
+13. Webhook thanh toán phải được xác minh.
+
+14. Webhook phải chống xử lý lặp.
+
+15. Chỉ tạo vé sau khi thanh toán thành công.
+
+16. Không được hoàn tiền nhiều hơn số tiền đã thanh toán.
+
+17. Hoàn tiền phải tham chiếu giao dịch thanh toán gốc.
+
+18. Không xóa tùy tiện:
+
+```text
+ThanhToan
+Ve
+LichSu
+Audit
+```
+
+19. `RowVersion` không thay thế transaction hoặc locking.
+
+---
+
+# 7. API
+
+## 7.1. Auth
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+```
+
+## 7.2. Tài khoản
+
+```http
+GET /api/accounts/me
+PUT /api/accounts/me
+```
+
+## 7.3. Xác thực ban tổ chức
+
+```http
+POST /api/organizer-verifications
+GET  /api/organizer-verifications/me
+
+POST /api/organizer-verifications/{id}/approve
+POST /api/organizer-verifications/{id}/reject
+```
+
+## 7.4. Sự kiện
+
+```http
+GET  /api/events
+GET  /api/events/{id}
+
+POST /api/events
+PUT  /api/events/{id}
+
+POST /api/events/{id}/submit
+POST /api/events/{id}/approve
+POST /api/events/{id}/reject
+```
+
+## 7.5. Địa điểm
+
+```http
+GET  /api/venues
+POST /api/venues
+
+POST /api/venue-bookings
+```
+
+## 7.6. Loại vé
+
+```http
+POST /api/events/{eventId}/ticket-types
+PUT  /api/ticket-types/{id}
+```
+
+## 7.7. Đơn vé
+
+```http
+POST /api/orders
+GET  /api/orders/{id}
+POST /api/orders/{id}/cancel
+```
+
+## 7.8. Thanh toán
+
+```http
+POST /api/payments
+POST /api/payments/webhook
+POST /api/payments/{id}/refund
+```
+
+## 7.9. Vé
+
+```http
+GET /api/tickets/{id}
+GET /api/tickets/by-code/{code}
+```
+
+## 7.10. Check-in
+
+```http
+POST /api/check-in
+```
+
+## 7.11. Xuất vé
+
+```http
+POST /api/tickets/{id}/export
+POST /api/tickets/{id}/email
+```
+
+## 7.12. Admin
+
+```http
+GET /api/admin/dashboard
+```
+
+---
+
+# 8. RESPONSE API
+
+## 8.1. Thành công
+
+```json
+{
+  "success": true,
+  "data": {}
+}
+```
+
+## 8.2. Thất bại
+
+```json
+{
+  "success": false,
+  "code": "ERROR_CODE",
+  "message": "..."
+}
+```
+
+Frontend chỉ cần dựa vào:
+
+```text
+success
+code
+message
+data
+```
+
+---
+
+# 9. ERROR CODE
+
+## 9.1. Chung
+
+```text
+AUTH_REQUIRED
+FORBIDDEN
+ACCOUNT_LOCKED
+NOT_FOUND
+VALIDATION_ERROR
+```
+
+## 9.2. Xác thực ban tổ chức
+
+```text
+ORGANIZER_NOT_VERIFIED
+VERIFICATION_ALREADY_PENDING
+```
+
+## 9.3. Sự kiện
+
+```text
+EVENT_NOT_APPROVED
+EVENT_INVALID_STATE
+```
+
+## 9.4. Địa điểm
+
+```text
+VENUE_INACTIVE
+VENUE_TIME_CONFLICT
+```
+
+## 9.5. Vé
+
+```text
+TICKET_NOT_ON_SALE
+TICKET_SOLD_OUT
+TICKET_LIMIT_EXCEEDED
+```
+
+## 9.6. Đơn
+
+```text
+ORDER_EXPIRED
+ORDER_INVALID_STATE
+```
+
+## 9.7. Thanh toán
+
+```text
+PAYMENT_INVALID
+PAYMENT_ALREADY_PROCESSED
+PAYMENT_VERIFICATION_FAILED
+```
+
+## 9.8. Hoàn tiền
+
+```text
+REFUND_EXCEEDS_PAYMENT
+```
+
+## 9.9. Check-in
+
+```text
+TICKET_ALREADY_CHECKED_IN
+TICKET_INVALID_STATE
+```
+
+---
+
+# 10. HTTP STATUS
+
+```text
+400
+Validation sai
+
+401
+Chưa đăng nhập
+
+403
+Không có quyền
+
+404
+Không tìm thấy
+
+409
+Xung đột nghiệp vụ hoặc concurrency
+
+500
+Lỗi hệ thống
+```
+
+---
+
+# 11. VALIDATION
+
+# 11.1. TaiKhoan
+
+Kiểm tra:
+
+- Email đúng định dạng.
+- Email không được trùng.
+- Mật khẩu phải hash.
+- Tài khoản bị khóa không được thực hiện thao tác bảo vệ.
+
+Ví dụ thuộc tính:
+
+```csharp
+public class TaiKhoan
+{
+    public int Id { get; set; }
+
+    public string HoTen { get; set; } = "";
+
+    public string Email { get; set; } = "";
+
+    public string MatKhau { get; set; } = "";
+
+    public int VaiTroId { get; set; }
+
+    public bool HoatDong { get; set; }
+
+    public DateTime NgayTao { get; set; }
+}
+```
+
+---
+
+# 11.2. SuKien
+
+Kiểm tra:
+
+```text
+KetThuc > BatDau
+```
+
+- Số lượng người dự kiến phải lớn hơn 0.
+- Loại sự kiện phải đang hoạt động.
+
+Tên thuộc tính gợi ý:
+
+```csharp
+public DateTime BatDau { get; set; }
+
+public DateTime KetThuc { get; set; }
+
+public int SoNguoi { get; set; }
+```
+
+Không cần dùng:
+
+```csharp
+ThoiGianBatDauSuKien
+ThoiGianKetThucSuKien
+SoLuongNguoiDuKienThamGiaSuKien
+```
+
+---
+
+# 11.3. DiaDiem
+
+Kiểm tra:
+
+```text
+SucChua > 0
+GiaThue >= 0
+```
+
+Thuộc tính:
+
+```csharp
+public int SucChua { get; set; }
+
+public decimal GiaThue { get; set; }
+```
+
+---
+
+# 11.4. DatDiaDiem
+
+Kiểm tra:
+
+- Không trùng lịch.
+- Sức chứa phải phù hợp.
+- Tiền cọc không âm.
+- Tiền cọc không vượt tổng tiền.
+
+```text
+TienCoc >= 0
+
+TienCoc <= TongTien
+```
+
+---
+
+# 11.5. LoaiVe
+
+Kiểm tra:
+
+```text
+Gia >= 0
+SoLuong > 0
+DongBan > MoBan
+```
+
+Tên loại vé không được trùng trong cùng một sự kiện.
+
+Thuộc tính gợi ý:
+
+```csharp
+public string Ten { get; set; } = "";
+
+public decimal Gia { get; set; }
+
+public int SoLuong { get; set; }
+
+public int DaBan { get; set; }
+
+public int DangGiu { get; set; }
+
+public DateTime MoBan { get; set; }
+
+public DateTime DongBan { get; set; }
+```
+
+---
+
+# 11.6. DonVe
+
+Kiểm tra:
+
+- Số lượng lớn hơn 0.
+- Không vượt giới hạn mỗi đơn.
+- Các loại vé phải thuộc cùng sự kiện.
+- Backend tự tính tổng tiền.
+
+Tên thuộc tính:
+
+```csharp
+public int SoLuong { get; set; }
+
+public decimal TongTien { get; set; }
+
+public DateTime NgayTao { get; set; }
+
+public DateTime? HetHan { get; set; }
+```
+
+---
+
+# 11.7. ThanhToan
+
+Kiểm tra:
+
+```text
+SoTien > 0
+```
+
+Chỉ chuyển sang `ThanhCong` sau khi xác minh gateway.
+
+Thuộc tính gợi ý:
+
+```csharp
+public decimal SoTien { get; set; }
+
+public string MaGiaoDich { get; set; } = "";
+
+public DateTime NgayTao { get; set; }
+```
+
+---
+
+# 11.8. Ve
+
+Vé chỉ được tạo sau khi thanh toán thành công.
+
+Phải đảm bảo:
+
+```text
+MaVe unique
+MaQR unique
+```
+
+Thuộc tính gợi ý:
+
+```csharp
+public string MaVe { get; set; } = "";
+
+public string MaQR { get; set; } = "";
+```
+
+---
+
+# 12. TRANSACTION
+
+# 12.1. Giữ vé
+
+Luồng:
+
+```text
+Begin Transaction
+        ↓
+Kiểm tra vé còn
+        ↓
+Tăng DangGiu
+        ↓
+Tạo DonVe
+        ↓
+Tạo ChiTietDonVe
+        ↓
+SaveChanges
+        ↓
+Commit
+```
+
+Nếu lỗi:
+
+```text
+Rollback
+```
+
+Ví dụ biến:
+
+```csharp
+var loaiVe;
+var soLuong;
+var don;
+var chiTiet;
+```
+
+Không cần dùng:
+
+```csharp
+var thongTinLoaiVeHienTaiCanDuocDat;
+```
+
+---
+
+# 12.2. Đơn hết hạn hoặc hủy
+
+```text
+Begin Transaction
+        ↓
+Giảm DangGiu
+        ↓
+Cập nhật trạng thái đơn
+        ↓
+SaveChanges
+        ↓
+Commit
+```
+
+---
+
+# 12.3. Thanh toán thành công
+
+```text
+Nhận webhook
+        ↓
+Verify
+        ↓
+Kiểm tra đã xử lý chưa
+        ↓
+Begin Transaction
+        ↓
+Giảm DangGiu
+        ↓
+Tăng DaBan
+        ↓
+Cập nhật DonVe
+        ↓
+Tạo Ve
+        ↓
+SaveChanges
+        ↓
+Commit
+```
+
+Webhook phải idempotent.
+
+Có nghĩa là:
+
+```text
+Một giao dịch gửi webhook 5 lần
+```
+
+thì hệ thống chỉ xử lý thành công:
+
+```text
+1 lần
+```
+
+---
+
+# 12.4. Đặt địa điểm
+
+```text
+Begin Transaction
+        ↓
+Kiểm tra lịch
+        ↓
+Kiểm tra giao nhau
+        ↓
+Tạo DatDiaDiem
+        ↓
+SaveChanges
+        ↓
+Commit
+```
+
+Nếu có request khác đặt cùng thời gian:
+
+```text
+Chỉ một request được thành công.
+```
+
+---
+
+# 13. TEST BẮT BUỘC
+
+Mỗi chức năng cần tối thiểu các nhóm test sau:
+
+```text
+Happy path
+Validation sai
+Chưa đăng nhập
+Sai quyền
+Không tìm thấy
+Sai trạng thái
+Conflict
+Concurrency
+```
+
+Không phải chức năng nào cũng cần tất cả, nhưng chức năng có liên quan phải được test.
+
+---
+
+# 14. TEST QUAN TRỌNG
+
+## Test 1. Hai người mua vé cuối cùng
+
+Tình huống:
+
+```text
+Còn 1 vé.
+
+User A mua.
+User B mua cùng lúc.
+```
+
+Kết quả:
+
+```text
+Chỉ một người mua được.
+```
+
+Không được xảy ra:
+
+```text
+DaBan > SoLuong
+```
+
+---
+
+## Test 2. Hai request đặt cùng địa điểm
+
+Tình huống:
+
+```text
+Cùng DiaDiem
+Cùng thời gian
+Hai request chạy gần như đồng thời
+```
+
+Kết quả:
+
+```text
+Chỉ một request hợp lệ.
+```
+
+---
+
+## Test 3. Webhook gửi nhiều lần
+
+Tình huống:
+
+```text
+PayOS gửi lại cùng webhook nhiều lần.
+```
+
+Kết quả:
+
+```text
+Thanh toán chỉ được xử lý một lần.
+```
+
+Không được:
+
+```text
+Tạo nhiều vé
+Tăng DaBan nhiều lần
+```
+
+---
+
+## Test 4. Đơn hết hạn khi đang thanh toán
+
+Hệ thống phải đảm bảo:
+
+```text
+DonVe
+ThanhToan
+LoaiVe
+Ve
+```
+
+luôn đồng bộ.
+
+Không được bán vượt vé.
+
+---
+
+## Test 5. Check-in hai lần
+
+Lần 1:
+
+```text
+ChuaSuDung
+→ DaCheckIn
+```
+
+Lần 2:
+
+```text
+Từ chối
+```
+
+Error:
+
+```text
+TICKET_ALREADY_CHECKED_IN
+```
+
+---
+
+## Test 6. User đọc đơn của người khác
+
+Kết quả:
+
+```http
+403 Forbidden
+```
+
+---
+
+## Test 7. Ban tổ chức chưa xác thực tạo sự kiện
+
+Kết quả:
+
+```text
+Từ chối
+```
+
+Error:
+
+```text
+ORGANIZER_NOT_VERIFIED
+```
+
+---
+
+## Test 8. Người tạo tự duyệt sự kiện
+
+Kết quả:
+
+```text
+Từ chối
+```
+
+---
+
+## Test 9. Hoàn tiền vượt số tiền thanh toán
+
+Ví dụ:
+
+```text
+Đã thanh toán: 500.000
+
+Yêu cầu hoàn:
+600.000
+```
+
+Kết quả:
+
+```text
+Từ chối
+```
+
+Error:
+
+```text
+REFUND_EXCEEDS_PAYMENT
+```
+
+---
+
+# 15. THỨ TỰ CODE
+
+# PHASE 1
+## Database + Entity + DbContext + Migration
+
+Làm:
+
+```text
+Domain/Entities
+Domain/Enums
+ApplicationDbContext
+Quan hệ
+PK
+FK
+Unique
+Index
+Constraint
+Migration
+Seed cơ bản
+```
+
+Chưa làm:
+
+```text
+Controller
+Frontend
+Thanh toán
+Email
+QR
+```
+
+Kết quả cần đạt:
+
+```text
+Build thành công
+Migration thành công
+Database tạo đúng
+Quan hệ đúng
+```
+
+---
+
+# PHASE 2
+## Authentication + Account + Authorization
+
+Làm:
+
+```text
+Đăng ký
+Đăng nhập
+Đăng xuất
+Đổi mật khẩu
+Thông tin tài khoản
+Khóa/mở khóa
+Role
+Authorization
+Ownership
+```
+
+Các file có thể có:
+
+```text
+Features/
+└── TaiKhoan/
+    ├── TaiKhoanController.cs
+    ├── TaiKhoanService.cs
+    └── Dtos/
+```
+
+Không cần chia thành quá nhiều file nhỏ nếu nghiệp vụ chưa phức tạp.
+
+---
+
+# PHASE 3
+## Xác thực BanToChuc
+
+Làm:
+
+```text
+Gửi yêu cầu
+Xem yêu cầu
+Duyệt
+Từ chối
+Lưu lịch sử
+Tạo BanToChuc
+Cho phép gửi lại khi bị từ chối
+```
+
+---
+
+# PHASE 4
+## LoaiSuKien + SuKien
+
+Làm:
+
+```text
+CRUD LoaiSuKien
+Tạo SuKien
+Sửa SuKien
+Gửi duyệt
+Duyệt
+Từ chối
+Hủy
+Theo dõi trạng thái
+```
+
+---
+
+# PHASE 5
+## DiaDiem + DatDiaDiem
+
+Làm:
+
+```text
+CRUD DiaDiem
+Đặt địa điểm
+Kiểm tra sức chứa
+Kiểm tra trùng lịch
+Xác nhận
+Từ chối
+Hủy
+```
+
+Đặc biệt phải xử lý concurrency.
+
+---
+
+# PHASE 6
+## LoaiVe + DonVe + ChiTietDonVe
+
+Làm:
+
+```text
+Tạo LoaiVe
+Mở bán
+Đóng bán
+Tạo DonVe
+Giữ vé
+Tạo ChiTietDonVe
+Hết hạn đơn
+Hủy đơn
+Trả lại số vé giữ
+```
+
+Đây là phase cần transaction nghiêm túc.
+
+---
+
+# PHASE 7
+## ThanhToan + Webhook + Refund
+
+Làm:
+
+```text
+Tạo thanh toán
+Tích hợp PayOS
+Nhận webhook
+Verify webhook
+Idempotency
+Cập nhật đơn
+Hoàn tiền
+```
+
+Không tin trạng thái do frontend gửi.
+
+Gateway mới là nguồn xác nhận thanh toán.
+
+---
+
+# PHASE 8
+## Ve + QR + CheckIn
+
+Làm:
+
+```text
+Tạo vé
+Sinh mã vé
+Sinh QR
+Xem vé
+Check-in
+Chống check-in lặp
+```
+
+---
+
+# PHASE 9
+## XuatVe + PDF + Email
+
+Làm:
+
+```text
+Xuất vé PDF
+Lưu thông tin xuất vé
+Gửi vé qua email
+Gửi lại vé
+Theo dõi lịch sử gửi
+```
+
+---
+
+# PHASE 10
+## Admin + Dashboard + Thống kê
+
+Làm:
+
+```text
+Số tài khoản
+Số sự kiện
+Số vé
+Số đơn
+Doanh thu
+Thanh toán
+Hoàn tiền
+Thống kê theo trạng thái
+```
+
+---
+
+# PHASE 11
+## Frontend hoàn chỉnh
+
+Sau khi API chính ổn định mới hoàn thiện frontend.
+
+Làm:
+
+```text
+Trang đăng nhập
+Trang tài khoản
+Trang sự kiện
+Trang chi tiết
+Trang mua vé
+Trang đơn
+Trang vé
+Trang BanToChuc
+Trang QuanLy
+Trang Admin
+Dashboard
+```
+
+Không nên làm frontend hoàn chỉnh trước khi API ổn định.
+
+---
+
+# PHASE 12
+## Test + Security + Deploy + Documentation
+
+Làm:
+
+```text
+Unit Test
+Integration Test
+Concurrency Test
+Security Test
+Validation
+Authorization
+Error handling
+Logging
+Deploy
+README
+Tài liệu API
+ERD
+Sơ đồ luồng
+```
+
+---
+
+# 16. PHASE 1 CỤ THỂ
+
+Đây là phần phải làm đầu tiên.
+
+## Bước 1. Tạo Entity
+
+```text
+Domain/
+└── Entities/
+    ├── VaiTro.cs
+    ├── TaiKhoan.cs
+    ├── YeuCauXacThucToChuc.cs
+    ├── LichSuYeuCauXacThucToChuc.cs
+    ├── BanToChuc.cs
+    ├── LoaiSuKien.cs
+    ├── SuKien.cs
+    ├── DiaDiem.cs
+    ├── DatDiaDiem.cs
+    ├── LoaiVe.cs
+    ├── DonVe.cs
+    ├── ChiTietDonVe.cs
+    ├── ThanhToan.cs
+    ├── Ve.cs
+    └── XuatVe.cs
+```
+
+## Bước 2. Tạo Enum
+
+```text
+Domain/
+└── Enums/
+```
+
+Chỉ tạo enum thực sự cần dùng.
+
+Ví dụ:
+
+```csharp
+public enum TrangThaiDon
+{
+    ChoThanhToan,
+    ThanhCong,
+    HetHan,
+    DaHuy,
+    YeuCauHoanTien,
+    DaHoanTien
+}
+```
+
+Không cần đặt:
+
+```csharp
+TrangThaiXuLyHienTaiCuaDonVe
+```
+
+## Bước 3. Tạo DbContext
+
+```text
+Data/
+└── ApplicationDbContext.cs
+```
+
+Ví dụ:
+
+```csharp
+public class ApplicationDbContext : DbContext
+{
+    public DbSet<TaiKhoan> TaiKhoans { get; set; }
+
+    public DbSet<SuKien> SuKiens { get; set; }
+
+    public DbSet<LoaiVe> LoaiVes { get; set; }
+
+    public DbSet<DonVe> DonVes { get; set; }
+
+    public DbSet<ThanhToan> ThanhToans { get; set; }
+
+    public DbSet<Ve> Ves { get; set; }
+}
+```
+
+## Bước 4. Cấu hình database
+
+Có thể cấu hình trong:
+
+```csharp
+OnModelCreating()
+```
+
+Với dự án 15 bảng vẫn có thể quản lý được.
+
+Nếu sau này quá dài thì tách ra `Configurations`.
+
+Không cần tách ngay từ đầu nếu làm project khó đọc hơn.
+
+## Bước 5. Migration
+
+```bash
+dotnet ef migrations add InitialCreate
+```
+
+Sau đó:
+
+```bash
+dotnet ef database update
+```
+
+## Bước 6. Kiểm tra
+
+Phải kiểm tra:
+
+```text
+15 bảng được tạo
+PK đúng
+FK đúng
+Unique đúng
+Index đúng
+Quan hệ đúng
+Delete behavior đúng
+Nullable đúng
+Decimal đúng
+```
+
+Sau đó:
+
+```bash
+dotnet build
+```
+
+Build phải sạch trước khi sang Phase 2.
+
+---
+
+# 17. QUY TẮC CODE CHUNG
+
+## 17.1. Controller
+
+Controller càng ngắn càng tốt.
+
+Ví dụ:
+
+```csharp
+[HttpPost]
+public async Task<IActionResult> Tao(TaoSuKienDto dto)
+{
+    var data = await service.Tao(dto);
+
+    return Ok(data);
+}
+```
+
+Không nên viết toàn bộ nghiệp vụ trong Controller.
+
+---
+
+# 17.2. Service
+
+Ví dụ:
+
+```csharp
+public async Task<SuKien> Tao(TaoSuKienDto dto)
+{
+    var suKien = new SuKien
+    {
+        Ten = dto.Ten,
+        BatDau = dto.BatDau,
+        KetThuc = dto.KetThuc
+    };
+
+    db.SuKiens.Add(suKien);
+
+    await db.SaveChangesAsync();
+
+    return suKien;
+}
+```
+
+Tên biến:
+
+```text
+suKien
+don
+ve
+user
+loaiVe
+thanhToan
+```
+
+Không cần:
+
+```text
+thongTinSuKienMoiDuocTao
+duLieuDonVeHienTai
+doiTuongThanhToanCanXuLy
+```
+
+---
+
+# 18. DTO
+
+DTO chỉ chứa dữ liệu cần cho request hoặc response.
+
+Ví dụ tạo sự kiện:
+
+```csharp
+public class TaoSuKienDto
+{
+    public string Ten { get; set; } = "";
+
+    public string MoTa { get; set; } = "";
+
+    public DateTime BatDau { get; set; }
+
+    public DateTime KetThuc { get; set; }
+
+    public int LoaiSuKienId { get; set; }
+}
+```
+
+Không đưa toàn bộ Entity ra frontend nếu không cần.
+
+Ví dụ response:
+
+```csharp
+public class SuKienDto
+{
+    public int Id { get; set; }
+
+    public string Ten { get; set; } = "";
+
+    public DateTime BatDau { get; set; }
+
+    public DateTime KetThuc { get; set; }
+
+    public string TrangThai { get; set; } = "";
+}
+```
+
+---
+
+# 19. QUY TẮC ĐƠN GIẢN HÓA TÊN
+
+Ưu tiên:
+
+```text
+Id
+Ten
+MoTa
+Email
+MatKhau
+HoTen
+BatDau
+KetThuc
+NgayTao
+NgaySua
+SoLuong
+Gia
+TongTien
+TrangThai
+HoatDong
+```
+
+Thay vì:
+
+```text
+IDSuKien
+TenCuaSuKien
+MoTaChiTietSuKien
+ThoiGianBatDauSuKien
+ThoiGianKetThucSuKien
+TrangThaiHienTaiCuaSuKien
+```
+
+Ví dụ:
+
+```csharp
+public class SuKien
+{
+    public int Id { get; set; }
+
+    public string Ten { get; set; } = "";
+
+    public string MoTa { get; set; } = "";
+
+    public DateTime BatDau { get; set; }
+
+    public DateTime KetThuc { get; set; }
+
+    public int SoNguoi { get; set; }
+
+    public TrangThaiSuKien TrangThai { get; set; }
+}
+```
+
+Đây là kiểu đặt tên chính của dự án.
+
+---
+
+# 20. NGUYÊN TẮC CUỐI
+
+Code phải ưu tiên:
+
+```text
+Ngắn
+Rõ
+Dễ đọc
+Dễ tìm
+Dễ sửa
+```
+
+Không cố làm kiến trúc quá phức tạp.
+
+Không tạo class chỉ để cho "đúng mô hình" nếu class đó chưa có tác dụng thực tế.
+
+Không chia một chức năng nhỏ thành quá nhiều file.
+
+Không dùng tên dài chỉ để mô tả toàn bộ ý nghĩa trong tên biến.
+
+Tên chỉ cần đủ để hiểu trong ngữ cảnh.
+
+Ví dụ tốt:
+
+```csharp
+var don = await db.DonVes.FindAsync(id);
+
+if (don == null)
+    return null;
+
+if (don.TrangThai != TrangThaiDon.ChoThanhToan)
+    throw new Exception("Đơn không hợp lệ.");
+```
+
+Thay vì:
+
+```csharp
+var thongTinDonVeCuaNguoiDungCanDuocXuLy =
+    await db.DonVes.FindAsync(id);
+```
+
+---
+
+# 21. ĐIỀU KIỆN BẮT ĐẦU CODE
+
+Hiện tại đã có:
+
+```text
+[x] Danh sách chức năng
+[x] 15 bảng database
+[x] Quan hệ PK/FK
+[x] Constraint chính
+[x] Business rule chính
+[x] Kiến trúc
+[x] Phân quyền
+[x] State machine
+[x] API convention
+[x] Error code
+[x] Validation
+[x] Transaction
+[x] Test bắt buộc
+[x] Thứ tự triển khai
+[x] Quy tắc đặt tên
+```
+
+Có thể bắt đầu code.
+
+Thứ tự:
+
+```text
+PHASE 1
+Database
+↓
+Entity
+↓
+DbContext
+↓
+Migration
+↓
+Test database
+
+PHASE 2
+Auth + TaiKhoan
+
+PHASE 3
+XacThucToChuc
+
+PHASE 4
+LoaiSuKien + SuKien
+
+PHASE 5
+DiaDiem + DatDiaDiem
+
+PHASE 6
+LoaiVe + DonVe
+
+PHASE 7
+ThanhToan
+
+PHASE 8
+Ve + QR + CheckIn
+
+PHASE 9
+PDF + Email
+
+PHASE 10
+Admin + ThongKe
+
+PHASE 11
+Frontend
+
+PHASE 12
+Test + Security + Deploy
+```
+
+---
+
+# 22. LƯU Ý
+
+- Request/response DTO thiết kế khi làm từng phase.
+- UI chi tiết làm sau khi API tương ứng ổn định.
+- Quyền giữa `BanToChuc`, `QuanLySuKien` và `QuanTriVien` phải kiểm tra ở backend.
+- Không tin dữ liệu nhạy cảm từ frontend.
+- Không tin giá tiền từ frontend.
+- Không tin trạng thái thanh toán từ frontend.
+- Các thao tác vé, đơn, thanh toán và đặt địa điểm cần chú ý concurrency.
+- Không bỏ transaction ở các nghiệp vụ liên quan số lượng vé.
+- Không cho chuyển trạng thái Entity tự do.
+- Không xóa lịch sử tài chính và vé tùy tiện.
+- Ưu tiên tên class, biến và thuộc tính ngắn gọn, rõ nghĩa.
+- Chỉ thêm hậu tố như `Service`, `Controller`, `Dto` khi cần phân biệt loại class.

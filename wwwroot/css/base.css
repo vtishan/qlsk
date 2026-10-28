@@ -1,0 +1,93 @@
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.brand-description {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #5b21f2;
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .topbar-main {
+    flex-wrap: wrap;
+  }
+
+  .searchbar {
+    width: 100%;
+  }
+
+  .mainnav {
+    display: none;
+  }
+
+  .menu-mobile:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grid.g2,
+  .grid.g3 {
+    grid-template-columns: 1fr;
+  }
+}

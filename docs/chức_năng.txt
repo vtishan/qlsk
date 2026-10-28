@@ -1,0 +1,565 @@
+# DANH SÁCH CHỨC NĂNG HỆ THỐNG QUẢN LÝ SỰ KIỆN
+
+## NHÓM 1. QUẢN LÝ TÀI KHOẢN VÀ PHÂN QUYỀN
+
+### 1. Quản lý tài khoản và phân quyền
+
+- Đăng ký tài khoản.
+- Đăng nhập hệ thống.
+- Đăng xuất hệ thống.
+- Đổi mật khẩu.
+- Xem thông tin tài khoản.
+- Cập nhật họ tên và số điện thoại.
+- Kiểm tra email đã tồn tại khi đăng ký hoặc cập nhật.
+- Khóa tài khoản.
+- Mở khóa tài khoản.
+- Kiểm tra trạng thái hoạt động của tài khoản.
+- Tìm kiếm tài khoản theo họ tên hoặc email.
+- Lọc tài khoản theo vai trò và trạng thái.
+- Phân trang danh sách tài khoản.
+- Phân quyền tài khoản theo 4 vai trò:
+  - Người dùng.
+  - Ban tổ chức.
+  - Quản lý sự kiện.
+  - Quản trị viên.
+- Kiểm tra vai trò trước khi thực hiện các chức năng được bảo vệ.
+- Thống kê số lượng tài khoản theo vai trò.
+- Thống kê số lượng tài khoản đang hoạt động và bị khóa.
+- Tra cứu các sự kiện do một tài khoản tạo.
+- Tra cứu các đơn vé do một tài khoản tạo.
+
+**Bảng sử dụng:** `VaiTro`, `TaiKhoan`, kết hợp `SuKien`, `DonVe`.
+
+---
+
+# NHÓM 2. XÁC THỰC BAN TỔ CHỨC VÀ QUẢN LÝ SỰ KIỆN
+
+## 2. Xác thực ban tổ chức
+
+- Gửi yêu cầu xác thực ban tổ chức.
+- Nhập số CCCD.
+- Nhập ngày sinh.
+- Nhập giới tính.
+- Nhập địa chỉ thường trú.
+- Tải ảnh CCCD mặt trước.
+- Tải ảnh CCCD mặt sau.
+- Theo dõi trạng thái yêu cầu xác thực.
+- Mỗi tài khoản chỉ được có tối đa một yêu cầu xác thực hiện hành.
+- Không cho gửi yêu cầu mới khi đang có yêu cầu `ChoDuyet`.
+- Quản lý sự kiện xem danh sách yêu cầu đang chờ duyệt.
+- Duyệt yêu cầu xác thực.
+- Từ chối yêu cầu xác thực.
+- Ghi nhận tài khoản thực hiện duyệt.
+- Ghi nhận thời gian duyệt.
+- Ghi nhận lý do từ chối.
+- Khi yêu cầu bị từ chối, lưu kết quả vào lịch sử xác thực.
+- Sau khi lưu lịch sử, có thể xóa yêu cầu hiện hành để người dùng gửi lại.
+- Khi yêu cầu được duyệt, tạo hồ sơ ban tổ chức chính thức.
+- Kiểm tra ban tổ chức đã được xác thực hay chưa.
+- Kiểm tra trạng thái hoạt động của ban tổ chức.
+- Tra cứu lịch sử các lần xác thực.
+- Không lưu lâu dài ảnh CCCD và dữ liệu định danh không cần thiết.
+- Xóa dữ liệu xác thực theo chính sách lưu trữ của hệ thống.
+
+**Bảng sử dụng:** `YeuCauXacThucToChuc`, `LichSuYeuCauXacThucToChuc`, `BanToChuc`, `TaiKhoan`.
+
+---
+
+## 3. Quản lý loại sự kiện
+
+- Thêm loại sự kiện.
+- Cập nhật tên loại sự kiện.
+- Cập nhật mô tả loại sự kiện.
+- Ngừng hoạt động loại sự kiện.
+- Kích hoạt lại loại sự kiện.
+- Xem danh sách loại sự kiện.
+- Tìm kiếm loại sự kiện theo tên.
+- Lọc loại sự kiện theo trạng thái hoạt động.
+- Kiểm tra loại sự kiện còn hoạt động trước khi tạo sự kiện.
+- Không cho tạo sự kiện mới với loại sự kiện đã ngừng hoạt động.
+- Thống kê số lượng sự kiện theo từng loại.
+
+**Bảng sử dụng:** `LoaiSuKien`, `SuKien`.
+
+---
+
+## 4. Quản lý sự kiện
+
+- Tạo sự kiện.
+- Cập nhật sự kiện.
+- Nhập tên sự kiện.
+- Nhập mô tả sự kiện.
+- Cập nhật ảnh bìa.
+- Thiết lập thời gian bắt đầu.
+- Thiết lập thời gian kết thúc.
+- Thiết lập số lượng người dự kiến.
+- Chọn loại sự kiện.
+- Gửi sự kiện chờ duyệt.
+- Duyệt sự kiện.
+- Từ chối sự kiện.
+- Ghi nhận người duyệt sự kiện.
+- Ghi nhận thời gian duyệt.
+- Ghi nhận lý do từ chối.
+- Không cho người tạo tự duyệt sự kiện của mình.
+- Chỉ cho phép ban tổ chức đã xác thực và đang hoạt động tạo sự kiện.
+- Kiểm tra thời gian kết thúc phải lớn hơn thời gian bắt đầu.
+- Theo dõi trạng thái sự kiện:
+  - Chờ duyệt.
+  - Đã duyệt.
+  - Từ chối.
+  - Đang diễn ra.
+  - Đã kết thúc.
+  - Đã hủy.
+- Hủy sự kiện theo điều kiện nghiệp vụ.
+- Tìm kiếm sự kiện theo tên.
+- Lọc sự kiện theo loại.
+- Lọc sự kiện theo trạng thái.
+- Lọc sự kiện theo thời gian tổ chức.
+- Xem chi tiết sự kiện.
+- Phân trang danh sách sự kiện.
+- Xem danh sách sự kiện do một tài khoản tạo.
+- Thống kê số lượng sự kiện theo trạng thái.
+- Thống kê số lượng sự kiện theo loại.
+- Thống kê số lượng sự kiện theo người tạo.
+- Chỉ sự kiện đã được duyệt mới được mở bán vé.
+
+**Bảng sử dụng:** `SuKien`, `LoaiSuKien`, `TaiKhoan`, `BanToChuc`.
+
+---
+
+# NHÓM 3. QUẢN LÝ ĐỊA ĐIỂM VÀ ĐẶT ĐỊA ĐIỂM
+
+## 5. Quản lý địa điểm
+
+- Thêm địa điểm.
+- Cập nhật địa điểm.
+- Nhập tên địa điểm.
+- Nhập địa chỉ.
+- Nhập sức chứa.
+- Nhập giá thuê.
+- Nhập mô tả.
+- Ngừng hoạt động địa điểm.
+- Kích hoạt lại địa điểm.
+- Xem danh sách địa điểm.
+- Tìm kiếm địa điểm theo tên.
+- Tìm kiếm địa điểm theo địa chỉ.
+- Lọc địa điểm theo sức chứa.
+- Lọc địa điểm theo giá thuê.
+- Lọc địa điểm theo trạng thái.
+- Kiểm tra sức chứa phải lớn hơn 0.
+- Kiểm tra giá thuê không được âm.
+- Hạn chế tạo trùng địa điểm có cùng tên và địa chỉ.
+- Thống kê số địa điểm đang hoạt động.
+- Thống kê số địa điểm đã ngừng hoạt động.
+
+**Bảng sử dụng:** `DiaDiem`.
+
+---
+
+## 6. Đặt và quản lý địa điểm
+
+- Tạo yêu cầu đặt địa điểm cho sự kiện.
+- Chọn sự kiện cần tổ chức.
+- Chọn địa điểm.
+- Chọn thời gian bắt đầu thuê.
+- Chọn thời gian kết thúc thuê.
+- Kiểm tra thời gian kết thúc lớn hơn thời gian bắt đầu.
+- Kiểm tra địa điểm còn hoạt động.
+- Kiểm tra sức chứa địa điểm phù hợp với số người dự kiến của sự kiện.
+- Xác định tổng tiền thuê tại thời điểm đặt.
+- Nhập hoặc tính tiền cọc.
+- Kiểm tra tiền cọc không được âm.
+- Kiểm tra tiền cọc không được lớn hơn tổng tiền thuê.
+- Gửi yêu cầu đặt địa điểm.
+- Xác nhận yêu cầu đặt địa điểm.
+- Từ chối yêu cầu đặt địa điểm.
+- Hủy lượt đặt địa điểm.
+- Hoàn thành lượt đặt địa điểm.
+- Theo dõi trạng thái:
+  - Chờ xác nhận.
+  - Đã xác nhận.
+  - Từ chối.
+  - Đã hủy.
+  - Hoàn thành.
+- Kiểm tra trùng thời gian đặt tại cùng một địa điểm.
+- Ngăn hai yêu cầu có hiệu lực đặt cùng một địa điểm trong khoảng thời gian giao nhau.
+- Xử lý kiểm tra trùng lịch trong transaction.
+- Sử dụng `RowVersion` để hỗ trợ kiểm soát cạnh tranh cập nhật.
+- Xem lịch sử đặt địa điểm của một sự kiện.
+- Xem lịch sử đặt của một địa điểm.
+- Thống kê số lượt đặt theo địa điểm.
+- Thống kê lượt đặt theo trạng thái.
+
+**Bảng sử dụng:** `DatDiaDiem`, `DiaDiem`, `SuKien`.
+
+---
+
+# NHÓM 4. QUẢN LÝ VÉ, ĐƠN VÉ VÀ THANH TOÁN
+
+## 7. Quản lý loại vé
+
+- Tạo loại vé cho sự kiện.
+- Cập nhật loại vé.
+- Thiết lập tên loại vé.
+- Thiết lập giá vé.
+- Thiết lập số lượng vé tối đa.
+- Thiết lập số vé tối đa được mua trong một đơn.
+- Thiết lập thời gian mở bán.
+- Thiết lập thời gian đóng bán.
+- Mở bán loại vé.
+- Ngừng bán loại vé.
+- Kiểm tra giá vé không được âm.
+- Kiểm tra số lượng tối đa phải lớn hơn 0.
+- Kiểm tra thời gian đóng bán phải sau thời gian mở bán.
+- Không cho hai loại vé cùng tên trong cùng một sự kiện.
+- Chỉ cho phép tạo hoặc mở bán vé đối với sự kiện hợp lệ.
+- Chỉ cho phép bán vé cho sự kiện đã được duyệt.
+- Theo dõi số lượng vé đã bán.
+- Theo dõi số lượng vé đang giữ.
+- Tính số lượng vé còn lại.
+- Kiểm tra:
+  `SoLuongDaBan + SoLuongDangGiu <= SoLuongToiDa`.
+- Ngăn bán vượt quá số lượng vé tối đa.
+- Tìm kiếm loại vé.
+- Lọc loại vé theo sự kiện.
+- Lọc loại vé theo trạng thái.
+- Thống kê số lượng vé theo từng loại.
+
+**Bảng sử dụng:** `LoaiVe`, `SuKien`.
+
+---
+
+## 8. Quản lý đơn vé
+
+- Tạo đơn mua vé.
+- Sinh mã đơn hàng duy nhất.
+- Một đơn chỉ thuộc một sự kiện.
+- Cho phép mua nhiều loại vé của cùng một sự kiện trong một đơn.
+- Chọn số lượng của từng loại vé.
+- Kiểm tra số lượng mua phải lớn hơn 0.
+- Kiểm tra số lượng mua không vượt giới hạn mỗi đơn.
+- Kiểm tra tất cả loại vé trong đơn thuộc đúng sự kiện của đơn.
+- Kiểm tra số lượng vé còn lại.
+- Giữ số lượng vé trong quá trình chờ thanh toán.
+- Cập nhật `SoLuongDangGiu` trong transaction.
+- Lưu giá vé tại thời điểm đặt mua.
+- Lưu số lượng từng loại vé.
+- Lưu đơn giá từng loại vé.
+- Tính thành tiền từng dòng.
+- Tính tổng tiền gốc.
+- Tính tổng tiền giảm.
+- Tính tổng tiền thanh toán.
+- Không tin số tiền được gửi từ phía client.
+- Backend tự tính lại toàn bộ số tiền.
+- Thiết lập thời hạn thanh toán.
+- Theo dõi trạng thái đơn:
+  - Chờ thanh toán.
+  - Thành công.
+  - Bị hết hạn.
+  - Đã hủy.
+  - Yêu cầu hoàn tiền.
+  - Đã hoàn tiền.
+- Theo dõi trạng thái thanh toán:
+  - Chưa thanh toán.
+  - Đã thanh toán.
+  - Hoàn tiền một phần.
+  - Đã hoàn tiền.
+- Tra cứu đơn theo mã đơn hàng.
+- Xem lịch sử mua vé của tài khoản.
+- Xem chi tiết các loại vé trong đơn.
+- Hủy đơn theo điều kiện nghiệp vụ.
+- Tự động xử lý đơn hết hạn.
+- Khi đơn hết hạn hoặc bị hủy, giải phóng số vé đang giữ.
+- Kiểm tra tài khoản chỉ được truy cập đơn thuộc quyền của mình, trừ tài khoản có quyền quản trị.
+- Phân trang danh sách đơn.
+- Lọc đơn theo trạng thái.
+- Lọc đơn theo thời gian.
+- Thống kê số lượng đơn theo trạng thái.
+- Thống kê số lượng đơn theo thời gian.
+
+**Bảng sử dụng:** `DonVe`, `ChiTietDonVe`, `LoaiVe`, `TaiKhoan`, `SuKien`.
+
+---
+
+## 9. Thanh toán và hoàn tiền
+
+- Tạo giao dịch thanh toán cho đơn vé.
+- Hỗ trợ các phương thức thanh toán được hệ thống tích hợp thực tế:
+  - PayOS.
+  - VNPAY.
+  - MoMo.
+  - ZaloPay.
+  - Chuyển khoản.
+- Lưu phương thức thanh toán.
+- Lưu số tiền giao dịch.
+- Lưu nội dung thanh toán.
+- Lưu mã giao dịch của cổng thanh toán.
+- Lưu mã giao dịch ngân hàng nếu có.
+- Theo dõi trạng thái giao dịch:
+  - Đang xử lý.
+  - Thành công.
+  - Thất bại.
+  - Nghi vấn lỗi.
+- Một đơn có thể có nhiều lần thử thanh toán.
+- Xác minh callback hoặc webhook từ cổng thanh toán.
+- Chỉ cập nhật thanh toán thành công sau khi xác minh kết quả từ cổng.
+- Chống xử lý webhook lặp.
+- Cập nhật trạng thái đơn khi thanh toán thành công.
+- Giảm số lượng vé đang giữ.
+- Tăng số lượng vé đã bán.
+- Phát hành vé sau khi thanh toán thành công.
+- Toàn bộ quá trình xử lý thanh toán thành công phải được thực hiện an toàn trong transaction.
+- Tạo giao dịch hoàn tiền.
+- Cho phép hoàn tiền toàn phần.
+- Cho phép hoàn tiền một phần.
+- Giao dịch hoàn tiền phải tham chiếu giao dịch thanh toán gốc.
+- Kiểm tra giao dịch gốc đã thanh toán thành công.
+- Kiểm tra tổng số tiền hoàn không vượt tổng số tiền đã thanh toán thành công.
+- Cập nhật trạng thái thanh toán sau hoàn tiền.
+- Cập nhật trạng thái đơn sau hoàn tiền.
+- Tra cứu lịch sử giao dịch của một đơn.
+- Tra cứu giao dịch thanh toán.
+- Tra cứu giao dịch hoàn tiền.
+- Lọc giao dịch theo phương thức.
+- Lọc giao dịch theo trạng thái.
+- Lọc giao dịch theo thời gian.
+- Thống kê số lượng giao dịch theo phương thức.
+- Thống kê giao dịch theo trạng thái.
+- Thống kê tổng số tiền thanh toán thành công.
+- Thống kê tổng số tiền hoàn thành công.
+
+**Bảng sử dụng:** `ThanhToan`, `DonVe`, kết hợp `LoaiVe`.
+
+---
+
+## 10. Phát hành và quản lý vé
+
+- Phát hành vé sau khi đơn thanh toán thành công.
+- Không phát hành vé khi đơn chưa thanh toán thành công.
+- Mỗi bản ghi vé đại diện cho một vé cụ thể.
+- Sinh mã vé duy nhất.
+- Sinh mã QR duy nhất.
+- Liên kết vé với đơn hàng.
+- Liên kết vé với loại vé.
+- Lưu họ tên người sử dụng vé.
+- Lưu email người sử dụng vé.
+- Lưu giá thực tế của từng vé.
+- Nếu đơn có giảm giá, phân bổ giảm giá để xác định giá thực tế của từng vé.
+- Kiểm tra loại vé thuộc đúng sự kiện của đơn.
+- Ngăn phát hành số lượng vé vượt số lượng đã mua.
+- Tra cứu vé bằng mã vé.
+- Tra cứu vé bằng mã QR.
+- Xem danh sách vé thuộc một đơn.
+- Xem trạng thái vé.
+- Theo dõi trạng thái:
+  - Chưa sử dụng.
+  - Đã check-in.
+  - Đã hủy.
+  - Đã hoàn tiền.
+- Hủy vé theo điều kiện nghiệp vụ.
+- Cập nhật vé sang trạng thái đã hoàn tiền khi hoàn tiền thành công.
+- Thống kê số lượng vé theo trạng thái.
+- Thống kê số lượng vé theo loại vé.
+- Thống kê số lượng vé theo sự kiện.
+
+**Bảng sử dụng:** `Ve`, `DonVe`, `ChiTietDonVe`, `LoaiVe`.
+
+---
+
+## 11. Check-in vé
+
+- Quét mã QR trên vé.
+- Nhập hoặc tra cứu bằng mã vé.
+- Tra cứu vé tương ứng.
+- Kiểm tra vé tồn tại.
+- Kiểm tra trạng thái vé.
+- Kiểm tra vé thuộc đơn đã thanh toán thành công.
+- Kiểm tra vé chưa từng được check-in.
+- Từ chối vé đã check-in.
+- Từ chối vé đã hủy.
+- Từ chối vé đã hoàn tiền.
+- Từ chối vé không hợp lệ.
+- Cập nhật trạng thái vé thành `DaCheckIn`.
+- Ghi nhận thời gian check-in.
+- Ghi nhận tài khoản thực hiện check-in.
+- Kiểm tra tài khoản check-in có quyền phù hợp.
+- Ngăn một vé được check-in nhiều lần.
+- Thống kê tổng số vé đã phát hành.
+- Thống kê số vé đã check-in.
+- Thống kê số vé chưa check-in.
+- Đối chiếu số lượng vé phát hành và số lượng vé đã check-in theo sự kiện.
+
+**Bảng sử dụng:** `Ve`, `TaiKhoan`, kết hợp `DonVe`, `ThanhToan`, `LoaiVe`.
+
+---
+
+## 12. Xuất và gửi vé
+
+- Xuất vé dưới dạng PDF.
+- In vé giấy tại quầy.
+- Gửi vé qua email.
+- In vé qua kiosk.
+- Lưu lịch sử mỗi lần xuất vé.
+- Lưu hình thức xuất vé.
+- Lưu đường dẫn file vé khi có file được tạo.
+- Lưu mã số phôi vé nếu hệ thống có sử dụng phôi.
+- Ghi nhận tài khoản thực hiện xuất vé.
+- Cho phép tài khoản xuất để trống khi hệ thống tự động xuất.
+- Ghi nhận thời gian xuất.
+- Theo dõi trạng thái xuất:
+  - Thành công.
+  - Thất bại.
+- Cho phép xuất lại vé.
+- Cho phép in lại vé.
+- Khi xuất lại không tạo mã vé mới.
+- Khi xuất lại không tạo mã QR mới.
+- Tra cứu lịch sử xuất của một vé.
+- Thống kê số lần xuất của từng vé.
+- Thống kê số lần xuất theo hình thức.
+- Thống kê số lần xuất thành công và thất bại.
+
+**Bảng sử dụng:** `XuatVe`, `Ve`, `TaiKhoan`.
+
+---
+
+# NHÓM 5. QUẢN TRỊ VÀ THỐNG KÊ HỆ THỐNG
+
+## 13. Quản trị hệ thống
+
+- Quản lý danh sách tài khoản.
+- Khóa hoặc mở khóa tài khoản.
+- Quản lý vai trò tài khoản.
+- Quản lý loại sự kiện.
+- Quản lý địa điểm.
+- Theo dõi yêu cầu xác thực ban tổ chức.
+- Duyệt hoặc từ chối yêu cầu xác thực theo quyền.
+- Tra cứu lịch sử xác thực ban tổ chức.
+- Quản lý hồ sơ ban tổ chức.
+- Theo dõi danh sách sự kiện.
+- Duyệt hoặc từ chối sự kiện.
+- Theo dõi các lượt đặt địa điểm.
+- Theo dõi loại vé của từng sự kiện.
+- Theo dõi số vé đang giữ.
+- Theo dõi số vé đã bán.
+- Theo dõi đơn vé.
+- Theo dõi trạng thái thanh toán.
+- Theo dõi giao dịch thanh toán.
+- Theo dõi giao dịch hoàn tiền.
+- Theo dõi vé đã phát hành.
+- Theo dõi tình trạng check-in.
+- Theo dõi lịch sử xuất và in lại vé.
+- Tìm kiếm dữ liệu quản trị.
+- Lọc dữ liệu quản trị.
+- Phân trang dữ liệu quản trị.
+
+### Thống kê tài khoản
+
+- Tổng số tài khoản.
+- Số tài khoản theo vai trò.
+- Số tài khoản đang hoạt động.
+- Số tài khoản bị khóa.
+
+### Thống kê ban tổ chức
+
+- Số yêu cầu xác thực đang chờ duyệt.
+- Số yêu cầu được duyệt.
+- Số yêu cầu bị từ chối.
+- Số ban tổ chức đang hoạt động.
+
+### Thống kê sự kiện
+
+- Tổng số sự kiện.
+- Số sự kiện theo trạng thái.
+- Số sự kiện theo loại.
+- Số sự kiện theo người tạo.
+
+### Thống kê địa điểm
+
+- Số địa điểm đang hoạt động.
+- Số địa điểm ngừng hoạt động.
+- Số lượt đặt theo địa điểm.
+- Số lượt đặt theo trạng thái.
+
+### Thống kê vé và đơn vé
+
+- Tổng số đơn vé.
+- Số đơn theo trạng thái.
+- Tổng số vé theo từng loại.
+- Tổng số vé đã bán.
+- Tổng số vé đang giữ.
+- Tổng số vé còn lại.
+- Tổng số vé đã phát hành.
+- Tổng số vé đã check-in.
+- Tổng số vé chưa check-in.
+- Hiệu quả bán vé theo loại vé.
+
+### Thống kê thanh toán và doanh thu
+
+- Tổng số giao dịch thanh toán.
+- Tổng số giao dịch thành công.
+- Tổng số giao dịch thất bại.
+- Tổng số tiền thanh toán thành công.
+- Tổng số tiền hoàn thành công.
+- Doanh thu theo sự kiện.
+- Doanh thu theo khoảng thời gian.
+- Thống kê giao dịch theo phương thức thanh toán.
+
+### Thống kê xuất vé
+
+- Tổng số lần xuất vé.
+- Số lần xuất PDF.
+- Số lần gửi email.
+- Số lần in tại quầy.
+- Số lần in qua kiosk.
+- Số lần xuất thành công.
+- Số lần xuất thất bại.
+
+**Bảng sử dụng:** tổng hợp từ toàn bộ 15 bảng hiện có.
+
+---
+
+# CÁC QUY TẮC NGHIỆP VỤ CHÍNH
+
+1. Tài khoản phải đang hoạt động và có đúng quyền mới được thực hiện chức năng được bảo vệ.
+
+2. Mỗi tài khoản có tối đa một yêu cầu xác thực ban tổ chức hiện hành.
+
+3. Yêu cầu xác thực bị từ chối phải được lưu vào lịch sử trước khi xóa yêu cầu hiện hành.
+
+4. Khi yêu cầu xác thực được duyệt phải tạo hồ sơ `BanToChuc`.
+
+5. Chỉ ban tổ chức đã xác thực và đang hoạt động được tạo sự kiện.
+
+6. Người tạo sự kiện không được tự duyệt sự kiện.
+
+7. Thời gian kết thúc phải lớn hơn thời gian bắt đầu.
+
+8. Không được đặt trùng lịch tại cùng một địa điểm.
+
+9. Chỉ sự kiện đã duyệt mới được bán vé.
+
+10. Thời gian đóng bán vé phải sau thời gian mở bán.
+
+11. Tổng số vé đã bán và đang giữ không được vượt số lượng vé tối đa.
+
+12. Backend phải tự tính giá và tổng tiền đơn.
+
+13. Không sử dụng trực tiếp số tiền do client gửi lên làm dữ liệu tin cậy.
+
+14. Việc giữ vé phải thực hiện trong transaction.
+
+15. Đơn hết hạn hoặc bị hủy phải giải phóng vé đang giữ.
+
+16. Webhook thanh toán phải được xác minh và xử lý idempotent.
+
+17. Chỉ phát hành vé sau khi thanh toán thành công.
+
+18. Một vé chỉ được check-in một lần.
+
+19. Không cho hoàn tiền vượt quá số tiền đã thanh toán thành công.
+
+20. Giao dịch hoàn tiền phải tham chiếu giao dịch thanh toán gốc.
+
+21. Không xóa tùy tiện lịch sử thanh toán, hoàn tiền, vé và dữ liệu audit.
+
+22. Các cột `RowVersion` chỉ hỗ trợ kiểm soát cạnh tranh; các luồng giữ vé và đặt địa điểm vẫn phải dùng transaction phù hợp.

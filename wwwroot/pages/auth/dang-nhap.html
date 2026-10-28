@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập — SựKiện Hub</title>
+<link rel="icon" href="../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css"><link rel="stylesheet" href="../../css/content.css">
+</head>
+<body>
+<div id="spinner"></div><div id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
+<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="dang-ky.html">Đăng ký</a><a href="dang-nhap.html" data-trang="dangnhap" class="active">Đăng nhập</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
+<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hay đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="dang-ky.html">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
+</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a id="btn-dangnhap-m" href="dang-nhap.html">Đăng nhập</a><a id="btn-dangky-m" href="dang-ky.html">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
+<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
+<div class="shell no-side"><div class="content">
+<div id="tb-chung" class="thongbao" style="display:none"></div>
+<div class="hero"><img class="bg" src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=60" alt="Không gian sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'"><div class="hero-inner"><h1>Chào mừng trở lại 👋</h1><p>Đăng nhập để đặt vé, quản lý sự kiện, check-in và xem thống kê theo vai trò của bạn.</p><p class="muted small">Một tài khoản dùng cho mọi vai trò. Hệ thống tự đưa bạn về đúng trang sau khi đăng nhập.</p></div></div>
+<div class="demo-strip"><span class="pill">Demo: <b>khach@example.com</b> / 12345678</span><span class="pill">Ban tổ chức: <b>btc@example.com</b></span><span class="pill">Hết phiên tự về trang này</span><span class="pill">Đăng nhập 1 lần, dùng mọi trang</span></div>
+<div class="grid g2" style="align-items:start">
+<div class="card">
+<h2>Đăng nhập</h2>
+<p class="muted small">Nhập email và mật khẩu đã đăng ký. Hệ thống tự điều hướng theo vai trò sau khi đăng nhập thành công.</p>
+<label class="lbl">Email</label><input id="dn-email" type="email" placeholder="vd: an@example.com"><div class="f-err" id="dn-email-err"></div>
+<label class="lbl">Mật khẩu</label><input id="dn-mk" type="password" placeholder="Tối thiểu 8 ký tự"><div class="f-err" id="dn-mk-err"></div>
+<div class="toolbar"><button class="chinh" onclick="dangNhap()">Đăng nhập</button><a class="phu btn" href="dang-ky.html">Chưa có tài khoản?</a></div>
+<div class="row"><a class="phu btn sm" href="dang-ky.html">Tạo tài khoản mới</a><a class="phu btn sm" href="../../index.html">Xem sự kiện trước</a></div>
+<p class="muted small">Đăng nhập sai mật khẩu báo không khớp • Tài khoản bị khóa không đăng nhập được • Hết phiên tự về trang này.</p>
+<div class="note-demo">Demo nhanh: tạo tài khoản mới tại <a href="dang-ky.html">Đăng ký</a> rồi đăng nhập. Vai trò điều hướng: Người dùng → sự kiện, Ban tổ chức → sự kiện của tôi, Quản lý / Quản trị viên → duyệt.</div>
+<!-- api-line: POST /api/auth/login — Body: { email, matKhau } -->
+</div>
+<div>
+<div class="card"><h3>Ảnh sự kiện nổi bật</h3>
+<img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=60" alt="Hội thảo SựKiện Hub" style="border-radius:12px;height:190px;width:100%;object-fit:cover" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<p class="muted small">Sau khi đăng nhập, bạn có thể đặt vé ngay các sự kiện đang mở bán trong 2 phút.</p>
+<div class="toolbar"><a class="phu btn sm" href="../su-kien/danh-sach.html">Xem sự kiện</a><a class="phu btn sm" href="../don-ve/don-cua-toi.html">Đơn của tôi</a></div>
+</div>
+<div class="howto"><b>Hướng dẫn đăng nhập (4 bước)</b><ol><li>Nhập <b>email</b> đã dùng khi đăng ký tài khoản.</li><li>Nhập <b>mật khẩu</b> tối thiểu 8 ký tự, phân biệt chữ hoa/thường.</li><li>Nhấn <b>Đăng nhập</b> và chờ thông báo thành công.</li><li>Nếu quên mật khẩu, hãy tạo tài khoản mới hoặc liên hệ quản trị viên.</li></ol></div>
+</div>
+</div>
+<div class="grid g3">
+<div class="card"><h3>Vai trò sau đăng nhập</h3><p class="muted small"><span class="badge b-info">Người dùng</span> đặt vé, xem đơn. <span class="badge b-ok">Ban tổ chức</span> tạo sự kiện. <span class="badge b-warn">Quản lý / Quản trị viên</span> duyệt và quản trị.</p></div>
+<div class="card"><h3>Bảo mật tài khoản</h3><p class="muted small">Không chia sẻ mật khẩu, luôn nhấn <b>Đăng xuất</b> trên máy dùng chung và đổi mật khẩu định kỳ.</p><div class="toolbar"><a class="phu btn sm" href="dang-ky.html">Đăng ký</a><a class="phu btn sm" href="../tai-khoan/doi-mat-khau.html">Đổi mật khẩu</a></div></div>
+<div class="card"><h3>Cần hỗ trợ?</h3><p class="muted small">Lỗi đăng nhập kéo dài? Chụp màn hình mã lỗi bên dưới và gửi cho quản trị viên để được mở khóa.</p></div>
+</div>
+<div class="card giup-su-co">
+<h3>Gặp sự cố? Xem tại đây</h3>
+<div class="toolbar"><div class="card"><div class="muted small">• Bạn nhập thiếu thông tin.</div></div><div class="card"><div class="muted small">• Bạn chưa đăng nhập.</div></div><div class="card"><div class="muted small">• Tài khoản này đang bị khóa.</div></div><div class="card"><div class="muted small">• Không tìm thấy thông tin.</div></div><div class="card"><div class="muted small">• Vé vừa hết / thông tin vừa đổi.</div></div></div>
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>Câu hỏi thường gặp</h3><p class="muted small"><b>Quên mật khẩu thì sao?</b> Hãy tạo tài khoản mới hoặc liên hệ quản trị viên để được đặt lại mật khẩu.</p><p class="muted small"><b>Đăng nhập trên máy khác?</b> Phiên đăng nhập lưu theo trình duyệt, hãy đăng xuất sau khi dùng máy chung.</p></div>
+<div class="card"><h3>Lợi ích khi đăng nhập</h3><p class="muted small">Lưu lịch sử đặt vé, nhận thông báo sự kiện mới, nâng cấp lên Ban tổ chức và quản lý vé QR của bạn.</p><div class="toolbar"><a class="phu btn sm" href="../su-kien/danh-sach.html">Khám phá sự kiện</a></div></div>
+</div>
+</div></div>
+<footer class="footer-grid">
+<div class="footer-col"><div class="logo"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><div><div style="font-weight:700">SựKiện Hub</div><div class="muted small">Nền tảng đặt vé và tổ chức sự kiện.</div></div></div><p class="muted small">Hotline: 1900 6868</p><p class="muted small">hotro@sukienhub.vn</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a class="muted small" href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a class="muted small" href="../dia-diem/danh-sach.html">Địa điểm</a><a class="muted small" href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a class="muted small" href="../ve/tra-cuu-check-in.html">Vé của tôi</a></div>
+<div class="footer-col"><h4>Dành cho Ban tổ chức</h4><a class="muted small" href="../to-chuc/gui-xac-thuc.html">Trở thành Ban tổ chức</a><a class="muted small" href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a class="muted small" href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Hỗ trợ</h4><a class="muted small" href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a><a class="muted small" href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a><a class="muted small" href="../../index.html">Liên hệ</a></div>
+<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
+</footer>
+<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}</script>
+</body></html>
