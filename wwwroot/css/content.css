@@ -20,8 +20,8 @@
 /* ===== Fix hero trang danh-sach: lop ::after (app.css) dang phu mo ca chu + nut ===== */
 .hero .grid{position:relative;z-index:1}
 .hero h2{margin:0 0 8px;font-size:28px;color:#fff}
-.hero .demo-strip .pill{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5);color:#fff}
-.hero .demo-strip .pill b{color:#fff}
+.hero .service-highlights .pill{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5);color:#fff}
+.hero .service-highlights .pill b{color:#fff}
 .hero .searchbar input{background:#fff;border-color:transparent}
 .hero .searchbar .phu{background:#fff;border-color:#fff}
 /* Card huong dan dung chung */

@@ -1,103 +1,56 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Tất cả sự kiện — SựKiện Hub</title>
-<link rel="icon" href="../../assets/icons/favicon.svg">
-<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css">
-<link rel="stylesheet" href="../../css/content.css">
-</head>
-<body>
-<div id="spinner"></div><div id="toast-wrap"></div>
+<link href="../../assets/icons/favicon.svg" rel="icon"/>
+<link href="../../css/base.css?v=3d373e85d690" rel="stylesheet"/><link href="../../css/app.css?v=c3a2fcbf8a0f" rel="stylesheet"/>
+<link href="../../css/content.css?v=e1ea1c5a1cc7" rel="stylesheet"/>
+<link href="../../css/responsive.css?v=8dba7aa7f5fd" rel="stylesheet"/></head>
+<body><a class="skip-link chinh" href="#noi-dung">Đến nội dung chính</a>
+<div id="spinner"></div><div aria-live="polite" id="toast-wrap"></div>
 <header class="topbar"><div class="topbar-main">
-<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
-<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html" class="active">Tất cả sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
-<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a class="chinh sm" id="btn-dangnhap" href="../auth/dang-nhap.html">Đăng nhập</a><a class="phu sm" id="btn-dangky" href="../auth/dang-ky.html">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
-</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a><a href="../auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
-<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero">
-<div class="shell no-side"><div class="content">
-<div id="tb-chung" class="thongbao" style="display:none"></div>
-<section class="card hero">
-<div class="grid g2">
-<div>
-<p class="muted">Khám phá • Đặt vé • Tham dự</p>
-<h2>Tất cả sự kiện đang mở bán</h2>
-<p class="muted">Tổng hợp các sự kiện âm nhạc, hội thảo, thể thao và triển lãm trên toàn quốc. Tìm kiếm theo tên sự kiện hoặc địa điểm, xem chi tiết và đặt vé chỉ trong vài phút.</p>
-<div class="demo-strip">
-<span class="pill">Âm nhạc <b>120+</b></span>
-<span class="pill">Hội thảo <b>80+</b></span>
-<span class="pill">Thể thao <b>45+</b></span>
-<span class="pill">Triển lãm <b>30+</b></span>
-</div>
-<div class="searchbar"><input id="sk-tukhoa-page" type="text" placeholder="Tìm theo tên sự kiện, địa điểm..."><button class="chinh" onclick="taiDanhSachSuKien()">Tìm kiếm</button><button class="phu" onclick="taiDanhSachSuKien()">Tải lại</button></div>
-<p class="muted"><small>Mẹo: bỏ trống ô tìm kiếm rồi bấm “Tải lại” để xem toàn bộ danh sách.</small></p>
-</div>
-<div>
-<img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=60" alt="Khán giả tại sự kiện âm nhạc" style="width:100%;border-radius:12px" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
-<p class="muted"><small>Ảnh minh họa hội trường sự kiện. Nguồn ảnh: Unsplash.</small></p>
-</div>
-</div>
-</section>
-<section class="card">
-<h3>Bộ lọc nhanh theo nhu cầu</h3>
-<div class="toolbar">
-<button class="phu sm" onclick="taiDanhSachSuKien()">Tất cả</button>
-<button class="phu sm" onclick="taiDanhSachSuKien()">Âm nhạc</button>
-<button class="phu sm" onclick="taiDanhSachSuKien()">Hội thảo</button>
-<button class="phu sm" onclick="taiDanhSachSuKien()">Thể thao</button>
-<button class="phu sm" onclick="taiDanhSachSuKien()">Triển lãm</button>
-</div>
-<!-- api-line (kỹ thuật): GET /api/events?q=... -->
-</section>
-<div id="ds-sukien" class="grid g3"></div>
-<div class="grid g3" style="margin-top:16px">
-<div class="card"><h3>Tìm sự kiện phù hợp</h3><p class="muted">Dùng ô tìm kiếm theo tên, địa điểm hoặc loại sự kiện. Kết quả hiển thị dạng thẻ gồm ảnh bìa, thời gian và giá vé từ.</p></div>
-<div class="card"><h3>Xem chi tiết minh bạch</h3><p class="muted">Mỗi sự kiện có trang chi tiết riêng: mô tả, lịch trình, sơ đồ chỗ ngồi và danh sách loại vé đang mở bán.</p></div>
-<div class="card"><h3>Đặt vé an toàn</h3><p class="muted">Chọn loại vé, số lượng và thanh toán. Mã vé QR được gửi ngay sau khi đơn hàng được xác nhận.</p></div>
-</div>
-<div id="sk-chitiet" class="card" style="margin-top:16px"><p class="muted">Chọn một sự kiện trong danh sách để xem thông tin tóm tắt tại đây.</p></div>
-<section class="card howto">
-<h3>Hướng dẫn tìm và đặt vé (4 bước)</h3>
-<ol>
-<li><b>Bước 1 — Tìm kiếm:</b> nhập từ khóa vào ô tìm kiếm rồi bấm “Tìm kiếm”.</li>
-<li><b>Bước 2 — So sánh:</b> mở từng thẻ sự kiện để xem thời gian, địa điểm và giá vé.</li>
-<li><b>Bước 3 — Xem chi tiết:</b> bấm vào sự kiện để tới trang chi tiết và chọn loại vé.</li>
-<li><b>Bước 4 — Đặt vé:</b> hoàn tất đơn hàng tại trang “Đơn của tôi” và nhận mã QR.</li>
-</ol>
-</section>
-<div class="card giup-su-co"><h3>Gặp sự cố? Xem tại đây</h3><p class="muted small">Bạn nhập thiếu thông tin.</p><p class="muted small">Bạn chưa đăng nhập.</p><p class="muted small">Tài khoản này đang bị khóa.</p><p class="muted small">Không tìm thấy thông tin.</p><p class="muted small">Vé vừa hết / thông tin vừa đổi.</p></div>
+<a aria-label="SựKiện Hub - Trang chủ" class="logo" href="../../index.html">
+<img alt="" height="40" src="../../assets/icons/logo.svg" width="40"/>
+<span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Kết nối những trải nghiệm</span></span>
+</a>
+<nav aria-label="Điều hướng chính" class="mainnav"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a></nav>
+<div class="userbox"><div aria-hidden="true" class="avatar" id="avatar-chu">SK</div><span id="nd-user"></span>
+<a class="phu sm" href="../../pages/auth/dang-nhap.html" id="btn-dangnhap">Đăng nhập</a>
+<a class="chinh sm" href="../../pages/auth/dang-ky.html" id="btn-dangky">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat" onclick="dangXuat()">Đăng xuất</button>
+<button aria-controls="menu-mobile" aria-expanded="false" aria-label="Mở menu" class="phu sm" id="btn-menu" type="button">☰</button>
 </div></div>
-<footer>
-<div class="footer-grid">
-<div class="footer-col">
-<div class="footer-logo">SựKiện Hub</div>
-<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
-<p class="footer-hotline">Hotline: 1900 6868</p>
-<p class="footer-email">hotro@sukienhub.vn</p>
-</div>
-<div class="footer-col">
-<h4>Khám phá</h4>
-<a href="../../index.html">Tất cả sự kiện</a>
-<a href="../dia-diem/danh-sach.html">Địa điểm</a>
-<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
-<a href="../ve/ve-theo-don.html">Vé của tôi</a>
-</div>
-<div class="footer-col">
-<h4>Dành cho Ban tổ chức</h4>
-<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
-<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
-<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
-</div>
-<div class="footer-col">
-<h4>Hỗ trợ</h4>
-<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
-<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
-<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
-</div>
-</div>
-<div class="footer-bottom">© 2026 SựKiện Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
-</footer>
-<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
-<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}</script>
-<script>window.addEventListener('DOMContentLoaded',function(){try{var t=null;try{t=localStorage.getItem('token')||localStorage.getItem('accessToken')||localStorage.getItem('sukienhub_token')||sessionStorage.getItem('token');}catch(e){}if(t&&typeof taiDanhSachSuKien==='function'){taiDanhSachSuKien();}}catch(e){}});</script>
+<nav aria-label="Điều hướng trên điện thoại" class="menu-mobile" hidden="" id="menu-mobile"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a>
+<a href="../../pages/auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../../pages/auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat-m" onclick="dangXuat()">Đăng xuất</button>
+</nav></header>
+<input id="sk-tukhoa" type="hidden"/><input id="sk-tukhoa-hero" type="hidden"/>
+<div class="shell no-side" id="noi-dung"><div class="content">
+<div class="thongbao" id="tb-chung" role="status" style="display:none"></div>
+<section class="hero"><img alt="Không gian sự kiện" class="bg" src="../../assets/images/events/sources/music.jpg"/><div class="hero-inner"><p class="eyebrow">Khám phá những điểm hẹn mới</p><h1>Tìm sự kiện dành cho bạn</h1><p>Âm nhạc, nghệ thuật, thể thao hay một điều mới để học. Khởi đầu từ điều bạn yêu thích.</p><form class="hero-search" onsubmit="event.preventDefault();taiDanhSachSuKien()"><label class="visually-hidden" for="sk-tukhoa-page">Tìm tên sự kiện hoặc chủ đề</label><input id="sk-tukhoa-page" placeholder="Tìm tên sự kiện, chủ đề..." type="search"/><button class="chinh" type="submit">Tìm kiếm</button></form></div></section>
+<section aria-label="Lọc chủ đề" class="event-filters"><div class="hero-tags" data-event-categories></div></section>
+<div class="section-intro"><h2>Tất cả sự kiện</h2><p id="event-count" role="status"></p></div>
+<div aria-live="polite" class="ev-grid" data-page-size="12" id="ds-sukien"></div><nav aria-label="Phân trang sự kiện" class="pagination" id="event-pagination"></nav>
+</div></div>
+<footer class="site-footer"><div class="footer-grid">
+<div class="footer-col"><a class="logo" href="../../index.html"><img alt="" height="36" src="../../assets/icons/logo.svg" width="36"/><span class="brand-name">SựKiện Hub</span></a><p>Khám phá sự kiện, kết nối đam mê và lưu giữ những khoảnh khắc đáng nhớ.</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a href="../../pages/su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a><a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a></div>
+<div class="footer-col"><h4>Dành cho nhà tổ chức</h4><a href="../../pages/to-chuc/gui-xac-thuc.html">Trở thành ban tổ chức</a><a href="../../pages/ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a href="../../pages/dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Tài khoản &amp; vé</h4><a href="../../pages/tai-khoan/thong-tin.html">Thông tin tài khoản</a><a href="../../pages/ve/ve-theo-don.html">Tra cứu vé</a><a href="../../pages/thanh-toan/hoan-tien.html">Thông tin hoàn tiền</a></div>
+</div><div class="footer-bottom">© 2026 SựKiện Hub. Kết nối những trải nghiệm.</div></footer>
+<script src="../../config.js?v=bdd0090a4767"></script><script src="../../js/api.js?v=c1d7619e6258"></script><script src="../../js/auth.js?v=a245dba78509"></script><script src="../../js/sukien.js?v=918a332a6a09"></script><script src="../../js/tochuc.js?v=2b6d0dce7382"></script><script src="../../js/diadiem.js?v=dff7d228d71c"></script><script src="../../js/donve.js?v=10d73840725c"></script><script src="../../js/checkin.js?v=d4df51f88685"></script><script src="../../js/quantri.js?v=cf50cdcabcf5"></script><script src="../../js/main.js?v=c4cd0eb83e64"></script><script src="../../js/compat-multipage.js?v=fe985c02be3b"></script>
+
 </body></html>

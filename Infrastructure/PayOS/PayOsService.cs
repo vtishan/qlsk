@@ -23,7 +23,7 @@ public class PayOsService(
 
         if (ChuaCauHinh())
         {
-            return TaoLinkGia(orderCode, amount);
+            throw new ApiException(503, "PAYMENT_NOT_CONFIGURED", "Thanh toán trực tuyến hiện chưa khả dụng. Vui lòng thử lại sau.");
         }
 
         var money = decimal.ToInt64(amount);
@@ -179,18 +179,6 @@ public class PayOsService(
             string.IsNullOrWhiteSpace(cfg.ClientId) ||
             string.IsNullOrWhiteSpace(cfg.ApiKey) ||
             string.IsNullOrWhiteSpace(cfg.ChecksumKey);
-    }
-
-    private PayOsLink TaoLinkGia(
-        long orderCode,
-        decimal amount)
-    {
-        var url =
-            $"/pages/thanh-toan/mo-phong.html" +
-            $"?orderCode={orderCode}" +
-            $"&amount={(long)amount}";
-
-        return new PayOsLink(url, null);
     }
 
     private static string RutGonMoTa(string moTa)

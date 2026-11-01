@@ -11,11 +11,11 @@ using QLSK.Common.Auth;
 using QLSK.Common.Exceptions;
 using QLSK.Common.Models;
 using QLSK.Data;
-using QLSK.Data.Seed;
 using QLSK.Domain.Entities;
 using QLSK.Features.DiaDiem;
 using QLSK.Features.DonVe;
 using QLSK.Features.LoaiVe;
+using QLSK.Features.QuanTri;
 using QLSK.Features.SuKien;
 using QLSK.Features.TaiKhoan;
 using QLSK.Features.ThanhToan;
@@ -35,7 +35,9 @@ QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddControllers(o => o.Filters.Add<ActiveUserFilter>())
     .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddScoped<ActiveUserFilter>();
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+var connectionString = builder.Configuration.GetConnectionString("Default");
+if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("Cần cấu hình ConnectionStrings:Default trước khi khởi động.");
+builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<PayOsOptions>(builder.Configuration.GetSection("PayOS"));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
@@ -51,6 +53,7 @@ builder.Services.AddScoped<ThanhToanService>();
 builder.Services.AddScoped<VeService>();
 builder.Services.AddScoped<XuatVeService>();
 builder.Services.AddScoped<ThongKeService>();
+builder.Services.AddScoped<QuanTriService>();
 builder.Services.AddSingleton<QrService>();
 builder.Services.AddSingleton<VePdfService>();
 builder.Services.AddScoped<EmailService>();
@@ -125,7 +128,6 @@ app.UseStatusCodePages(async context =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-await DbSeeder.SeedAsync(app.Services, app.Configuration, app.Environment);
 app.Lifetime.ApplicationStarted.Register(() =>
 {
     app.Logger.LogInformation("Serving frontend from: {WebRootPath}", app.Environment.WebRootPath);

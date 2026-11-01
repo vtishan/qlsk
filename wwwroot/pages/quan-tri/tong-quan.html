@@ -1,25 +1,48 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Tổng quan quản trị — SựKiện Hub</title>
-<link rel="icon" href="../../assets/icons/favicon.svg">
-<link rel="stylesheet" href="../../css/base.css"><link rel="stylesheet" href="../../css/app.css">
-<link rel="stylesheet" href="../../css/content.css">
-</head>
-<body data-allow="QuanLySuKien,QuanTriVien">
-<div id="spinner"></div><div id="toast-wrap"></div>
+<link href="../../assets/icons/favicon.svg" rel="icon"/>
+<link href="../../css/base.css?v=3d373e85d690" rel="stylesheet"/><link href="../../css/app.css?v=c3a2fcbf8a0f" rel="stylesheet"/>
+<link href="../../css/content.css?v=e1ea1c5a1cc7" rel="stylesheet"/>
+<link href="../../css/responsive.css?v=8dba7aa7f5fd" rel="stylesheet"/></head>
+<body data-allow="QuanLySuKien,QuanTriVien"><a class="skip-link chinh" href="#noi-dung">Đến nội dung chính</a>
+<div id="spinner"></div><div aria-live="polite" id="toast-wrap"></div>
 <header class="topbar"><div class="topbar-main">
-<a class="logo" href="../../index.html"><img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'"><span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Đặt vé • Tổ chức • Check-in</span></span></a>
-<nav class="mainnav"><a href="../../index.html">Sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../thanh-toan/thanh-toan.html">Thanh toán</a><a href="../ve/ve-theo-don.html">Vé</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a></nav>
-<div class="userbox"><div class="avatar" id="avatar-chu">SK</div><span id="nd-user">Chào bạn, hãy đăng nhập</span><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a><button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button><button id="btn-menu" class="phu sm">☰</button></div>
-</div><nav class="menu-mobile" id="menu-mobile" hidden><a href="../../index.html">Sự kiện</a><a href="../don-ve/don-cua-toi.html">Đơn của tôi</a><a href="../thanh-toan/thanh-toan.html">Thanh toán</a><a href="../ve/ve-theo-don.html">Vé</a><a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a><a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a><a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a><button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button></nav></header>
-<input type="hidden" id="sk-tukhoa"><input type="hidden" id="sk-tukhoa-hero"><input type="hidden" id="sk-tukhoa-page">
-<div class="shell"><aside class="sidebar">
+<a aria-label="SựKiện Hub - Trang chủ" class="logo" href="../../index.html">
+<img alt="" height="40" src="../../assets/icons/logo.svg" width="40"/>
+<span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Kết nối những trải nghiệm</span></span>
+</a>
+<nav aria-label="Điều hướng chính" class="mainnav"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a></nav>
+<div class="userbox"><div aria-hidden="true" class="avatar" id="avatar-chu">SK</div><span id="nd-user"></span>
+<a class="phu sm" href="../../pages/auth/dang-nhap.html" id="btn-dangnhap">Đăng nhập</a>
+<a class="chinh sm" href="../../pages/auth/dang-ky.html" id="btn-dangky">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat" onclick="dangXuat()">Đăng xuất</button>
+<button aria-controls="menu-mobile" aria-expanded="false" aria-label="Mở menu" class="phu sm" id="btn-menu" type="button">☰</button>
+</div></div>
+<nav aria-label="Điều hướng trên điện thoại" class="menu-mobile" hidden="" id="menu-mobile"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a>
+<a href="../../pages/auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../../pages/auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat-m" onclick="dangXuat()">Đăng xuất</button>
+</nav></header>
+<input id="sk-tukhoa" type="hidden"/><input id="sk-tukhoa-hero" type="hidden"/><input id="sk-tukhoa-page" type="hidden"/>
+<div class="shell" id="noi-dung"><aside class="sidebar">
 <div class="card"><h3>Quản trị</h3>
 <div class="side-links">
 <a class="btn phu" href="tong-quan.html">Tổng quan</a>
-<a class="btn phu" href="tai-khoan.html">Tài khoản</a>
+<a class="btn phu" data-quyen="QuanTriVien" href="du-lieu.html">Quản lý dữ liệu</a><a class="btn phu" href="tai-khoan.html">Tài khoản</a>
 <a class="btn phu" href="su-kien-don-theo-tai-khoan.html">Sự kiện &amp; đơn theo tài khoản</a>
 <a class="btn phu" href="duyet-to-chuc.html">Duyệt tổ chức</a>
 <a class="btn phu" href="duyet-su-kien.html">Duyệt sự kiện</a>
@@ -29,26 +52,25 @@
 <a class="btn phu" href="bao-cao.html">Báo cáo</a>
 </div></div>
 </aside><div class="content">
-<div id="tb-chung" class="thongbao" style="display:none"></div>
-<div class="lock-card" data-khoa hidden><div class="lock-ic">Khóa</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
-<div data-noi-dung-chinh>
+<div class="thongbao" id="tb-chung" role="status" style="display:none"></div>
+<div class="lock-card" data-khoa="" hidden=""><div class="lock-ic">Khóa</div><h3>Bạn cần đăng nhập để xem mục này</h3><p>Vui lòng đăng nhập để tiếp tục.</p><a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a></div>
+<div data-noi-dung-chinh="">
 <div class="hero hero-sm">
-<img class="bg" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=60&auto=format&fit=crop" alt="Bảng điều khiển quản trị" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<img alt="Bảng điều khiển quản trị" class="bg" decoding="async" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'" src="../../assets/images/events/sources/business.jpg"/>
 <div class="hero-inner"><h2>Tổng quan quản trị</h2><p>Thống kê toàn hệ thống theo vai trò, sự kiện, vé, tổ chức, đặt địa điểm và thanh toán.</p></div>
 </div>
-<div class="demo-strip"><span class="pill">Vai trò <b>Quản lý / Quản trị viên</b></span><span class="pill">Số liệu <b>thời gian thực</b></span><span class="pill">Khớp 100%</span></div>
+<div class="service-highlights"><span class="pill">Vai trò <b>Quản lý / Quản trị viên</b></span><span class="pill">Số liệu <b>thời gian thực</b></span><span class="pill">Dễ theo dõi</span></div>
 <div class="card"><h2>Bảng điều khiển trung tâm</h2>
 <p class="muted">Nhấn nút bên dưới để tải toàn bộ thống kê. Số liệu đọc từ hệ thống thống kê.</p>
 <div class="toolbar"><button class="chinh" onclick="taiThongKe()">Tải thống kê</button><a class="phu btn sm" href="bao-cao.html">Mở báo cáo chi tiết</a><a class="phu btn sm" href="tai-khoan.html">Quản lý tài khoản</a></div>
-<!-- thong-ke: GET /api/admin/dashboard (QuanTriVien) -->
 </div>
-<div class="card howto-card"><h3>Hướng dẫn giám sát trong 4 bước</h3>
+<details class="help-details"><summary>Hướng dẫn giám sát trong 4 bước</summary>
 <div class="howto"><ol>
 <li><b>Bước 1:</b> Đăng nhập tài khoản có quyền Quản lý sự kiện hoặc Quản trị viên.</li>
 <li><b>Bước 2:</b> Bấm <b>Tải thống kê</b> để nạp số liệu tài khoản, sự kiện và vé.</li>
 <li><b>Bước 3:</b> Đối chiếu các khối bên dưới, phát hiện bất thường thì sang trang chi tiết.</li>
 <li><b>Bước 4:</b> Xuất báo cáo tổng hợp tại trang Báo cáo để lưu trữ.</li>
-</ol></div></div>
+</ol></div></details>
 <div class="grid g2" style="margin-top:14px">
 <div class="card"><h3>Tài khoản theo vai trò</h3><div id="tk-taikhoan"><p class="muted">Chưa có dữ liệu — bấm “Tải thống kê”.</p></div></div>
 <div class="card"><h3>Tài khoản theo trạng thái</h3><div id="tk-taikhoan-tt"><p class="muted">Hoạt động / bị khóa / chờ xác minh.</p></div></div>
@@ -59,47 +81,13 @@
 <div class="card"><h3>Đặt địa điểm theo địa điểm</h3><div id="tk-dat-dd"><p class="muted">Top địa điểm được đặt nhiều nhất.</p></div></div>
 <div class="card"><h3>Thanh toán</h3><div id="tk-thanhtoan"><p class="muted">Thành công / chờ xử lý / thất bại / hoàn tiền.</p></div></div>
 </div>
-<div class="card giup-su-co" style="margin-top:14px"><h3>Gặp sự cố? Xem tại đây</h3>
-<ul class="muted">
-<li>Bạn nhập thiếu thông tin</li>
-<li>Bạn chưa đăng nhập</li>
-<li>Tài khoản này đang bị khóa</li>
-<li>Không tìm thấy thông tin</li>
-<li>Vé vừa hết / thông tin vừa đổi</li>
-</ul>
-</div>
-<div class="card" style="margin-top:14px"><p class="muted small">Ghi chú: Tài khoản quản trị do kỹ thuật tạo sẵn ở hệ thống, không đăng ký trên web. Quản lý do quản trị viên bổ nhiệm ở trang quản trị.</p></div>
 </div></div></div>
-<footer>
-<div class="footer-grid">
-<div class="footer-col">
-<div class="footer-logo">SuKien Hub</div>
-<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
-<p class="footer-hotline">Hotline: 1900 6868</p>
-<p class="footer-email">hotro@sukienhub.vn</p>
-</div>
-<div class="footer-col">
-<h4>Khám phá</h4>
-<a href="../../index.html">Tất cả sự kiện</a>
-<a href="../dia-diem/danh-sach.html">Địa điểm</a>
-<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
-<a href="../ve/ve-theo-don.html">Vé của tôi</a>
-</div>
-<div class="footer-col">
-<h4>Dành cho Ban tổ chức</h4>
-<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
-<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
-<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
-</div>
-<div class="footer-col">
-<h4>Hỗ trợ</h4>
-<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
-<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
-<a href="../../index.html">Liên hệ</a>
-</div>
-</div>
-<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
-</footer>
-<script src="../../config.js"></script><script src="../../js/api.js"></script><script src="../../js/auth.js"></script><script src="../../js/sukien.js"></script><script src="../../js/tochuc.js"></script><script src="../../js/diadiem.js"></script><script src="../../js/donve.js"></script><script src="../../js/checkin.js"></script><script src="../../js/quantri.js"></script><script src="../../js/main.js"></script><script src="../../js/compat-multipage.js"></script>
-<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script><script>try{lucide.createIcons()}catch(e){}document.addEventListener("DOMContentLoaded",function(){try{if(sessionStorage.getItem("sk_token")&&typeof taiThongKe==="function")taiThongKe();}catch(e){}});</script>
+<footer class="site-footer"><div class="footer-grid">
+<div class="footer-col"><a class="logo" href="../../index.html"><img alt="" height="36" src="../../assets/icons/logo.svg" width="36"/><span class="brand-name">SựKiện Hub</span></a><p>Khám phá sự kiện, kết nối đam mê và lưu giữ những khoảnh khắc đáng nhớ.</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a href="../../pages/su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a><a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a></div>
+<div class="footer-col"><h4>Dành cho nhà tổ chức</h4><a href="../../pages/to-chuc/gui-xac-thuc.html">Trở thành ban tổ chức</a><a href="../../pages/ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a href="../../pages/dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Tài khoản &amp; vé</h4><a href="../../pages/tai-khoan/thong-tin.html">Thông tin tài khoản</a><a href="../../pages/ve/ve-theo-don.html">Tra cứu vé</a><a href="../../pages/thanh-toan/hoan-tien.html">Thông tin hoàn tiền</a></div>
+</div><div class="footer-bottom">© 2026 SựKiện Hub. Kết nối những trải nghiệm.</div></footer>
+<script src="../../config.js?v=bdd0090a4767"></script><script src="../../js/api.js?v=c1d7619e6258"></script><script src="../../js/auth.js?v=a245dba78509"></script><script src="../../js/sukien.js?v=918a332a6a09"></script><script src="../../js/tochuc.js?v=2b6d0dce7382"></script><script src="../../js/diadiem.js?v=dff7d228d71c"></script><script src="../../js/donve.js?v=10d73840725c"></script><script src="../../js/checkin.js?v=d4df51f88685"></script><script src="../../js/quantri.js?v=cf50cdcabcf5"></script><script src="../../js/main.js?v=c4cd0eb83e64"></script><script src="../../js/compat-multipage.js?v=fe985c02be3b"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){try{if(sessionStorage.getItem("sk_token")&&typeof taiThongKe==="function")taiThongKe();}catch(e){}});</script>
 </body></html>

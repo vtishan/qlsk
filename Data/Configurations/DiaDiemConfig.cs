@@ -33,6 +33,7 @@ public class DiaDiemConfig : IEntityTypeConfiguration<DiaDiem>
 
         e.Property(x => x.GiaThue)
             .HasPrecision(18, 2);
+        e.Property(x => x.HinhAnh).HasMaxLength(500);
 
         e.Property(x => x.RowVersion)
             .IsRowVersion();

@@ -108,15 +108,8 @@ async function taiLichSuXuat(veID) {
   var id = veID || num("xv-lichsu-ve");
   if (!id || id <= 0) { toast("Nhap ma ve de xem lich su xuat.", "loi"); return; }
   try {
-    var kq = await apiFetch("/api/orders/" + id);
-    var d = kq.data || kq;
-    var rows = (d.Ves || []).map(function (v) {
-      return {
-        HinhThucXuat: "PDF",
-        NgayXuat: v.NgayTao,
-        TrangThai: v.TrangThai
-      };
-    });
+    var kq = await apiFetch("/api/tickets/" + id + "/exports");
+    var rows = (kq.data || []).map(function (x) { return { HinhThucXuat: x.Kieu, NgayXuat: x.NgayTao, TrangThai: x.ThanhCong ? "Thành công" : "Thất bại" }; });
     var host = document.getElementById("ds-xuatve") || document.getElementById("ds-ve-theodon");
     if (host) {
       host.innerHTML = "<h3>Lich su xuat ve #" + id + "</h3>" + bangHTML(

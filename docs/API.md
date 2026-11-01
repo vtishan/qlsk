@@ -1,5 +1,25 @@
 # API chính
 
+## Quản lý dữ liệu nghiệp vụ (QuanTriVien)
+
+GET /api/admin/catalog
+POST /api/admin/catalog/events
+PUT /api/admin/catalog/events/{id}
+POST /api/admin/catalog/organizers
+PUT /api/admin/catalog/organizers/{id}
+PUT /api/admin/catalog/accounts/{id}
+GET /api/admin/catalog/accounts/{id}/activity
+DELETE /api/admin/catalog/{kind}/{id}
+
+`kind`: events, organizers, ticket-types, venues, event-types. Xóa trả 409 nếu có dữ liệu liên quan; không xóa lịch sử đơn/vé/lịch đặt. Tạo sự kiện cần BanToChucId; sửa sự kiện giữ chủ sở hữu và trạng thái duyệt. Lịch sự kiện đã đặt địa điểm được bảo toàn. Các DTO sự kiện/địa điểm nhận thêm HinhAnh (đường dẫn cục bộ hoặc URL HTTP/HTTPS).
+
+Admin có thể tạo/sửa hạng vé qua POST /api/events/{eventId}/ticket-types và PUT /api/ticket-types/{id}. Backend tiếp tục kiểm tra số vé đã bán/đang giữ. Tạo tài khoản dùng API đăng ký, sau đó quản lý email, mật khẩu, khóa và vai trò bằng API quản trị.
+
+GET /api/admin/dashboard/events/{id}/check-in
+GET /api/tickets/{id}/exports (chủ vé hoặc admin)
+
+Thống kê và lịch sử xuất vé truy vấn trực tiếp database, không suy diễn từ số người dự kiến hoặc trạng thái đơn.
+
 ## Auth / account
 POST /api/auth/register
 POST /api/auth/login

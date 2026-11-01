@@ -26,4 +26,34 @@ public class RuleTests
 
         Assert.Equal("PAYMENT_INVALID", error.Code);
     }
+
+    [Theory]
+    [InlineData("", "test-api-key", "test-checksum-key")]
+    [InlineData("test-client-id", "", "test-checksum-key")]
+    [InlineData("test-client-id", "test-api-key", "")]
+    public async Task Payos_missing_configuration_returns_unavailable_without_gateway_calls(string clientId, string apiKey, string checksumKey)
+    {
+        using var handler = new RejectingPaymentHandler();
+        using var http = new HttpClient(handler);
+        var service = new PayOsService(http, Options.Create(new PayOsOptions
+        {
+            ClientId = clientId, ApiKey = apiKey, ChecksumKey = checksumKey
+        }));
+
+        var error = await Assert.ThrowsAsync<ApiException>(() => service.Tao(1, 100_000, "DON 1"));
+
+        Assert.Equal(503, error.Status);
+        Assert.Equal("PAYMENT_NOT_CONFIGURED", error.Code);
+        Assert.Equal(0, handler.Calls);
+    }
+
+    private sealed class RejectingPaymentHandler : HttpMessageHandler
+    {
+        public int Calls { get; private set; }
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Calls++;
+            throw new InvalidOperationException("A missing payment configuration must not contact any gateway.");
+        }
+    }
 }

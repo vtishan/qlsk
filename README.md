@@ -202,6 +202,10 @@ Sau đó mở:
 http://localhost:5291/
 ```
 
+Sau khi sửa CSS hoặc JavaScript trong `wwwroot`, chạy `py -3 scripts/version-frontend-assets.py`
+để cập nhật phiên bản tài nguyên trên các trang HTML. Việc này giúp trình duyệt tải đúng
+bản giao diện mới, tránh dùng lại mã cũ từ bộ nhớ đệm. Có thể dùng thêm `--check` để kiểm tra.
+
 API có dạng:
 
 ```text
@@ -234,6 +238,25 @@ Trước lần chạy đầu tiên cần cấu hình connection string, sau đó
 dotnet ef database update
 ```
 
+### Dữ liệu nghiệp vụ và tài khoản
+
+Ứng dụng chỉ đọc/ghi dữ liệu qua API, service và SQL Server. Khởi động backend không chạy migration, không tạo sự kiện và không seed tài khoản. Migration chỉ khởi tạo schema và bốn vai trò hệ thống.
+
+Dữ liệu nghiệp vụ đã có trong database được giữ lại với nguyên ID, khóa ngoại, ảnh, lịch đặt và vé. Admin quản lý tại **Quản trị → Quản lý dữ liệu**, cùng các trang Loại sự kiện và Địa điểm. Các thay đổi được lưu bằng API rồi tải lại; không có dữ liệu giả dự phòng khi API lỗi. Không xóa bản ghi có đơn/vé/lịch đặt liên quan; có thể tắt danh mục, địa điểm hoặc đóng bán vé.
+
+Công cụ triển khai tại [tools/QLSK.Setup](tools/QLSK.Setup/README.md):
+
+```powershell
+dotnet run --project tools/QLSK.Setup -c Release -- migrate
+dotnet run --project tools/QLSK.Setup -c Release -- create-admin
+```
+
+Cần đặt `ConnectionStrings__Default`, `QLSK_ADMIN_EMAIL`, `QLSK_ADMIN_PASSWORD` bằng biến môi trường hoặc secret manager. Không có thông tin đăng nhập mặc định.
+
+Với database cũ, sao lưu trước, đặt thông tin quản trị mới rồi chủ động chạy `adopt-legacy-data`. Lệnh đổi thông tin admin seed cũ tại chỗ, thu hồi mật khẩu và khóa các tài khoản tổ chức cũ; giữ nguyên tài khoản sở hữu, ID và các quan hệ nghiệp vụ. Tài khoản smoke test không có lịch sử được loại bỏ; tài khoản có lịch sử được chuyển thành tài khoản lưu trữ đã khóa. Lệnh không nạp danh mục mẫu và chạy lại không khôi phục dữ liệu đã sửa. Admin có thể gán email/mật khẩu thật cho tài khoản sở hữu qua giao diện rồi mở khóa.
+
+Ảnh sự kiện và địa điểm được lưu bằng đường dẫn `HinhAnh` trong database. Mang theo database và thư mục ảnh khi chuyển máy. Danh mục dữ liệu phát triển nằm riêng trong `tests/QLSK.LocalData`, chỉ được tạo trên database cục bộ có tên `QLSK_Test_*`, `QLSK_Dev_*` hoặc `QLSK_Local*`, không được đóng gói production.
+
 ---
 
 ## 6. Build và Test
@@ -249,6 +272,8 @@ Chạy test:
 ```bash
 dotnet test tests/QLSK.Tests/QLSK.Tests.csproj
 ```
+
+Kiểm thử luồng dữ liệu frontend (Node.js): `node --test tests/frontend-data.test.cjs`.
 
 Có thể chạy lần lượt:
 
@@ -304,6 +329,8 @@ Email__Password
 
 ### JWT
 
+Phát triển cục bộ dùng .NET User Secrets (`Jwt:Key`), hoặc biến môi trường `Jwt__Key`; không có khóa mặc định trong source.
+
 `Jwt__Key` phải có độ dài tối thiểu:
 
 ```text
@@ -312,47 +339,29 @@ Email__Password
 
 Không nên lưu JWT secret production trực tiếp trong source code.
 
-Khóa JWT trong `appsettings.json` là giá trị mẫu dùng cho phát triển. Khi triển khai, đặt `Jwt__Key` bằng khóa riêng. File `appsettings.Production.json` có thể chứa cấu hình riêng của máy và được Git bỏ qua; ASP.NET Core tự đọc file này khi chạy ở môi trường `Production`.
+`Jwt:Key` và connection string trong `appsettings.json` để trống; cần cấp bằng biến môi trường/secret manager trước khi chạy production. `appsettings.Development.json` chỉ chứa cấu hình cục bộ và không được publish. File `appsettings.Production.json` có thể chứa cấu hình riêng của máy và được Git bỏ qua; ASP.NET Core tự đọc file này khi chạy ở môi trường `Production`.
 
 ---
 
-## 9. Development Configuration
+## 9. Dữ liệu phát triển và kiểm thử
 
-File:
+`tests/QLSK.LocalData` và toàn bộ test fixtures không được backend tham chiếu hoặc đóng gói production. Integration test tự tạo database `QLSK_Test_<GUID>` riêng và dọn đúng database đó. Không chạy bộ dữ liệu test trên database nghiệp vụ. Không dùng cờ seed tài khoản khi triển khai.
 
-```text
-appsettings.Development.json
-```
-
-chỉ dùng cho môi trường development.
-
-Có thể chứa:
-
-- JWT development key.
-- Tài khoản admin mẫu.
-- Các cấu hình local.
-
-Ứng dụng chỉ tự động:
-
-- migrate database;
-- seed admin;
-
-trong môi trường `Development`.
-
-Production nên chạy migration như một bước deploy riêng.
+Backend không tự migrate hoặc tạo tài khoản ở bất kỳ môi trường nào. Migration được chạy riêng bằng công cụ thiết lập.
 
 ---
 
-## 10. Tài khoản Admin Development
+## 10. Đổi thông tin admin từ terminal
 
-Tài khoản mặc định trong môi trường development:
+Trên Windows, đặt biến môi trường `ConnectionStrings__Default` cho database cần quản trị rồi chạy:
 
-```text
-Email: admin@qlsk.local
-Password: Admin@123456
+```powershell
+./scripts/Set-AdminCredential.ps1 -Operation Update -AdminId <ID>
 ```
 
-> Phải đổi hoặc xóa tài khoản/mật khẩu mặc định trước khi deploy production.
+Script hỏi email và nhập mật khẩu ẩn; không đặt mật khẩu vào dòng lệnh, file nguồn hay lịch sử terminal. Mật khẩu cần ít nhất 12 ký tự và ba trong bốn nhóm chữ hoa, chữ thường, số, ký tự đặc biệt. Backend băm mật khẩu bằng ASP.NET Identity; đổi mật khẩu làm các phiên đăng nhập cũ mất hiệu lực. Script không mở khóa tài khoản đã khóa.
+
+Với gói triển khai, đặt `QLSK_ADMIN_ID`, `QLSK_ADMIN_EMAIL`, `QLSK_ADMIN_PASSWORD` qua secret manager hoặc biến môi trường và chạy `dotnet QLSK.Setup.dll update-admin`. Xóa các biến chứa thông tin đăng nhập sau khi hoàn tất.
 
 ---
 
@@ -394,17 +403,9 @@ Cancel URL cũng quay về giao diện quản lý đơn vé.
 
 ---
 
-## 12. PayOS Mock Mode
+## 12. PayOS
 
-Nếu chưa cấu hình PayOS, API tạo thanh toán có thể trả về:
-
-```text
-/pages/thanh-toan/mo-phong.html
-```
-
-Trang này chỉ phục vụ development/testing.
-
-Mock payment page không được phép giả mạo hoặc thay thế webhook production.
+Production gọi cổng PayOS thật và yêu cầu cấu hình thông tin kết nối. Phản hồi giả chỉ nằm trong test assembly và không được publish.
 
 ---
 
@@ -597,9 +598,9 @@ Check-in
 Có thể sử dụng:
 
 - local SQL Server;
-- admin seed;
+- tài khoản do quản trị viên chủ động tạo;
 - JWT development key;
-- mock payment;
+- phản hồi cổng thanh toán giả chỉ trong test;
 - Swagger.
 
 ### Production

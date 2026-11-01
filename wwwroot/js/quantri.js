@@ -1,111 +1,54 @@
-/* ===== quantri.js — thong ke tong hop + tai khoan mo rong ===== */
-"use strict";
-/* global apiFetch, thongBao, toast, val, num, bangHTML, badgeTT, skeleton, esc */
-
+﻿"use strict";
+function hienThongKe(id, cols, rows) {
+  var host = document.getElementById(id); if (host) host.innerHTML = bangHTML(cols, rows);
+}
 async function taiThongKe() {
-  skeleton("tk-taikhoan", 3);
-  skeleton("tk-sukien", 3);
-  skeleton("tk-ve", 3);
   try {
-    var dash = await apiFetch("/api/admin/dashboard");
-    var d = dash.data || dash;
-    renderTk("tk-taikhoan", [
-      ["vaiTro", "Vai tro"], ["soLuong", "So luong"]
-    ], d.theoVaiTro || []);
-    document.getElementById("tk-sukien").innerHTML = bangHTML(
-      [["trangThai", "Trang thai"], ["soLuong", "So luong"]],
-      (d.theoTrangThaiSuKien || []).map(function (g) {
-        return { trangThai: g.trangThai || g.TrangThai || "Khac", soLuong: g.soLuong || g.SoLuong || 0 };
-      })
-    );
-    document.getElementById("tk-ve").innerHTML = bangHTML(
-      [["TrangThai", "Trang thai"], ["SoLuongVe", "So luong"]],
-      [
-        { TrangThai: "Ve da check in", SoLuongVe: d.veDaCheckIn || 0 },
-        { TrangThai: "Don thanh cong", SoLuongVe: d.donThanhCong || 0 },
-        { TrangThai: "Hoan tien", SoLuongVe: d.hoanTien || 0 }
-      ]
-    );
-    /* mo rong: thong ke con lai chay nen, khong lam hong khoi chinh */
-    try { await taiThongKeTaiKhoanMoRong(); } catch (e) {}
-    try {
-      if (typeof taiThongKeToChuc === "function") await taiThongKeToChuc();
-    } catch (e) {}
-    try {
-      if (typeof taiThongKeDatDiaDiem === "function") await taiThongKeDatDiaDiem();
-    } catch (e) {}
-    try {
-      if (typeof taiThongKeThanhToan === "function") await taiThongKeThanhToan();
-    } catch (e) {}
-    try { await taiThongKeCheckIn(); } catch (e) {}
-  } catch (e) { thongBao(e.message, "loi"); }
+    var result = await apiFetch("/api/admin/dashboard"), d = result.data;
+    hienThongKe("tk-taikhoan", [["vaiTro", "Vai trò"], ["soLuong", "Số lượng"]], d.theoVaiTro);
+    hienThongKe("tk-sukien", [["trangThai", "Trạng thái"], ["soLuong", "Số lượng"]], d.theoTrangThaiSuKien);
+    hienThongKe("tk-ve", [["trangThai", "Trạng thái vé"], ["soLuong", "Số lượng"]], d.theoTrangThaiVe);
+    hienThongKeTaiKhoan(d);
+    hienThongKeThanhToan(d);
+    if (document.getElementById("tk-tochuc")) await taiThongKeToChuc();
+    if (document.getElementById("tk-dat-tt") || document.getElementById("tk-dat-dd")) await taiThongKeDatDiaDiem();
+    await taiThongKeCheckIn();
+  } catch (error) { thongBao(error.message, "loi"); }
 }
-
-function renderTk(hostId, cols, rows) {
-  var host = document.getElementById(hostId);
-  if (!host) return;
-  host.innerHTML = bangHTML(cols, (rows || []).map(function (r, i) {
-    var obj = {};
-    obj[cols[0][0]] = i + 1;
-    obj[cols[1][0]] = r[cols[1][1]] || r[cols[1][0]] || 0;
-    return obj;
-  }));
+function hienThongKeTaiKhoan(d) {
+  hienThongKe("tk-taikhoan-tt", [["TrangThai", "Trạng thái"], ["SoLuong", "Số lượng"]], [
+    { TrangThai: "Hoạt động", SoLuong: d.taiKhoanHoatDong },
+    { TrangThai: "Đã khóa", SoLuong: d.taiKhoan - d.taiKhoanHoatDong }
+  ]);
 }
-
 async function taiThongKeTaiKhoanMoRong() {
-  try {
-    var kq = await apiFetch("/api/accounts");
-    var rows = kq.data || [];
-    var host = document.getElementById("tk-taikhoan-tt");
-    if (host) host.innerHTML = bangHTML([["TrangThai", "Trang thai"], ["SoLuong", "So luong"]],
-      [
-        { TrangThai: "Hoat dong", SoLuong: rows.filter(function (x) { return x.HoatDong; }).length },
-        { TrangThai: "Da khoa", SoLuong: rows.filter(function (x) { return !x.HoatDong; }).length }
-      ]);
-  } catch (e) { /* bo qua khi thieu quyen */ }
+  try { var r = await apiFetch("/api/admin/dashboard"); hienThongKeTaiKhoan(r.data); }
+  catch (error) { thongBao(error.message, "loi"); }
 }
-
+function hienThongKeThanhToan(d) {
+  hienThongKe("tk-thanhtoan", [["trangThai", "Trạng thái"], ["soLuong", "Số giao dịch"], ["soTien", "Số tiền", "tien"], ["soTienHoan", "Đã hoàn", "tien"]], d.theoTrangThaiThanhToan);
+}
 async function taiSuKienCuaTaiKhoan() {
   var id = num("qtk-sukien-id") || num("qtk-id");
-  if (!id || id <= 0) { toast("Nhap tai khoan de xem su kien.", "loi"); return; }
+  if (!id) { toast("Nhập mã tài khoản.", "loi"); return; }
   try {
-    var kq = await apiFetch("/api/events/mine");
-    var rows = (kq.data || []).filter(function (e) { return e.BanToChucId === id; });
-    document.getElementById("ds-sukien-cua-toi").innerHTML = bangHTML(
-      [["Ten", "Su kien"], ["TrangThai", "Trang thai"]],
-      rows.map(function (e) { return { Ten: e.Ten, TrangThai: e.TrangThai }; })
-    );
-  } catch (e) { thongBao(e.message, "loi"); }
+    var r = await apiFetch("/api/admin/catalog/accounts/" + id + "/activity");
+    hienThongKe("ds-sukien-cua-toi", [["Ten", "Sự kiện"], ["TrangThaiTen", "Trạng thái"]], r.data.SuKien.map(function (e) { return { Ten: e.Ten, TrangThaiTen: trangThaiSuKienHienThi(e.TrangThai) }; }));
+  } catch (error) { thongBao(error.message, "loi"); }
 }
-
 async function taiDonVeCuaTaiKhoan() {
   var id = num("qtk-donve-id") || num("qtk-id");
-  if (!id || id <= 0) { toast("Nhap tai khoan de xem don ve.", "loi"); return; }
+  if (!id) { toast("Nhập mã tài khoản.", "loi"); return; }
   try {
-    var kq = await apiFetch("/api/orders/me");
-    var rows = kq.data || [];
-    document.getElementById("ds-don-cua-toi").innerHTML = bangHTML(
-      [["MaDonHang", "Ma don"], ["TongTien", "Tong TT", "tien"], ["TrangThai", "Don"]],
-      rows.map(function (d) { return { MaDonHang: d.MaDonHang || ("DH-" + d.Id), TongTien: d.TongTien, TrangThai: d.TrangThai }; })
-    );
-  } catch (e) { thongBao(e.message, "loi"); }
+    var r = await apiFetch("/api/admin/catalog/accounts/" + id + "/activity");
+    hienThongKe("ds-don-cua-toi", [["Id", "Mã đơn"], ["TongTien", "Tổng tiền", "tien"], ["TrangThai", "Trạng thái"]], r.data.DonVe);
+  } catch (error) { thongBao(error.message, "loi"); }
 }
-
 async function taiThongKeCheckIn() {
-  var id = num("tk-checkin-sk");
-  var host = document.getElementById("tk-checkin");
-  if (!host) return;
-  if (!id || id <= 0) {
-    host.innerHTML = '<p class="muted">Nhap su kien roi bam "Tai check-in" de xem thong ke diem danh.</p>';
-    return;
-  }
+  var id = num("tk-checkin-sk"), host = document.getElementById("tk-checkin");
+  if (!host || !id) return;
   try {
-    var kq = await apiFetch("/api/events/" + id);
-    var e = kq.data || kq;
-    host.innerHTML = bangHTML([["TrangThai", "Trang thai"], ["SoLuong", "So luong"]],
-      [
-        { TrangThai: "Su kien", SoLuong: e.SoNguoi || 0 },
-        { TrangThai: "Trang thai hien tai", SoLuong: e.TrangThai ? 1 : 0 }
-      ]);
-  } catch (e) { thongBao(e.message, "loi"); }
+    var r = await apiFetch("/api/admin/dashboard/events/" + id + "/check-in");
+    hienThongKe("tk-checkin", [["trangThai", "Trạng thái vé"], ["soLuong", "Số lượng"]], r.data);
+  } catch (error) { thongBao(error.message, "loi"); }
 }

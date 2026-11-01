@@ -3,20 +3,28 @@
 /* global apiFetch, toast, thongBao, val, bangHTML, badgeTT, skeleton, isoLocal, esc */
 
 async function guiYeuCau() {
-  var tenToChuc = val("tc-ten") || val("tc-cccd") || "";
-  var giayTo = val("tc-giayto") || val("tc-truoc") || "";
+  var tenToChuc = val("tc-ten");
+  var giayTo = val("tc-giayto");
   if (!tenToChuc || !giayTo) {
-    toast("Vui long nhap ten to chuc va giay to chung nhan.", "loi");
+    toast("Vui lòng nhập tên tổ chức và đường dẫn giấy tờ xác minh.", "loi");
     return;
   }
+  try {
+    var documentUrl = new URL(giayTo);
+    if (documentUrl.protocol !== "https:" && documentUrl.protocol !== "http:") throw new Error();
+  } catch (e) { toast("Vui lòng nhập đường dẫn giấy tờ hợp lệ.", "loi"); return; }
+  var button = document.getElementById("btn-gui-xacthuc");
+  if (button && button.disabled) return;
+  if (button) button.disabled = true;
   try {
     var kq = await apiFetch("/api/organizer-verifications", "POST", {
       TenToChuc: tenToChuc,
       GiayTo: giayTo
     });
-    thongBao("Gui yeu cau thanh cong. ID: " + ((kq.data && (kq.data.Id || kq.data.Id)) || ""));
-    taiYeuCauCuaToi();
+    thongBao("Đã gửi hồ sơ xác thực tổ chức.");
+    location.assign("/pages/to-chuc/yeu-cau-cua-toi.html");
   } catch (e) { thongBao(e.message, "loi"); }
+  finally { if (button) button.disabled = false; }
 }
 
 async function capNhatYeuCau() {
@@ -35,29 +43,34 @@ async function capNhatYeuCau() {
 }
 
 async function taiYeuCauCuaToi() {
+  var host = document.getElementById("ds-yeucau");
+  if (!host || !store.token) return;
   skeleton("ds-yeucau", 3);
   try {
     var kq = await apiFetch("/api/organizer-verifications/me");
-    var rows = (kq.data || []).map(function (d) {
+    var data = kq.data ? (Array.isArray(kq.data) ? kq.data : [kq.data]) : [];
+    var rows = data.map(function (d) {
       return {
         YeuCauID: d.Id,
         SoCCCD: d.TenToChuc,
-        TrangThai: d.TrangThai,
+        TrangThai: typeof d.TrangThai === "number" ? ["ChoDuyet", "DaDuyet", "TuChoi"][d.TrangThai] : d.TrangThai,
         NgayTao: isoLocal(d.NgayTao),
         LyDoTuChoi: d.LyDo
       };
     });
-    var host = document.getElementById("ds-yeucau");
-    if (!rows.length) { host.innerHTML = bangHTML([], []); return; }
+    if (!rows.length) { host.innerHTML = '<div class="empty"><h3>Bạn không có hồ sơ đang chờ xử lý</h3><p>Nếu hồ sơ đã được duyệt, hãy đăng nhập lại để sử dụng quyền ban tổ chức.</p><a class="phu btn" href="gui-xac-thuc.html">Gửi hồ sơ</a></div>'; return; }
     host.innerHTML = '<div class="grid g2">' + rows.map(function (r) {
-      return '<div class="card hoverable anim-pop"><h3>Yeu cau #' + esc(r.YeuCauID) + '</h3>' +
-        '<div class="muted">To chuc: ' + esc(r.SoCCCD) + " &middot; " + esc(r.NgayTao) + "</div>" +
+      return '<div class="card hoverable anim-pop"><h3>Hồ sơ ' + esc(r.SoCCCD) + '</h3>' +
+        '<div class="muted">Ngày gửi: ' + esc(r.NgayTao) + "</div>" +
         '<div class="toolbar"><span>' + badgeTT(r.TrangThai) + "</span></div>" +
-        (r.LyDoTuChoi ? '<div class="muted">Ly do tu choi: ' + esc(r.LyDoTuChoi) + "</div>" : "") +
+        (r.LyDoTuChoi ? '<div class="muted">Lý do từ chối: ' + esc(r.LyDoTuChoi) + "</div>" : "") +
         "</div>";
     }).join("") + "</div>";
   } catch (e) { thongBao(e.message, "loi"); }
 }
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.getElementById("ds-yeucau")) taiYeuCauCuaToi();
+});
 
 async function duyetYeuCauToChuc(id) {
   try {
@@ -71,7 +84,7 @@ async function duyetYeuCauToChuc(id) {
 async function tuChoiYeuCauToChuc(id) {
   var lydo = prompt("Nhap ly do tu choi yeu cau #" + id + ":");
   if (lydo === null) return;
-  if (!lydo.trim()) { toast("Phai nhap ly do tu choi.", "loi"); return; }
+  if (!lydo.trim()) { toast("Vui lòng nhập lý do từ chối.", "loi"); return; }
   try {
     await apiFetch("/api/organizer-verifications/" + id + "/reject", "POST", { LyDo: lydo.trim() });
     thongBao("Da tu choi yeu cau #" + id + ".");
@@ -87,7 +100,7 @@ async function taiThongKeToChuc() {
     var host = document.getElementById("tk-tochuc");
     if (host) host.innerHTML = bangHTML(
       [["TrangThai", "Trang thai"], ["SoLuong", "So luong"]],
-      groupCount(rows, function (r) { return String(r.TrangThai || r.trangThai || "Chua xet"); }));
+      groupCount(rows, function (r) { return ["ChoDuyet", "DaDuyet", "TuChoi"][r.TrangThai] || r.TrangThai; }));
   } catch (e) { thongBao(e.message, "loi"); }
 }
 

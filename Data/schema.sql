@@ -86,6 +86,7 @@ CREATE TABLE SuKien (
     LoaiSuKienId INT             NOT NULL,
     Ten          NVARCHAR (200)  NOT NULL,
     MoTa         NVARCHAR (4000) DEFAULT '' NOT NULL,
+    HinhAnh      NVARCHAR (500) NULL,
     BatDau       DATETIME2       NOT NULL,
     KetThuc      DATETIME2       NOT NULL,
     SoNguoi      INT             NOT NULL,
@@ -104,6 +105,7 @@ CREATE INDEX IX_SuKien_TrangThai_BatDau
 CREATE TABLE DiaDiem (
     Id         INT             IDENTITY PRIMARY KEY,
     Ten        NVARCHAR (200)  NOT NULL,
+    HinhAnh NVARCHAR (500) NULL,
     DiaChi     NVARCHAR (300)  NOT NULL,
     SucChua    INT             NOT NULL,
     GiaThue    DECIMAL (18, 2) NOT NULL,

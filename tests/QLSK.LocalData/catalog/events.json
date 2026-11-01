@@ -1,0 +1,704 @@
+{
+  "events": [
+    {
+      "number": 1,
+      "title": "Đêm nhạc acoustic bên sông",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-001.jpg"
+    },
+    {
+      "number": 2,
+      "title": "Giai điệu thanh xuân",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-002.jpg"
+    },
+    {
+      "number": 3,
+      "title": "Jazz dưới ánh đèn",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-003.jpg"
+    },
+    {
+      "number": 4,
+      "title": "Rock kết nối đam mê",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-004.jpg"
+    },
+    {
+      "number": 5,
+      "title": "Hòa nhạc mùa gió mới",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-005.jpg"
+    },
+    {
+      "number": 6,
+      "title": "Indie và những câu chuyện",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-006.jpg"
+    },
+    {
+      "number": 7,
+      "title": "Đêm nhạc phim yêu thích",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-007.jpg"
+    },
+    {
+      "number": 8,
+      "title": "Piano cuối tuần",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-008.jpg"
+    },
+    {
+      "number": 9,
+      "title": "Guitar mộc giữa phố",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-009.jpg"
+    },
+    {
+      "number": 10,
+      "title": "Sắc màu âm nhạc Việt",
+      "category": "Âm nhạc",
+      "description": "Thưởng thức các tiết mục biểu diễn trực tiếp và giao lưu cùng nghệ sĩ trong không gian âm nhạc gần gũi. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-010.jpg"
+    },
+    {
+      "number": 11,
+      "title": "Ngày hội trí tuệ nhân tạo",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-011.jpg"
+    },
+    {
+      "number": 12,
+      "title": "Lập trình web từ ý tưởng",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-012.jpg"
+    },
+    {
+      "number": 13,
+      "title": "Kết nối cộng đồng dữ liệu",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-013.jpg"
+    },
+    {
+      "number": 14,
+      "title": "An toàn thông tin cho mọi người",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-014.jpg"
+    },
+    {
+      "number": 15,
+      "title": "Trải nghiệm robot sáng tạo",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-015.jpg"
+    },
+    {
+      "number": 16,
+      "title": "Điện toán đám mây thực chiến",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-016.jpg"
+    },
+    {
+      "number": 17,
+      "title": "Thiết kế ứng dụng di động",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-017.jpg"
+    },
+    {
+      "number": 18,
+      "title": "Công nghệ xanh cho đô thị",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-018.jpg"
+    },
+    {
+      "number": 19,
+      "title": "Khởi đầu cùng mã nguồn mở",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-019.jpg"
+    },
+    {
+      "number": 20,
+      "title": "Ngày hội sản phẩm số",
+      "category": "Công nghệ",
+      "description": "Khám phá sản phẩm mới, trao đổi kinh nghiệm với diễn giả và thực hành qua các phiên trình diễn công nghệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-020.jpg"
+    },
+    {
+      "number": 21,
+      "title": "Chạy bộ đón bình minh",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-021.jpg"
+    },
+    {
+      "number": 22,
+      "title": "Ngày hội cầu lông phong trào",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-022.jpg"
+    },
+    {
+      "number": 23,
+      "title": "Yoga cân bằng cuộc sống",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-023.jpg"
+    },
+    {
+      "number": 24,
+      "title": "Đạp xe khám phá thành phố",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-024.jpg"
+    },
+    {
+      "number": 25,
+      "title": "Bóng rổ kết nối tuổi trẻ",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-025.jpg"
+    },
+    {
+      "number": 26,
+      "title": "Thử thách thể lực cuối tuần",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-026.jpg"
+    },
+    {
+      "number": 27,
+      "title": "Ngày hội bóng đá cộng đồng",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-027.jpg"
+    },
+    {
+      "number": 28,
+      "title": "Nhịp bước vì sức khỏe",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-028.jpg"
+    },
+    {
+      "number": 29,
+      "title": "Khám phá bộ môn pickleball",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-029.jpg"
+    },
+    {
+      "number": 30,
+      "title": "Giao lưu võ thuật Việt",
+      "category": "Thể thao",
+      "description": "Vận động cùng cộng đồng, nhận hướng dẫn từ huấn luyện viên và tham gia các hoạt động phù hợp nhiều cấp độ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-030.jpg"
+    },
+    {
+      "number": 31,
+      "title": "Triển lãm sắc màu phố thị",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-031.jpg"
+    },
+    {
+      "number": 32,
+      "title": "Vẽ màu nước cho người mới",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-032.jpg"
+    },
+    {
+      "number": 33,
+      "title": "Nhiếp ảnh kể chuyện đời thường",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-033.jpg"
+    },
+    {
+      "number": 34,
+      "title": "Nặn gốm bằng đôi tay",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-034.jpg"
+    },
+    {
+      "number": 35,
+      "title": "Nghệ thuật in tranh thủ công",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-035.jpg"
+    },
+    {
+      "number": 36,
+      "title": "Phác họa góc phố thân quen",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-036.jpg"
+    },
+    {
+      "number": 37,
+      "title": "Chạm vào nghệ thuật đương đại",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-037.jpg"
+    },
+    {
+      "number": 38,
+      "title": "Thư pháp và nét chữ Việt",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-038.jpg"
+    },
+    {
+      "number": 39,
+      "title": "Thiết kế poster sáng tạo",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-039.jpg"
+    },
+    {
+      "number": 40,
+      "title": "Không gian điêu khắc trẻ",
+      "category": "Nghệ thuật",
+      "description": "Gặp gỡ người làm sáng tạo, tham quan tác phẩm và tự tay trải nghiệm các hoạt động nghệ thuật có hướng dẫn. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-040.jpg"
+    },
+    {
+      "number": 41,
+      "title": "Ngày hội món ngon ba miền",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-041.jpg"
+    },
+    {
+      "number": 42,
+      "title": "Workshop bánh mì thủ công",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-042.jpg"
+    },
+    {
+      "number": 43,
+      "title": "Hành trình cà phê Việt",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-043.jpg"
+    },
+    {
+      "number": 44,
+      "title": "Bếp xanh cuối tuần",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-044.jpg"
+    },
+    {
+      "number": 45,
+      "title": "Khám phá nghệ thuật pha trà",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-045.jpg"
+    },
+    {
+      "number": 46,
+      "title": "Lớp làm bánh ngọt đầu tiên",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-046.jpg"
+    },
+    {
+      "number": 47,
+      "title": "Ẩm thực đường phố Việt Nam",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-047.jpg"
+    },
+    {
+      "number": 48,
+      "title": "Gia vị và câu chuyện quê nhà",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-048.jpg"
+    },
+    {
+      "number": 49,
+      "title": "Trải nghiệm món chay sáng tạo",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-049.jpg"
+    },
+    {
+      "number": 50,
+      "title": "Bữa sáng cùng đầu bếp",
+      "category": "Ẩm thực",
+      "description": "Thưởng thức hương vị đa dạng, tìm hiểu nguyên liệu và tham gia phần thực hành cùng những người yêu ẩm thực. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-050.jpg"
+    },
+    {
+      "number": 51,
+      "title": "Kết nối doanh nghiệp địa phương",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-051.jpg"
+    },
+    {
+      "number": 52,
+      "title": "Khởi nghiệp từ bài toán nhỏ",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-052.jpg"
+    },
+    {
+      "number": 53,
+      "title": "Xây dựng thương hiệu bền vững",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-053.jpg"
+    },
+    {
+      "number": 54,
+      "title": "Quản lý tài chính cửa hàng",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-054.jpg"
+    },
+    {
+      "number": 55,
+      "title": "Kỹ năng bán hàng tử tế",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-055.jpg"
+    },
+    {
+      "number": 56,
+      "title": "Câu chuyện nhà sáng lập",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-056.jpg"
+    },
+    {
+      "number": 57,
+      "title": "Thương mại điện tử thực hành",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-057.jpg"
+    },
+    {
+      "number": 58,
+      "title": "Tiếp thị nội dung sáng tạo",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-058.jpg"
+    },
+    {
+      "number": 59,
+      "title": "Lãnh đạo đội nhóm hiệu quả",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-059.jpg"
+    },
+    {
+      "number": 60,
+      "title": "Ngày hội ý tưởng kinh doanh",
+      "category": "Kinh doanh",
+      "description": "Kết nối người làm kinh doanh, chia sẻ tình huống thực tế và xây dựng kế hoạch hành động sau chương trình. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-060.jpg"
+    },
+    {
+      "number": 61,
+      "title": "Kỹ năng thuyết trình tự tin",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-061.jpg"
+    },
+    {
+      "number": 62,
+      "title": "Học ngoại ngữ qua trải nghiệm",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-062.jpg"
+    },
+    {
+      "number": 63,
+      "title": "Ngày hội định hướng nghề nghiệp",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-063.jpg"
+    },
+    {
+      "number": 64,
+      "title": "Đọc sách và tư duy phản biện",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-064.jpg"
+    },
+    {
+      "number": 65,
+      "title": "Quản lý thời gian hiệu quả",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-065.jpg"
+    },
+    {
+      "number": 66,
+      "title": "Phương pháp học tập chủ động",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-066.jpg"
+    },
+    {
+      "number": 67,
+      "title": "Viết sáng tạo mỗi ngày",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-067.jpg"
+    },
+    {
+      "number": 68,
+      "title": "Khoa học vui cho gia đình",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-068.jpg"
+    },
+    {
+      "number": 69,
+      "title": "Tư duy thiết kế trong học tập",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-069.jpg"
+    },
+    {
+      "number": 70,
+      "title": "Kỹ năng làm việc nhóm",
+      "category": "Giáo dục",
+      "description": "Học qua hoạt động thực hành, trao đổi với người hướng dẫn và mang về tài liệu để tiếp tục tự học. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-070.jpg"
+    },
+    {
+      "number": 71,
+      "title": "Đổi sách trao tri thức",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-071.jpg"
+    },
+    {
+      "number": 72,
+      "title": "Ngày xanh khu phố",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-072.jpg"
+    },
+    {
+      "number": 73,
+      "title": "Gian hàng sẻ chia",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-073.jpg"
+    },
+    {
+      "number": 74,
+      "title": "Kết nối tình nguyện viên",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-074.jpg"
+    },
+    {
+      "number": 75,
+      "title": "Sống xanh từ việc nhỏ",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-075.jpg"
+    },
+    {
+      "number": 76,
+      "title": "Gặp gỡ câu lạc bộ đọc sách",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-076.jpg"
+    },
+    {
+      "number": 77,
+      "title": "Ngày hội tái chế sáng tạo",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-077.jpg"
+    },
+    {
+      "number": 78,
+      "title": "Chăm sóc vườn cộng đồng",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-078.jpg"
+    },
+    {
+      "number": 79,
+      "title": "Câu chuyện người truyền cảm hứng",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-079.jpg"
+    },
+    {
+      "number": 80,
+      "title": "Kết nối hàng xóm thân thiện",
+      "category": "Cộng đồng",
+      "description": "Gặp gỡ những người cùng quan tâm, chia sẻ kinh nghiệm và cùng thực hiện hoạt động tích cực cho cộng đồng. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-080.jpg"
+    },
+    {
+      "number": 81,
+      "title": "Hành trình khám phá miền Tây",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-081.jpg"
+    },
+    {
+      "number": 82,
+      "title": "Kể chuyện những cung đường",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-082.jpg"
+    },
+    {
+      "number": 83,
+      "title": "Du lịch chậm và trải nghiệm",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-083.jpg"
+    },
+    {
+      "number": 84,
+      "title": "Khám phá di sản Việt Nam",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-084.jpg"
+    },
+    {
+      "number": 85,
+      "title": "Chuẩn bị chuyến đi đầu tiên",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-085.jpg"
+    },
+    {
+      "number": 86,
+      "title": "Văn hóa bản địa qua ống kính",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-086.jpg"
+    },
+    {
+      "number": 87,
+      "title": "Cắm trại cùng bạn bè",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-087.jpg"
+    },
+    {
+      "number": 88,
+      "title": "Ngày hội du lịch xanh",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-088.jpg"
+    },
+    {
+      "number": 89,
+      "title": "Trekking cho người mới",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-089.jpg"
+    },
+    {
+      "number": 90,
+      "title": "Ẩm thực trên những hành trình",
+      "category": "Du lịch",
+      "description": "Tìm cảm hứng cho chuyến đi, khám phá văn hóa địa phương và học cách chuẩn bị hành trình có trách nhiệm. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-090.jpg"
+    },
+    {
+      "number": 91,
+      "title": "Ngày hội gia đình sáng tạo",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-091.jpg"
+    },
+    {
+      "number": 92,
+      "title": "Cùng con làm đồ thủ công",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-092.jpg"
+    },
+    {
+      "number": 93,
+      "title": "Kể chuyện dưới tán cây",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-093.jpg"
+    },
+    {
+      "number": 94,
+      "title": "Trò chơi dân gian cuối tuần",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-094.jpg"
+    },
+    {
+      "number": 95,
+      "title": "Vườn nhỏ của bé",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-095.jpg"
+    },
+    {
+      "number": 96,
+      "title": "Vẽ tranh cùng ba mẹ",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-096.jpg"
+    },
+    {
+      "number": 97,
+      "title": "Khám phá khoa học cùng con",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-097.jpg"
+    },
+    {
+      "number": 98,
+      "title": "Bếp vui cả nhà",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-098.jpg"
+    },
+    {
+      "number": 99,
+      "title": "Ngày hội tuổi thơ",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-099.jpg"
+    },
+    {
+      "number": 100,
+      "title": "Kết nối những thế hệ",
+      "category": "Gia đình",
+      "description": "Dành thời gian chất lượng bên người thân với các hoạt động sáng tạo, vui chơi và kết nối nhiều thế hệ. Chương trình gồm đón khách, hoạt động chính và phần giao lưu tổng kết. Vui lòng đến trước 30 phút để check-in.",
+      "image": "/assets/images/events/event-100.jpg"
+    }
+  ]
+}

@@ -3,8 +3,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>QLSK-local-development</UserSecretsId>
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**;tools/**;artifacts/**;scripts/**;publish/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
+    <Content Update="appsettings.*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <Content Remove="Data/Seed/**;tests/**;tools/**;artifacts/**;scripts/**;docs/**" />
     <Compile Remove="tests/**/*.cs" />
     <Content Remove="tests/**/*" />
     <EmbeddedResource Remove="tests/**/*" />

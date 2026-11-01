@@ -1,73 +1,63 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Loại vé — SựKiện Hub</title>
-<link rel="icon" href="../../assets/icons/favicon.svg">
-<link rel="stylesheet" href="../../css/base.css">
-<link rel="stylesheet" href="../../css/app.css">
-<link rel="stylesheet" href="../../css/content.css">
-</head>
-<body data-allow="BanToChuc,QuanLySuKien,QuanTriVien">
+<link href="../../assets/icons/favicon.svg" rel="icon"/>
+<link href="../../css/base.css?v=3d373e85d690" rel="stylesheet"/>
+<link href="../../css/app.css?v=c3a2fcbf8a0f" rel="stylesheet"/>
+<link href="../../css/content.css?v=e1ea1c5a1cc7" rel="stylesheet"/>
+<link href="../../css/responsive.css?v=8dba7aa7f5fd" rel="stylesheet"/></head>
+<body data-allow="BanToChuc,QuanLySuKien,QuanTriVien"><a class="skip-link chinh" href="#noi-dung">Đến nội dung chính</a>
 <div id="spinner"></div>
-<div id="toast-wrap"></div>
-<header class="topbar">
-<div class="topbar-main">
-<a class="logo" href="../../index.html">
-<img src="../../assets/icons/logo.svg" alt="" onerror="this.style.display='none'">
-<span class="brand-content">
-<span class="brand-name">SựKiện Hub</span>
-<span class="brand-description">Đặt vé • Tổ chức • Check-in</span>
-</span>
+<div aria-live="polite" id="toast-wrap"></div>
+<header class="topbar"><div class="topbar-main">
+<a aria-label="SựKiện Hub - Trang chủ" class="logo" href="../../index.html">
+<img alt="" height="40" src="../../assets/icons/logo.svg" width="40"/>
+<span class="brand-content"><span class="brand-name">SựKiện Hub</span><span class="brand-description">Kết nối những trải nghiệm</span></span>
 </a>
-<nav class="mainnav">
-<a href="../../index.html">Sự kiện</a>
-<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
-<a href="../dia-diem/danh-sach.html">Địa điểm</a>
-<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
-<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
-<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
-</nav>
-<div class="userbox">
-<div class="avatar" id="avatar-chu">SK</div>
-<span id="nd-user">Chào bạn, hãy đăng nhập</span>
-<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap">Đăng nhập</a>
-<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky">Đăng ký</a>
-<button id="btn-dangxuat" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
-<button id="btn-menu" class="phu sm">☰</button>
-</div>
-</div>
-<nav class="menu-mobile" id="menu-mobile" hidden>
-<a href="../../index.html">Sự kiện</a>
-<a href="../su-kien/danh-sach.html">Tất cả sự kiện</a>
-<a href="../dia-diem/danh-sach.html">Địa điểm</a>
-<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
-<a href="../ve/tra-cuu-check-in.html" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien">Check-in</a>
-<a href="../quan-tri/tong-quan.html" data-quyen="QuanLySuKien,QuanTriVien">Quản trị</a>
-<a href="../auth/dang-nhap.html" class="chinh sm" id="btn-dangnhap-m">Đăng nhập</a>
-<a href="../auth/dang-ky.html" class="phu sm" id="btn-dangky-m">Đăng ký</a>
-<button id="btn-dangxuat-m" class="phu sm" onclick="dangXuat()" hidden>Đăng xuất</button>
-</nav>
-</header>
-<input type="hidden" id="sk-tukhoa">
-<input type="hidden" id="sk-tukhoa-hero">
-<input type="hidden" id="sk-tukhoa-page">
-<div class="shell no-side">
+<nav aria-label="Điều hướng chính" class="mainnav"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a></nav>
+<div class="userbox"><div aria-hidden="true" class="avatar" id="avatar-chu">SK</div><span id="nd-user"></span>
+<a class="phu sm" href="../../pages/auth/dang-nhap.html" id="btn-dangnhap">Đăng nhập</a>
+<a class="chinh sm" href="../../pages/auth/dang-ky.html" id="btn-dangky">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat" onclick="dangXuat()">Đăng xuất</button>
+<button aria-controls="menu-mobile" aria-expanded="false" aria-label="Mở menu" class="phu sm" id="btn-menu" type="button">☰</button>
+</div></div>
+<nav aria-label="Điều hướng trên điện thoại" class="menu-mobile" hidden="" id="menu-mobile"><a href="../../pages/su-kien/danh-sach.html">Sự kiện</a>
+<a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a>
+<a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a>
+<a data-quyen="BanToChuc" href="../../pages/ban-to-chuc/su-kien-cua-toi.html">Tổ chức</a>
+<a data-quyen="BanToChuc,QuanLySuKien,QuanTriVien" href="../../pages/ve/tra-cuu-check-in.html">Check-in</a>
+<a data-quyen="QuanLySuKien,QuanTriVien" href="../../pages/quan-tri/tong-quan.html">Quản trị</a>
+<a href="../../pages/auth/dang-nhap.html" id="btn-dangnhap-m">Đăng nhập</a>
+<a href="../../pages/auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a>
+<button class="phu sm" hidden="" id="btn-dangxuat-m" onclick="dangXuat()">Đăng xuất</button>
+</nav></header>
+<input id="sk-tukhoa" type="hidden"/>
+<input id="sk-tukhoa-hero" type="hidden"/>
+<input id="sk-tukhoa-page" type="hidden"/>
+<div class="shell no-side" id="noi-dung">
 <div class="content" style="max-width:960px;margin:0 auto;width:100%">
-<div id="tb-chung" class="thongbao" style="display:none"></div>
-<div class="lock-card" data-khoa hidden>
+<div class="thongbao" id="tb-chung" role="status" style="display:none"></div>
+<div class="lock-card" data-khoa="" hidden="">
 <div class="lock-ic">Khóa</div>
 <h3>Bạn cần đăng nhập để xem mục này</h3>
 <p>Vui lòng đăng nhập để tiếp tục.</p>
 <a class="chinh btn" href="../auth/dang-nhap.html">Đăng nhập ngay</a>
 </div>
-<div data-noi-dung-chinh>
+<div data-noi-dung-chinh="">
 <section class="hero">
 <div class="hero-text">
 <h1>Quản lý hạng vé sự kiện</h1>
 <p class="muted">Tạo hạng vé Thường, VIP, Early Bird với giá, số lượng và khung giờ mở bán rõ ràng để khách hàng dễ lựa chọn.</p>
-<div class="demo-strip">
+<div class="service-highlights">
 <span class="pill">Vé thường</span>
 <span class="pill">Vé VIP</span>
 <span class="pill">Early Bird</span>
@@ -75,7 +65,7 @@
 </div>
 </div>
 <div class="hero-media">
-<img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=60" alt="Sân khấu sự kiện" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'">
+<img alt="Sân khấu sự kiện" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='../../assets/images/placeholder-event.svg'" src="../../assets/images/events/sources/music.jpg"/>
 </div>
 </section>
 <section class="card howto">
@@ -92,66 +82,55 @@
 <p class="muted">Dành cho Ban tổ chức. Tạo hạng vé cho sự kiện của bạn. Thời gian đóng bán phải sau thời gian mở bán.</p>
 <div class="grid g2">
 <div>
-<label class="lbl">Chọn sự kiện của bạn</label>
-<input id="lv-sk" type="number" min="1" placeholder="vd: 3">
+<label class="lbl" for="lv-sk">Chọn sự kiện của bạn</label>
+<input id="lv-sk" min="1" placeholder="vd: 3" type="number"/>
 </div>
 <div>
-<label class="lbl">Hạng vé cần sửa (chỉ khi cập nhật)</label>
-<input id="lv-id" type="number" min="1" placeholder="vd: 10">
+<label class="lbl" for="lv-id">Hạng vé cần sửa (chỉ khi cập nhật)</label>
+<input id="lv-id" min="1" placeholder="vd: 10" type="number"/>
 </div>
 </div>
-<label class="lbl">Tên hạng vé</label>
-<input id="lv-ten" type="text" placeholder="vd: Vé VIP, Vé thường...">
+<label class="lbl" for="lv-ten">Tên hạng vé</label>
+<input id="lv-ten" placeholder="vd: Vé VIP, Vé thường..." type="text"/>
 <div class="grid g3">
 <div>
-<label class="lbl">Giá vé</label>
-<input id="lv-gia" type="number" min="0" step="1000" placeholder="vd: 150000">
+<label class="lbl" for="lv-gia">Giá vé</label>
+<input id="lv-gia" min="0" placeholder="vd: 150000" step="1000" type="number"/>
 </div>
 <div>
-<label class="lbl">Số lượng tối đa</label>
-<input id="lv-slmax" type="number" min="1" placeholder="vd: 200">
+<label class="lbl" for="lv-slmax">Số lượng tối đa</label>
+<input id="lv-slmax" min="1" placeholder="vd: 200" type="number"/>
 </div>
 <div>
-<label class="lbl">Tối đa mỗi đơn</label>
-<input id="lv-slmoi" type="number" min="1" placeholder="vd: 5">
+<label class="lbl" for="lv-slmoi">Tối đa mỗi đơn</label>
+<input id="lv-slmoi" min="1" placeholder="vd: 5" type="number"/>
 </div>
 </div>
 <div class="grid g2">
 <div>
-<label class="lbl">Mở bán</label>
-<input id="lv-mo" type="datetime-local">
+<label class="lbl" for="lv-mo">Mở bán</label>
+<input id="lv-mo" type="datetime-local"/>
 </div>
 <div>
-<label class="lbl">Đóng bán</label>
-<input id="lv-dong" type="datetime-local">
+<label class="lbl" for="lv-dong">Đóng bán</label>
+<input id="lv-dong" type="datetime-local"/>
 </div>
 </div>
 <div class="toolbar">
 <button class="chinh" onclick="themLoaiVe()">Thêm loại vé</button>
 <button class="phu" onclick="capNhatLoaiVe()">Cập nhật loại vé</button>
 </div>
-<!-- POST /api/events/{eventId}/ticket-types · PUT /api/ticket-types/{id} · GET /api/events/{id}/ticket-types -->
 </div>
 <div class="card" style="margin-top:16px">
 <h2>Xem hạng vé theo sự kiện</h2>
 <p class="muted">Nhập mã sự kiện để xem toàn bộ hạng vé đang mở bán và đã đóng bán.</p>
 <div class="searchbar">
-<input id="lv-xem-sk" type="number" min="1" placeholder="Nhập mã sự kiện để xem hạng vé...">
+<input aria-label="Nhập mã sự kiện để xem hạng vé..." id="lv-xem-sk" min="1" placeholder="Nhập mã sự kiện để xem hạng vé..." type="number"/>
 <button class="chinh" onclick="taiLoaiVeTheoSuKien()">Xem hạng vé</button>
 </div>
 <div id="ds-loaive" style="margin-top:12px"></div>
 <div id="ds-loaive-sk" style="margin-top:12px"></div>
 </div>
-<section class="card giup-su-co">
-<h3>Gặp sự cố? Xem tại đây</h3>
-<ul>
-<li>Bạn nhập thiếu thông tin</li>
-<li>Bạn chưa đăng nhập</li>
-<li>Tài khoản này đang bị khóa</li>
-<li>Không tìm thấy thông tin</li>
-<li>Vé vừa hết / thông tin vừa đổi</li>
-</ul>
-</section>
 <section class="grid g2" style="margin-top:16px">
 <div class="card">
 <h3>Mẹo định giá vé</h3>
@@ -165,48 +144,24 @@
 </div>
 </div>
 </div>
-<footer>
-<div class="footer-grid">
-<div class="footer-col">
-<div class="footer-logo">SuKien Hub</div>
-<p class="footer-desc">Nền tảng đặt vé và tổ chức sự kiện trực tuyến.</p>
-<p class="footer-hotline">Hotline: 1900 6868</p>
-<p class="footer-email">hotro@sukienhub.vn</p>
-</div>
-<div class="footer-col">
-<h4>Khám phá</h4>
-<a href="../../index.html">Tất cả sự kiện</a>
-<a href="../dia-diem/danh-sach.html">Địa điểm</a>
-<a href="../don-ve/don-cua-toi.html">Đơn của tôi</a>
-<a href="../ve/ve-theo-don.html">Vé của tôi</a>
-</div>
-<div class="footer-col">
-<h4>Dành cho Ban tổ chức</h4>
-<a href="../to-chuc/yeu-cau-cua-toi.html">Trở thành Ban tổ chức</a>
-<a href="../ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
-<a href="../dia-diem/dat-dia-diem.html">Đặt địa điểm</a>
-</div>
-<div class="footer-col">
-<h4>Hỗ trợ</h4>
-<a href="../tai-khoan/thong-tin.html">Hướng dẫn mua vé</a>
-<a href="../thanh-toan/hoan-tien.html">Chính sách hoàn tiền</a>
-<a href="../tai-khoan/thong-tin.html">Liên hệ</a>
-</div>
-</div>
-<div class="footer-bottom">© 2026 SuKien Hub - Demo giao diện, thanh toán mô phỏng, không phát sinh giao dịch thật.</div>
-</footer>
-<script src="../../config.js"></script>
-<script src="../../js/api.js"></script>
-<script src="../../js/auth.js"></script>
-<script src="../../js/sukien.js"></script>
-<script src="../../js/tochuc.js"></script>
-<script src="../../js/diadiem.js"></script>
-<script src="../../js/donve.js"></script>
-<script src="../../js/checkin.js"></script>
-<script src="../../js/quantri.js"></script>
-<script src="../../js/main.js"></script>
-<script src="../../js/compat-multipage.js"></script>
-<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
-<script>try{lucide.createIcons()}catch(e){}</script>
+<footer class="site-footer"><div class="footer-grid">
+<div class="footer-col"><a class="logo" href="../../index.html"><img alt="" height="36" src="../../assets/icons/logo.svg" width="36"/><span class="brand-name">SựKiện Hub</span></a><p>Khám phá sự kiện, kết nối đam mê và lưu giữ những khoảnh khắc đáng nhớ.</p></div>
+<div class="footer-col"><h4>Khám phá</h4><a href="../../pages/su-kien/danh-sach.html">Tất cả sự kiện</a><a href="../../pages/dia-diem/danh-sach.html">Địa điểm</a><a href="../../pages/don-ve/don-cua-toi.html">Đơn của tôi</a></div>
+<div class="footer-col"><h4>Dành cho nhà tổ chức</h4><a href="../../pages/to-chuc/gui-xac-thuc.html">Trở thành ban tổ chức</a><a href="../../pages/ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a><a href="../../pages/dia-diem/dat-dia-diem.html">Đặt địa điểm</a></div>
+<div class="footer-col"><h4>Tài khoản &amp; vé</h4><a href="../../pages/tai-khoan/thong-tin.html">Thông tin tài khoản</a><a href="../../pages/ve/ve-theo-don.html">Tra cứu vé</a><a href="../../pages/thanh-toan/hoan-tien.html">Thông tin hoàn tiền</a></div>
+</div><div class="footer-bottom">© 2026 SựKiện Hub. Kết nối những trải nghiệm.</div></footer>
+<script src="../../config.js?v=bdd0090a4767"></script>
+<script src="../../js/api.js?v=c1d7619e6258"></script>
+<script src="../../js/auth.js?v=a245dba78509"></script>
+<script src="../../js/sukien.js?v=918a332a6a09"></script>
+<script src="../../js/tochuc.js?v=2b6d0dce7382"></script>
+<script src="../../js/diadiem.js?v=dff7d228d71c"></script>
+<script src="../../js/donve.js?v=10d73840725c"></script>
+<script src="../../js/checkin.js?v=d4df51f88685"></script>
+<script src="../../js/quantri.js?v=cf50cdcabcf5"></script>
+<script src="../../js/main.js?v=c4cd0eb83e64"></script>
+<script src="../../js/compat-multipage.js?v=fe985c02be3b"></script>
+
+
 </body>
 </html>

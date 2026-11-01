@@ -25,19 +25,22 @@ function apDungQuyen() {
   try { vt = sessionStorage.getItem("sk_vaitro") || ""; } catch (e) {}
   var hoten = "";
   try { hoten = sessionStorage.getItem("sk_hoten") || ""; } catch (e) {}
+  hoten = noiDungGiaoDien(hoten);
   var nd = document.getElementById("nd-user");
   if (nd) {
     if (hoten) {
-      var chip = vt ? ' <span class="rolechip">' + vt + "</span>" : "";
       nd.innerHTML = "";
       var b = document.createElement("b");
       b.textContent = hoten;
       nd.appendChild(b);
-      var tmp = document.createElement("span");
-      tmp.innerHTML = chip;
-      while (tmp.firstChild) nd.appendChild(tmp.firstChild);
+      if (vt) {
+        var chip = document.createElement("span");
+        chip.className = "rolechip";
+        chip.textContent = "Thành viên";
+        nd.appendChild(chip);
+      }
     } else {
-      nd.textContent = "Chua dang nhap";
+      nd.textContent = "";
     }
   }
   var btnOut = document.getElementById("btn-dangxuat");
@@ -91,27 +94,34 @@ function ganEnterSubmit() {
   var menu = document.getElementById("menu-mobile");
   if (btn && menu) {
     var capNhat = function () {
-      btn.style.display = window.innerWidth <= 860 ? "" : "none";
-      if (window.innerWidth > 860) menu.style.display = "none";
+      if (window.innerWidth > 1150) dongMenu();
     };
+    function dongMenu() {
+      menu.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Mở menu");
+    }
     btn.onclick = function () {
-      menu.style.display = (menu.style.display === "none" || !menu.style.display) ? "grid" : "none";
+      menu.hidden = !menu.hidden;
+      btn.setAttribute("aria-expanded", String(!menu.hidden));
+      btn.setAttribute("aria-label", menu.hidden ? "Mở menu" : "Đóng menu");
     };
+    menu.addEventListener("click", function (event) { if (event.target.closest("a")) dongMenu(); });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !menu.hidden) { dongMenu(); btn.focus(); }
+    });
+    document.addEventListener("click", function (event) {
+      if (!menu.hidden && !menu.contains(event.target) && !btn.contains(event.target)) dongMenu();
+    });
     window.addEventListener("resize", capNhat);
     capNhat();
   }
   /* Tags nhanh hero -> tim kiem */
-  Array.prototype.forEach.call(document.querySelectorAll(".hero-tags .catchip"), function (c) {
+  Array.prototype.forEach.call(document.querySelectorAll("button[data-category]"), function (c) {
     c.addEventListener("click", function () {
       Array.prototype.forEach.call(document.querySelectorAll(".hero-tags .catchip"), function (x) { x.classList.remove("active"); });
       c.classList.add("active");
-      var q = c.textContent.trim();
-      ["sk-tukhoa", "sk-tukhoa-hero", "sk-tukhoa-page"].forEach(function (o) {
-        var t = document.getElementById(o);
-        if (t) t.value = (q === "Tat ca") ? "" : q;
-      });
-      hienTrang("sukien");
-      if (typeof taiDanhSachSuKien === "function") taiDanhSachSuKien();
+      if (typeof locLoaiSuKien === "function") locLoaiSuKien(c.getAttribute("data-category"));
     });
   });
 }
@@ -122,19 +132,19 @@ async function renderDuyetToChuc() {
   if (!host) return;
   try {
     var kq = await apiFetch("/api/organizer-verifications");
-    var rows = (kq.data || []).filter(function (r) { return String(r.TrangThai || r.trangThai || "") === "ChoDuyet"; });
+    var rows = (kq.data || []).filter(function (r) { return (r.TrangThai === 0 || r.TrangThai === "ChoDuyet"); });
     host.innerHTML = '<div class="muted">Co ' + rows.length + " yeu cau dang chờ duyet.</div>" +
       '<div class="toolbar">' +
       '<button class="chinh sm" onclick="taiDuyetToChuc()">Tai lai danh sach</button> ' +
       '<button class="phu sm" onclick="taiThongKeToChuc()">Thong ke</button></div>' +
-      '<p class="muted" style="margin:0">Chon ID yeu cau va bam duyet/tu choi.</p>' +
-      '<div class="row"><input id="dtc-id" type="number" placeholder="ID yeu cau">' +
+      '<p class="muted" style="margin:0">Chọn mã yeu cau va bam duyet/tu choi.</p>' +
+      '<div class="row"><input id="dtc-id" type="number" placeholder="Mã yeu cau">' +
       '<input id="dtc-ten" placeholder="Ten to chuc (khi duyet)">' +
       '<input id="dtc-lydo" placeholder="Ly do (khi tu choi)"></div>' +
       '<div class="toolbar" style="margin-top:6px"><button class="chinh sm" onclick="duyetToChucNhanh()">Duyet yeu cau</button> ' +
       '<button class="phu sm" onclick="tuChoiToChucNhanh()">Tu choi yeu cau</button></div>';
   } catch (e) {
-    host.innerHTML = '<div class="row"><input id="dtc-id" type="number" placeholder="ID yeu cau">' +
+    host.innerHTML = '<div class="row"><input id="dtc-id" type="number" placeholder="Mã yeu cau">' +
       '<input id="dtc-ten" placeholder="Ten to chuc (khi duyet)">' +
       '<input id="dtc-lydo" placeholder="Ly do (khi tu choi)"></div>' +
       '<div class="toolbar"><button class="chinh sm" onclick="duyetToChucNhanh()">Duyet yeu cau</button> ' +
@@ -148,7 +158,7 @@ async function taiDuyetToChuc() {
 
 async function duyetToChucNhanh() {
   var id = num("dtc-id");
-  if (!id || id <= 0) { toast("Nhap ID yeu cau.", "loi"); return; }
+  if (!id || id <= 0) { toast("Nhập mã yeu cau.", "loi"); return; }
   try {
     await apiFetch("/api/organizer-verifications/" + id + "/approve", "POST", null);
     thongBao("Da duyet yeu cau.");
@@ -160,7 +170,7 @@ async function duyetToChucNhanh() {
 async function tuChoiToChucNhanh() {
   var id = num("dtc-id");
   var lydo = val("dtc-lydo");
-  if (!id || id <= 0) { toast("Nhap ID yeu cau.", "loi"); return; }
+  if (!id || id <= 0) { toast("Nhập mã yeu cau.", "loi"); return; }
   if (!lydo) { toast("Nhap ly do tu choi.", "loi"); return; }
   try {
     await apiFetch("/api/organizer-verifications/" + id + "/reject", "POST", { LyDo: lydo });
@@ -172,18 +182,21 @@ async function tuChoiToChucNhanh() {
 
 window.addEventListener("DOMContentLoaded", function () {
   apDungQuyen();
-  hienTrang("dangnhap");
   ganEnterSubmit();
-  /* tu dong nap du lieu nhe cho trang cong khai su kien khi da dang nhap */
+  var params = new URLSearchParams(location.search);
+  if (params.has("q")) {
+    ["sk-tukhoa", "sk-tukhoa-page"].forEach(function (id) { var field = document.getElementById(id); if (field) field.value = params.get("q"); });
+  }
+  /* Tu dong nap su kien cong khai tren cac trang co danh sach. */
   try {
-    if (sessionStorage.getItem("sk_token") && typeof taiDanhSachSuKien === "function") {
+    if (document.getElementById("ds-sukien") && typeof taiDanhSachSuKien === "function") {
       taiDanhSachSuKien();
     }
   } catch (e) {}
   if (typeof taiLoaiSuKien === "function") {
     /* preload loai su kien cho select tao su kien (can token) */
     try {
-      if (sessionStorage.getItem("sk_token")) taiLoaiSuKien();
+      if (document.querySelector("[data-event-categories]") || (sessionStorage.getItem("sk_token") && (document.getElementById("sk-loai") || document.getElementById("ds-loai")))) taiLoaiSuKien();
     } catch (e) {}
   }
 });

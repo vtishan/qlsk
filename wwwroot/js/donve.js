@@ -8,6 +8,7 @@ async function taiLoaiVeTheoSuKien(suKienID) {
   if (!id || id <= 0) { toast("Nhap su kien de xem hang ve.", "loi"); return; }
   var hostId = suKienID ? "ds-loaive-sk" : "ds-loaive";
   var host = document.getElementById(hostId) || document.getElementById("ds-loaive-sk") || document.getElementById("ds-loaive");
+  if (!host) { location.assign("/pages/su-kien/chi-tiet.html?id=" + Number(id) + "#tickets"); return; }
   if (host) skeleton(host.id, 3);
   try {
     var kq = await apiFetch("/api/events/" + id + "/ticket-types");
@@ -17,50 +18,57 @@ async function taiLoaiVeTheoSuKien(suKienID) {
     else {
       html = '<div class="grid g3">' + rows.map(function (d) {
         return '<article class="card hoverable anim-pop">' +
-          '<div class="toolbar" style="margin:0 0 8px"><span class="badge b-info">#' + d.Id + "</span>" +
+          '<div class="toolbar" style="margin:0 0 8px">' +
           '<span style="margin-left:auto"><b>' + esc(fmtTien(d.Gia)) + " VND</b></span></div>" +
           "<h3>" + esc(d.Ten) + "</h3>" +
-          '<div class="muted">Toi da: ' + esc(d.SoLuong) + " &middot; Moi don: 20</div>" +
+          '<div class="muted">Còn ' + esc(Math.max(0, d.SoLuong - d.DaBan - d.DangGiu)) + " vé · Tối đa 20 vé/đơn</div>" +
           '<div class="muted">' + esc(isoLocal(d.MoBan)) + " &rarr; " + esc(isoLocal(d.DongBan)) + "</div>" +
-          '<div class="toolbar"><button class="chinh sm" onclick="chonLoaiVe(' + d.Id + ')">Chon mua</button></div>' +
+          '<div class="toolbar"><button class="chinh sm" onclick="chonLoaiVe(' + d.Id + ',' + id + ')"' + ((d.SoLuong - d.DaBan - d.DangGiu <= 0 || ngayDuLieu(d.DongBan) < new Date() || ngayDuLieu(d.MoBan) > new Date()) ? ' disabled' : '') + '>Chọn vé</button></div>' +
           "</article>";
       }).join("") + "</div>";
     }
     if (host) {
-      host.innerHTML = "<h3>Hang ve cua su kien</h3>" + html;
-      host.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      host.innerHTML = html;
     }
   } catch (e) { thongBao(e.message, "loi"); }
 }
 
-function chonLoaiVe(loaiVeID) {
-  var el = document.getElementById("don-loai");
-  if (el) el.value = loaiVeID;
-  if (typeof hienTrang === "function") hienTrang("donve");
-  toast("Da chon hang ve — nhap so luong roi Tao don.", "info");
+function chonLoaiVe(loaiVeID, suKienID) {
+  var target = "/pages/don-ve/tao-don.html?event=" + Number(suKienID) + "&ticket=" + Number(loaiVeID);
+  location.assign(store.token ? target : "/pages/auth/dang-nhap.html?next=" + encodeURIComponent(target));
 }
 
 /* ---- Don ve ---- */
 async function taoDon() {
   var loai = num("don-loai"), sl = num("don-sl");
   if (!loai || loai <= 0) { toast("Nhap hang ve hop le.", "loi"); return; }
-  if (sl === null || isNaN(sl) || sl <= 0) { toast("So luong ve phai > 0.", "loi"); return; }
+  if (!Number.isInteger(sl) || sl < 1 || sl > 20) { toast("Vui lòng chọn từ 1 đến 20 vé.", "loi"); return; }
+  var button = document.querySelector('button[onclick="taoDon()"]');
+  if (button && button.disabled) return;
+  if (button) button.disabled = true;
   try {
     var kq = await apiFetch("/api/orders", "POST", { Items: [{ LoaiVeId: loai, SoLuong: sl }] });
     var don = kq.data || kq;
     var ma = don.MaDonHang || ("DH-" + don.Id);
     thongBao("Tao don thanh cong. Ma don: " + ma);
     banConfetti(90);
-    taiDonCuaToi();
+    location.assign("/pages/don-ve/chi-tiet-don.html?id=" + Number(don.Id));
   } catch (e) { thongBao(e.message, "loi"); }
+  finally { if (button) button.disabled = false; }
 }
 
 var __dsDonCache = [];
 
+function nhanTrangThaiDon(value) {
+  return typeof value === "number" ? (["ChoThanhToan", "ThanhCong", "HetHan", "DaHuy", "YeuCauHoanTien", "DaHoanTien"][value] || "") : value;
+}
+
 function _phanLoaiDon(d) {
   var don = String((d && d.TrangThai) || "");
   var tt = String((d && d.TrangThaiThanhToan) || "");
-  if (/DaHuy|BiHetHan/i.test(don)) return "huy";
+  if (/DaHuy|HetHan/i.test(don) || [2, 3].indexOf(d.TrangThai) !== -1) return "huy";
+  if ([4, 5].indexOf(d.TrangThai) !== -1) return "refund";
+  if (d.TrangThai === 1) return "paid";
   if (/DaHoanTien|HoanTienMotPhan|YeuCauHoanTien/i.test(don) || /DaHoanTien|HoanTienMotPhan/i.test(tt)) return "refund";
   if (/ThanhCong/i.test(don) || /DaThanhToan/i.test(tt)) return "paid";
   return "cho";
@@ -68,10 +76,10 @@ function _phanLoaiDon(d) {
 
 function _nhanDon(d) {
   var loai = _phanLoaiDon(d);
-  if (loai === "cho") return "Cho thanh toan";
-  if (loai === "paid") return "Da thanh toan";
-  if (loai === "refund") return "Hoan tien";
-  if (loai === "huy") return "Da huy / Het han";
+  if (loai === "cho") return "Chờ thanh toán";
+  if (loai === "paid") return "Đã thanh toán";
+  if (loai === "refund") return "Hoàn tiền";
+  if (loai === "huy") return "Đã hủy / Hết hạn";
   return String(d.TrangThai || d.TrangThaiThanhToan || "—");
 }
 
@@ -125,7 +133,7 @@ function _cardDon(d) {
   var isPaid = loai === "paid" || loai === "refund";
   var h = '<article class="card hoverable anim-pop don-card ' + cls + '">' +
     '<div class="don-top"><span class="don-code">' + esc(d.MaDonHang || ("DH-" + d.Id)) + "</span>" +
-    '<span class="don-badges">' + badgeTT(d.TrangThai) + " " + badgeTT(d.TrangThaiThanhToan) + "</span></div>" +
+    '<span class="don-badges">' + badgeTT(nhanTrangThaiDon(d.TrangThai)) + "</span></div>" +
     '<div class="muted small">Đơn #' + esc(d.Id) + (ngayDat ? " &middot; Đặt lúc " + ngayDat : "") + " &middot; " + esc(_nhanDon(d)) + "</div>" +
     hetHan +
     '<div class="don-price-row"><span class="muted small">Tổng thanh toán</span><span class="don-price">' + esc(fmtTien(tong)) + "đ</span></div>" +
@@ -227,7 +235,7 @@ async function xemChiTietDon(id) {
           };
         })) +
       '<div class="don-sum"><span>Tổng cộng (' + rows.length + ' dòng vé)</span><span class="tien">' + esc(fmtTien(tong)) + "đ</span></div>" +
-      '<div class="don-actions"><a class="phu btn sm" href="../thanh-toan/thanh-toan.html">Sang thanh toán</a> ' +
+      '<div class="don-actions"><a class="phu btn sm" href="../thanh-toan/thanh-toan.html?id=' + Number(id) + '">Sang thanh toán</a> ' +
       '<a class="phu btn sm" href="../ve/ve-theo-don.html">Xem vé theo đơn</a></div></div>';
     host.innerHTML = h;
     host.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -251,13 +259,12 @@ async function taiGiaoDich() {
     var rows = (d.ThanhToans || []).map(function (p) {
       return {
         MaGiaoDich: p.MaGiaoDich,
-        PhuongThucThanhToan: "Tien mat",
         SoTien: p.SoTien,
         TrangThai: p.TrangThai
       };
     });
     document.getElementById("ds-giaodich").innerHTML = bangHTML(
-      [["MaGiaoDich", "Ma GD"], ["PhuongThucThanhToan", "Phuong thuc"], ["SoTien", "So tien", "tien"], ["TrangThai", "Trang thai"]],
+      [["MaGiaoDich", "Ma GD"], ["SoTien", "So tien", "tien"], ["TrangThai", "Trang thai"]],
       rows);
   } catch (e) { thongBao(e.message, "loi"); }
 }
@@ -269,33 +276,22 @@ async function thanhToanDon(donID) {
     var kq = await apiFetch("/api/payments", "POST", { DonVeId: donID });
     var p = kq.data || kq;
     var url = p.checkoutUrl || "";
-    thongBao("Tao link thanh toán thành công.");
     if (url) {
-      window.open(url, "_blank");
+      var checkout = new URL(url, location.origin);
+      if (checkout.protocol !== "https:" && checkout.origin !== location.origin) throw new Error("Chưa thể mở trang thanh toán. Vui lòng thử lại sau.");
+      location.assign(checkout.href);
     } else {
-      thongBao("Don da thanh toan (tong tien 0) - ve da duoc phat hanh.");
+      thongBao("Đặt vé miễn phí thành công. Vé của bạn đã sẵn sàng.");
+      if (!document.getElementById("ds-don")) location.assign("/pages/don-ve/don-cua-toi.html");
     }
-    taiDonCuaToi();
+    if (document.getElementById("ds-don")) taiDonCuaToi();
   } catch (e) { thongBao(e.message, "loi"); }
 }
 
 async function thanhToan() {
   var don = num("tt-don");
   if (!don || don <= 0) { toast("Nhap don hang hop le.", "loi"); return; }
-  try {
-    var kq = await apiFetch("/api/payments", "POST", { DonVeId: don });
-    var p = kq.data || kq;
-    var url = p.checkoutUrl || "";
-    thongBao("Ghi nhan thanh toan thanh cong.");
-    if (url) {
-      if (url.startsWith("/")) {
-        location.href = API_BASE + url;
-      } else {
-        window.open(url, "_blank");
-      }
-    }
-    taiDonCuaToi();
-  } catch (e) { thongBao(e.message, "loi"); }
+  await thanhToanDon(don);
 }
 
 async function hoanTien() {
@@ -319,30 +315,19 @@ async function taiThanhToanTheoDon() {
     var rows = (d.ThanhToans || []).map(function (p) {
       return {
         MaGiaoDich: p.MaGiaoDich,
-        PhuongThucThanhToan: "Tien mat",
         SoTien: p.SoTien,
         TrangThai: p.TrangThai
       };
     });
     document.getElementById("ds-thanhtoan").innerHTML = bangHTML(
-      [["MaGiaoDich", "Ma GD"], ["PhuongThucThanhToan", "Phuong thuc"], ["SoTien", "So tien", "tien"], ["TrangThai", "Trang thai"]],
+      [["MaGiaoDich", "Ma GD"], ["SoTien", "So tien", "tien"], ["TrangThai", "Trang thai"]],
       rows);
   } catch (e) { thongBao(e.message, "loi"); }
 }
 
 async function taiThongKeThanhToan() {
-  try {
-    var kq = await apiFetch("/api/orders/me");
-    var rows = kq.data || [];
-    var thanhCong = rows.filter(function (o) { return _phanLoaiDon(o) === "paid" || _phanLoaiDon(o) === "refund"; }).length;
-    var tong = rows.reduce(function (s, o) { return s + Number(o.TongTien || 0); }, 0);
-    var host = document.getElementById("tk-thanhtoan");
-    if (host) host.innerHTML = bangHTML(
-      [["MaGiaoDich", "Ma GD"], ["SoTien", "So tien", "tien"], ["TrangThai", "Trang thai"]],
-      rows.map(function (o) {
-        return { MaGiaoDich: o.MaDonHang || ("DH-" + o.Id), SoTien: o.TongTien, TrangThai: o.TrangThai };
-      }).slice(0, 10));
-  } catch (e) { thongBao(e.message, "loi"); }
+  try { var result = await apiFetch("/api/admin/dashboard"); hienThongKeThanhToan(result.data); }
+  catch (error) { thongBao(error.message, "loi"); }
 }
 
 /* ---- Phat hanh ve theo don ---- */
@@ -364,7 +349,7 @@ async function themLoaiVe() {
   var sl = num("lv-slmax"), mo = val("lv-mo"), dong = val("lv-dong");
   if (!sk || sk <= 0) { toast("Nhap ma su kien hop le.", "loi"); return; }
   if (!ten) { toast("Nhap ten hang ve.", "loi"); return; }
-  if (gia === null || isNaN(gia) || gia < 0) { toast("Gia ve phai la so khong am.", "loi"); return; }
+  if (gia === null || isNaN(gia) || gia < 0) { toast("Gia ve phải là số không âm.", "loi"); return; }
   if (sl === null || isNaN(sl) || sl <= 0) { toast("So luong phai > 0.", "loi"); return; }
   if (!mo || !dong) { toast("Chon thoi gian mo ban va dong ban.", "loi"); return; }
   try {
@@ -379,9 +364,9 @@ async function themLoaiVe() {
 async function capNhatLoaiVe() {
   var id = num("lv-id"), ten = val("lv-ten"), gia = num("lv-gia");
   var sl = num("lv-slmax"), mo = val("lv-mo"), dong = val("lv-dong");
-  if (!id || id <= 0) { toast("Nhap ID loai ve can cap nhat.", "loi"); return; }
+  if (!id || id <= 0) { toast("Nhập mã loai ve can cap nhat.", "loi"); return; }
   if (!ten) { toast("Nhap ten hang ve.", "loi"); return; }
-  if (gia === null || isNaN(gia) || gia < 0) { toast("Gia ve phai la so khong am.", "loi"); return; }
+  if (gia === null || isNaN(gia) || gia < 0) { toast("Gia ve phải là số không âm.", "loi"); return; }
   if (sl === null || isNaN(sl) || sl <= 0) { toast("So luong phai > 0.", "loi"); return; }
   if (!mo || !dong) { toast("Chon thoi gian mo ban va dong ban.", "loi"); return; }
   try {
@@ -392,3 +377,42 @@ async function capNhatLoaiVe() {
     taiLoaiVeTheoSuKien(num("lv-sk"));
   } catch (e) { thongBao(e.message, "loi"); }
 }
+
+document.addEventListener("DOMContentLoaded", async function () {
+  var params = new URLSearchParams(location.search);
+  var orderId = Number(params.get("id"));
+  if (orderId > 0 && document.getElementById("tt-don")) document.getElementById("tt-don").value = orderId;
+  if (orderId > 0 && location.pathname.endsWith("/don-ve/chi-tiet-don.html") && store.token) xemChiTietDon(orderId);
+  var eventSelect = document.getElementById("don-sukien");
+  if (!eventSelect || !store.token) return;
+  var ticketSelect = document.getElementById("don-loai");
+  var quantity = document.getElementById("don-sl");
+  var tickets = [];
+  function updateTotal() {
+    var ticket = tickets.find(function (item) { return item.Id === Number(ticketSelect.value); });
+    var total = document.getElementById("don-total");
+    if (total) total.textContent = ticket ? "Tổng tiền: " + fmtTien(ticket.Gia * Number(quantity.value || 0)) + " ₫" : "";
+  }
+  async function loadTickets() {
+    ticketSelect.innerHTML = '<option value="">Đang tải hạng vé…</option>';
+    tickets = [];
+    updateTotal();
+    if (!eventSelect.value) { ticketSelect.innerHTML = '<option value="">Chọn sự kiện trước</option>'; return; }
+    try {
+      var result = await apiFetch("/api/events/" + Number(eventSelect.value) + "/ticket-types");
+      tickets = (result.data || []).filter(function (item) { return item.SoLuong > item.DaBan + item.DangGiu && ngayDuLieu(item.MoBan) <= new Date() && ngayDuLieu(item.DongBan) > new Date(); });
+      ticketSelect.innerHTML = tickets.length ? tickets.map(function (item) { return '<option value="' + Number(item.Id) + '">' + esc(item.Ten) + ' · ' + (item.Gia ? esc(fmtTien(item.Gia)) + ' ₫' : 'Miễn phí') + '</option>'; }).join("") : '<option value="">Chưa có hạng vé đang mở bán</option>';
+      if (tickets.some(function (item) { return item.Id === Number(params.get("ticket")); })) ticketSelect.value = params.get("ticket");
+      updateTotal();
+    } catch (error) { ticketSelect.innerHTML = '<option value="">Chưa tải được hạng vé</option>'; thongBao(error.message, "loi"); }
+  }
+  eventSelect.addEventListener("change", loadTickets);
+  ticketSelect.addEventListener("change", updateTotal);
+  quantity.addEventListener("input", updateTotal);
+  try {
+    var result = await apiFetch("/api/events");
+    var events = (result.data || []).filter(function (item) { return item.TrangThai === 1 || item.TrangThai === "DaDuyet"; });
+    eventSelect.innerHTML = '<option value="">Chọn sự kiện</option>' + events.map(function (item) { return '<option value="' + Number(item.Id) + '">' + esc(item.Ten) + '</option>'; }).join("");
+    if (events.some(function (item) { return item.Id === Number(params.get("event")); })) { eventSelect.value = params.get("event"); await loadTickets(); }
+  } catch (error) { thongBao(error.message, "loi"); }
+});

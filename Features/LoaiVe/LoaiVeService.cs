@@ -21,20 +21,21 @@ public class LoaiVeService(ApplicationDbContext db)
         return await db.LoaiVes.AsNoTracking().Where(x => x.SuKienId == suKienId).OrderBy(x => x.Gia).ToListAsync();
     }
 
-    public async Task<LoaiVeEntity> Tao(int userId, int suKienId, LoaiVeDto dto)
+    public async Task<LoaiVeEntity> Tao(int userId, int suKienId, LoaiVeDto dto, bool admin = false)
     {
         Validate(dto);
-        await CheckOwner(userId, suKienId);
+        if (!admin) await CheckOwner(userId, suKienId);
+        else if (!await db.SuKiens.AnyAsync(x => x.Id == suKienId)) throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
         if (await db.LoaiVes.AnyAsync(x => x.SuKienId == suKienId && x.Ten == dto.Ten.Trim())) throw new ApiException(409, "TICKET_TYPE_EXISTS", "Tên loại vé đã tồn tại trong sự kiện.");
         var x = new LoaiVeEntity { SuKienId = suKienId, Ten = dto.Ten.Trim(), Gia = dto.Gia, SoLuong = dto.SoLuong, MoBan = dto.MoBan, DongBan = dto.DongBan };
         db.LoaiVes.Add(x); await db.SaveChangesAsync(); return x;
     }
 
-    public async Task<LoaiVeEntity> Sua(int userId, int id, LoaiVeDto dto)
+    public async Task<LoaiVeEntity> Sua(int userId, int id, LoaiVeDto dto, bool admin = false)
     {
         Validate(dto);
         var x = await db.LoaiVes.Include(x => x.SuKien).ThenInclude(x => x.BanToChuc).SingleOrDefaultAsync(x => x.Id == id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy loại vé.");
-        if (x.SuKien.BanToChuc.TaiKhoanId != userId) throw new ApiException(403, "FORBIDDEN", "Không có quyền sửa loại vé.");
+        if (!admin && x.SuKien.BanToChuc.TaiKhoanId != userId) throw new ApiException(403, "FORBIDDEN", "Không có quyền sửa loại vé.");
         if (dto.SoLuong < x.DaBan + x.DangGiu) throw new ApiException(409, "TICKET_LIMIT_EXCEEDED", "Số lượng mới nhỏ hơn số vé đã bán/đang giữ.");
         if (await db.LoaiVes.AnyAsync(y => y.Id != id && y.SuKienId == x.SuKienId && y.Ten == dto.Ten.Trim())) throw new ApiException(409, "TICKET_TYPE_EXISTS", "Tên loại vé đã tồn tại.");
         x.Ten = dto.Ten.Trim(); x.Gia = dto.Gia; x.SoLuong = dto.SoLuong; x.MoBan = dto.MoBan; x.DongBan = dto.DongBan;

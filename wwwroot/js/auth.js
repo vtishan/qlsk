@@ -4,17 +4,21 @@ async function dangKy() {
   var hoten = val("dk-hoten"), email = val("dk-email");
   var mk = document.getElementById("dk-mk") ? document.getElementById("dk-mk").value : "";
   var lai = document.getElementById("dk-nhaplai") ? document.getElementById("dk-nhaplai").value : "";
-  if (!hoten || !email || !mk) { toast("Vui long nhap day du ho ten, email, mat khau.", "loi"); return; }
+  if (!hoten || !email || !mk) { toast("Vui lòng nhập đầy đủ họ tên, email và mật khẩu.", "loi"); return; }
   if (!checkMatKhau(mk, lai, "dk-nhaplai")) return;
+  var button = document.getElementById("btn-dangky-form");
+  if (button && button.disabled) return;
+  if (button) button.disabled = true;
   try {
     await apiFetch("/api/auth/register", "POST", {
       HoTen: hoten,
       Email: email,
       MatKhau: mk
     });
-    thongBao("Dang ky thanh cong, moi dang nhap.");
+    thongBao("Đăng ký thành công. Vui lòng đăng nhập.");
     hienTrang("dangnhap");
   } catch (e) { thongBao(e.message, "loi"); }
+  finally { if (button) button.disabled = false; }
 }
 
 async function dangNhap() {
@@ -29,9 +33,13 @@ async function dangNhap() {
     sessionStorage.setItem("sk_vaitro", taiKhoan.vaiTro || taiKhoan.TenVaiTro || "");
     sessionStorage.setItem("sk_hoten", taiKhoan.hoTen || taiKhoan.HoTen || "");
     sessionStorage.setItem("sk_tkid", taiKhoan.id || taiKhoan.TaiKhoanID || "");
-    thongBao("Dang nhap thanh cong: " + (taiKhoan.hoTen || ""));
+    thongBao("Đăng nhập thành công: " + (taiKhoan.hoTen || ""));
     if (typeof taiDanhSachSuKien === "function") taiDanhSachSuKien();
-    hienTrang("sukien");
+    var next = new URLSearchParams(location.search).get("next");
+    if (next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")) location.assign(next);
+    else if (store.vaiTro === "BanToChuc") location.assign("/pages/ban-to-chuc/su-kien-cua-toi.html");
+    else if (["QuanLySuKien", "QuanTriVien"].indexOf(store.vaiTro) !== -1) location.assign("/pages/quan-tri/tong-quan.html");
+    else hienTrang("sukien");
   } catch (e) { thongBao(e.message, "loi"); }
 }
 
@@ -46,11 +54,11 @@ async function doiMatKhau() {
   var cu = document.getElementById("dmk-cu") ? document.getElementById("dmk-cu").value : "";
   var moi = document.getElementById("dmk-moi") ? document.getElementById("dmk-moi").value : "";
   var lai = document.getElementById("dmk-nhaplai") ? document.getElementById("dmk-nhaplai").value : "";
-  if (!cu || !moi) { toast("Vui long nhap mat khau cu va moi.", "loi"); return; }
+  if (!cu || !moi) { toast("Vui lòng nhập mật khẩu cũ và mật khẩu mới.", "loi"); return; }
   if (!checkMatKhau(moi, lai, "dmk-nhaplai")) return;
   try {
     await apiFetch("/api/auth/change-password", "PUT", { MatKhauCu: cu, MatKhauMoi: moi });
-    thongBao("Doi mat khau thanh thanh cong. Vui long dang nhap lai de cap quyen moi.");
+    thongBao("Đã đổi mật khẩu. Vui lòng đăng nhập lại.");
     dangXuat();
   } catch (e) { thongBao(e.message, "loi"); }
 }
@@ -64,7 +72,7 @@ async function taiTaiKhoan() {
     var qs = "/api/accounts?page=1&size=50" + (tuKhoa ? "&q=" + encodeURIComponent(tuKhoa) : "");
     var kq = await apiFetch(qs);
     document.getElementById("ds-taikhoan").innerHTML = bangHTML(
-      [["HoTen", "Ho ten"], ["Email", "Email"], ["TenVaiTro", "Vai tro"], ["TrangThai", "Hoat dong"]],
+      [["HoTen", "Ho ten"], ["Email", "Email"], ["VaiTro", "Vai trò"], ["TrangThai", "Hoat dong"]],
       (kq.data || []).map(function (d) {
         d.TrangThai = d.HoatDong ? "Dang hoat dong" : "Da khoa";
         return d;
@@ -96,10 +104,34 @@ async function doiVaiTroTaiKhoan(id) {
   } catch (e) { thongBao(e.message, "loi"); }
 }
 async function capNhatTaiKhoan() {
-  var hoten = val("qtk-hoten"), email = val("qtk-email");
-  if (!hoten || !email) { toast("Ho ten va Email khong duoc de trong.", "loi"); return; }
+  var hoten = val("qtk-hoten");
+  if (!hoten) { toast("Vui lòng nhập họ tên.", "loi"); return; }
+  var button = document.getElementById("btn-luu-hoso");
+  if (button && button.disabled) return;
+  if (button) button.disabled = true;
   try {
     await apiFetch("/api/accounts/me", "PUT", { HoTen: hoten });
-    thongBao("Cap nhat tai khoan thanh cong."); taiTaiKhoan();
+    sessionStorage.setItem("sk_hoten", hoten);
+    apDungQuyen();
+    thongBao("Đã lưu thông tin tài khoản.");
   } catch (e) { thongBao(e.message, "loi"); }
+  finally { if (button) button.disabled = false; }
 }
+
+async function taiHoSoCaNhan() {
+  if (!store.token || !document.getElementById("btn-luu-hoso")) return;
+  var button = document.getElementById("btn-luu-hoso");
+  if (button) button.disabled = true;
+  try {
+    var result = await apiFetch("/api/accounts/me");
+    var profile = result.data || {};
+    [["qtk-id", profile.Id], ["qtk-hoten", profile.HoTen], ["qtk-email", profile.Email]].forEach(function (field) {
+      var input = document.getElementById(field[0]);
+      if (input) input.value = field[1] || "";
+    });
+    sessionStorage.setItem("sk_hoten", profile.HoTen || "");
+    apDungQuyen();
+  } catch (e) { thongBao(e.message, "loi"); }
+  finally { if (button) button.disabled = false; }
+}
+document.addEventListener("DOMContentLoaded", taiHoSoCaNhan);

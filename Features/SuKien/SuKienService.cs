@@ -14,7 +14,7 @@ public class SuKienService(ApplicationDbContext db)
     public async Task<LoaiSuKien> TaoLoai(LoaiSuKienDto dto)
     {
         if (await db.LoaiSuKiens.AnyAsync(x => x.Ten == dto.Ten.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
-        var x = new LoaiSuKien { Ten = dto.Ten.Trim(), MoTa = dto.MoTa.Trim(), HoatDong = dto.HoatDong };
+        var x = new LoaiSuKien { Ten = dto.Ten.Trim(), MoTa = (dto.MoTa ?? "").Trim(), HoatDong = dto.HoatDong };
         db.LoaiSuKiens.Add(x); await db.SaveChangesAsync(); return x;
     }
 
@@ -22,7 +22,7 @@ public class SuKienService(ApplicationDbContext db)
     {
         var x = await db.LoaiSuKiens.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy loại sự kiện.");
         if (await db.LoaiSuKiens.AnyAsync(y => y.Id != id && y.Ten == dto.Ten.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
-        x.Ten = dto.Ten.Trim(); x.MoTa = dto.MoTa.Trim(); x.HoatDong = dto.HoatDong; await db.SaveChangesAsync(); return x;
+        x.Ten = dto.Ten.Trim(); x.MoTa = (dto.MoTa ?? "").Trim(); x.HoatDong = dto.HoatDong; await db.SaveChangesAsync(); return x;
     }
 
     public async Task<List<SuKienEntity>> DanhSach(bool manager = false)
@@ -54,7 +54,7 @@ public class SuKienService(ApplicationDbContext db)
         Validate(dto);
         var btcId = await LayBanToChucId(userId);
         if (!await db.LoaiSuKiens.AnyAsync(x => x.Id == dto.LoaiSuKienId && x.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
-        var x = new SuKienEntity { BanToChucId = btcId, LoaiSuKienId = dto.LoaiSuKienId, Ten = dto.Ten.Trim(), MoTa = dto.MoTa.Trim(), BatDau = dto.BatDau, KetThuc = dto.KetThuc, SoNguoi = dto.SoNguoi, TrangThai = TrangThaiSuKien.ChoDuyet };
+        var x = new SuKienEntity { BanToChucId = btcId, LoaiSuKienId = dto.LoaiSuKienId, Ten = dto.Ten.Trim(), MoTa = (dto.MoTa ?? "").Trim(), HinhAnh = dto.HinhAnh, BatDau = dto.BatDau, KetThuc = dto.KetThuc, SoNguoi = dto.SoNguoi, TrangThai = TrangThaiSuKien.ChoDuyet };
         db.SuKiens.Add(x); await db.SaveChangesAsync(); return x;
     }
 
@@ -64,7 +64,7 @@ public class SuKienService(ApplicationDbContext db)
         var x = await LayCuaChu(userId, id);
         if (x.TrangThai is not (TrangThaiSuKien.ChoDuyet or TrangThaiSuKien.TuChoi)) throw new ApiException(409, "EVENT_INVALID_STATE", "Không thể sửa sự kiện ở trạng thái hiện tại.");
         if (!await db.LoaiSuKiens.AnyAsync(y => y.Id == dto.LoaiSuKienId && y.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
-        x.LoaiSuKienId = dto.LoaiSuKienId; x.Ten = dto.Ten.Trim(); x.MoTa = dto.MoTa.Trim(); x.BatDau = dto.BatDau; x.KetThuc = dto.KetThuc; x.SoNguoi = dto.SoNguoi; x.TrangThai = TrangThaiSuKien.ChoDuyet;
+        x.LoaiSuKienId = dto.LoaiSuKienId; x.Ten = dto.Ten.Trim(); x.MoTa = (dto.MoTa ?? "").Trim(); x.HinhAnh = dto.HinhAnh; x.BatDau = dto.BatDau; x.KetThuc = dto.KetThuc; x.SoNguoi = dto.SoNguoi; x.TrangThai = TrangThaiSuKien.ChoDuyet;
         await db.SaveChangesAsync(); return x;
     }
 

@@ -7,6 +7,7 @@ public class SuKien
     public int LoaiSuKienId { get; set; }
     public string Ten { get; set; } = "";
     public string MoTa { get; set; } = "";
+    public string? HinhAnh { get; set; }
     public DateTime BatDau { get; set; }
     public DateTime KetThuc { get; set; }
     public int SoNguoi { get; set; }

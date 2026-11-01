@@ -16,6 +16,7 @@ public class DiaDiemService(ApplicationDbContext db)
     {
         Validate(dto);
         var x = new DiaDiemEntity { Ten = dto.Ten.Trim(), DiaChi = dto.DiaChi.Trim(), SucChua = dto.SucChua, GiaThue = dto.GiaThue, HoatDong = dto.HoatDong };
+        x.HinhAnh = dto.HinhAnh;
         db.DiaDiems.Add(x); await db.SaveChangesAsync(); return x;
     }
 
@@ -24,6 +25,7 @@ public class DiaDiemService(ApplicationDbContext db)
         Validate(dto);
         var x = await db.DiaDiems.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy địa điểm.");
         x.Ten = dto.Ten.Trim(); x.DiaChi = dto.DiaChi.Trim(); x.SucChua = dto.SucChua; x.GiaThue = dto.GiaThue; x.HoatDong = dto.HoatDong;
+        x.HinhAnh = dto.HinhAnh;
         await db.SaveChangesAsync(); return x;
     }
 

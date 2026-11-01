@@ -30,6 +30,9 @@ public class SuKienConfig : IEntityTypeConfiguration<SuKien>
         e.Property(x => x.MoTa)
             .HasMaxLength(4000);
 
+        e.Property(x => x.HinhAnh)
+            .HasMaxLength(500);
+
         e.Property(x => x.RowVersion)
             .IsRowVersion();
 

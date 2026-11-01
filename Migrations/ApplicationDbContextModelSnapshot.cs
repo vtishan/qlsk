@@ -168,6 +168,10 @@ namespace QLSK.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("HinhAnh")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<bool>("HoatDong")
                         .HasColumnType("bit");
 
@@ -396,6 +400,10 @@ namespace QLSK.Migrations
 
                     b.Property<DateTime>("BatDau")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("HinhAnh")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("KetThuc")
                         .HasColumnType("datetime2");
