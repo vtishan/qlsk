@@ -18,12 +18,14 @@ internal static class LocalDataProgram
                 Console.WriteLine("Local data maintenance; never run as part of backend startup.");
                 Console.WriteLine("--normalize-existing [--dry-run] [--root PROJECT_DIRECTORY]");
                 Console.WriteLine("--populate [--root PROJECT_DIRECTORY] (new account password: LOCALDATA_PASSWORD environment variable)");
+                Console.WriteLine("--populate-users [--root PROJECT_DIRECTORY] (100 sample users and related orders on the configured local database)");
                 return args.Length == 0 ? 1 : 0;
             }
             var normalize = args.Contains("--normalize-existing");
             var populate = args.Contains("--populate");
+            var populateUsers = args.Contains("--populate-users");
             var dryRun = args.Contains("--dry-run");
-            if (normalize == populate || (populate && dryRun))
+            if (new[] { normalize, populate, populateUsers }.Count(value => value) != 1 || (!normalize && dryRun))
                 throw new ArgumentException("Choose exactly one operation; --dry-run is available for normalization only.");
             string? rootArgument = null;
             for (var i = 0; i < args.Length; i++)
@@ -33,15 +35,16 @@ internal static class LocalDataProgram
                     if (++i >= args.Length) throw new ArgumentException("--root requires the project directory.");
                     rootArgument = args[i];
                 }
-                else if (args[i] is not ("--normalize-existing" or "--populate" or "--dry-run"))
+                else if (args[i] is not ("--normalize-existing" or "--populate" or "--populate-users" or "--dry-run"))
                     throw new ArgumentException("Unknown command argument. Use --help.");
             }
             var root = ResolveRoot(rootArgument);
-            var config = new ConfigurationBuilder().SetBasePath(root)
+            var configBuilder = new ConfigurationBuilder().SetBasePath(root)
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddJsonFile("appsettings.Development.json", optional: false)
-                .AddJsonFile("appsettings.Local.json", optional: true)
-                .AddEnvironmentVariables().Build();
+                .AddJsonFile("appsettings.Local.json", optional: true);
+            if (populateUsers) configBuilder.AddUserSecrets(typeof(ApplicationDbContext).Assembly, optional: true);
+            var config = configBuilder.AddEnvironmentVariables().Build();
             var connectionString = config.GetConnectionString("Default") ?? "";
             LocalSqlGuard.Validate(connectionString, requireTestDatabase: populate);
             var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
@@ -50,6 +53,12 @@ internal static class LocalDataProgram
             {
                 var result = await LocalEventSeeder.NormalizeExistingAsync(db, dryRun);
                 Console.WriteLine(JsonSerializer.Serialize(new { operation = "normalize-existing", dryRun, result }));
+            }
+            else if (populateUsers)
+            {
+                var password = config["LOCALDATA_PASSWORD"] ?? config["LocalData:UserPassword"] ?? "";
+                var result = await LocalUserSeeder.SeedAsync(db, new PasswordHasher<TaiKhoan>(), password);
+                Console.WriteLine(JsonSerializer.Serialize(new { operation = "populate-users", result }));
             }
             else
             {

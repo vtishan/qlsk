@@ -184,6 +184,17 @@ Khi publish project, thư mục `wwwroot` cũng được đóng gói cùng backe
 
 ## 4. Chạy project
 
+Trên Windows, nạp các biến môi trường cho terminal PowerShell hiện tại:
+
+```powershell
+./scripts/Set-DevelopmentEnvironment.ps1
+dotnet run
+```
+
+Script dùng connection string trong `appsettings.Development.json`, bật `Development`, cấu hình URL và nạp JWT từ .NET User Secrets. Nếu chưa có JWT, script tạo khóa ngẫu nhiên và lưu vào User Secrets. Các biến chỉ có hiệu lực trong terminal hiện tại; không in khóa hoặc lưu bí mật vào source. Có thể truyền `-ConnectionString` để chọn database phát triển khác. Sau khi nạp, `scripts/Set-AdminCredential.ps1` và công cụ `QLSK.Setup` cũng dùng được connection string này.
+
+Profile trong `Properties/launchSettings.json` cũng bật `Development` khi chạy trực tiếp `dotnet run`, để ứng dụng đọc cấu hình phát triển và User Secrets. PayOS và SMTP cần thông tin thật từ nhà cung cấp để sử dụng thanh toán và gửi email; không bắt buộc để khởi động ứng dụng.
+
 Tại thư mục chứa file:
 
 ```text
@@ -345,13 +356,15 @@ Không nên lưu JWT secret production trực tiếp trong source code.
 
 ## 9. Dữ liệu phát triển và kiểm thử
 
-`tests/QLSK.LocalData` và toàn bộ test fixtures không được backend tham chiếu hoặc đóng gói production. Integration test tự tạo database `QLSK_Test_<GUID>` riêng và dọn đúng database đó. Không chạy bộ dữ liệu test trên database nghiệp vụ. Không dùng cờ seed tài khoản khi triển khai.
+`tests/QLSK.LocalData` và toàn bộ test fixtures không được backend tham chiếu hoặc đóng gói production. Integration test tự tạo database `QLSK_Test_<GUID>` riêng và dọn đúng database đó. Lệnh `--populate` sự kiện yêu cầu database thử nghiệm riêng; lệnh `--populate-users` có thể chủ động thêm 100 người dùng và dữ liệu mua vé vào database phát triển cục bộ đang cấu hình. Xem [hướng dẫn dữ liệu cục bộ](tests/QLSK.LocalData/README.md). Không dùng cờ seed tài khoản khi triển khai.
 
 Backend không tự migrate hoặc tạo tài khoản ở bất kỳ môi trường nào. Migration được chạy riêng bằng công cụ thiết lập.
 
 ---
 
 ## 10. Đổi thông tin admin từ terminal
+
+Để tạo admin hoặc đổi thông tin bằng menu, mở terminal tại `tools/QLSK.Setup` và chạy `dotnet run`. Chọn **1** để tạo admin đầu tiên hoặc **2** để đổi thông tin admin. Công cụ tự đọc cấu hình database phát triển từ mã nguồn, hỏi email và nhập mật khẩu ẩn kèm xác nhận; không cần đặt biến `QLSK_ADMIN_*`. Chi tiết tại [tools/QLSK.Setup](tools/QLSK.Setup/README.md).
 
 Trên Windows, đặt biến môi trường `ConnectionStrings__Default` cho database cần quản trị rồi chạy:
 

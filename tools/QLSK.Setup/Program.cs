@@ -10,14 +10,21 @@ internal static class SetupProgram
 {
     public static async Task<int> Main(string[] args)
     {
-        if (args.Length == 0 || args is ["--help"] or ["-h"])
+        var interactive = !Console.IsInputRedirected;
+        if (args is ["--help"] or ["-h"] || args.Length == 0 && !interactive)
         {
             ShowUsage();
             return 0;
         }
+        if (args.Length == 0)
+        {
+            var command = SetupConsole.ChooseCommand();
+            if (command is null) return 0;
+            args = [command];
+        }
         if (args.Length != 1 || args[0] is not ("migrate" or "create-admin" or "update-admin" or "adopt-legacy-data"))
         {
-            Console.Error.WriteLine("Lệnh không hợp lệ. Chỉ hỗ trợ migrate hoặc create-admin.");
+            Console.Error.WriteLine("Lệnh không hợp lệ.");
             ShowUsage();
             return 2;
         }
@@ -25,6 +32,9 @@ internal static class SetupProgram
         try
         {
             var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Default");
+            if (string.IsNullOrWhiteSpace(connectionString) && interactive)
+                connectionString = DevelopmentSettings.FindConnectionString(Directory.GetCurrentDirectory())
+                    ?? DevelopmentSettings.FindConnectionString(AppContext.BaseDirectory);
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new SetupValidationException("Cần đặt biến môi trường ConnectionStrings__Default cho cơ sở dữ liệu đích.");
 
@@ -38,6 +48,8 @@ internal static class SetupProgram
                 new[] { "master", "model", "msdb", "tempdb" }.Contains(parsed.InitialCatalog, StringComparer.OrdinalIgnoreCase))
                 throw new SetupValidationException("Cần chỉ định máy chủ và cơ sở dữ liệu ứng dụng riêng.");
 
+            if (interactive)
+                Console.WriteLine($"Database: {parsed.DataSource} / {parsed.InitialCatalog}");
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseSqlServer(connectionString)
                 .Options;
@@ -49,12 +61,41 @@ internal static class SetupProgram
                 return 0;
             }
 
-            var email = Environment.GetEnvironmentVariable("QLSK_ADMIN_EMAIL") ?? "";
-            var password = Environment.GetEnvironmentVariable("QLSK_ADMIN_PASSWORD") ?? "";
+            if (args[0] == "create-admin" && await db.TaiKhoans.AnyAsync(x => x.VaiTroId == 4))
+            {
+                Console.WriteLine("Đã có tài khoản quản trị. Chọn đổi thông tin admin hoặc chạy update-admin.");
+                return 0;
+            }
+
+            var id = 0;
             if (args[0] == "update-admin")
             {
-                if (!int.TryParse(Environment.GetEnvironmentVariable("QLSK_ADMIN_ID"), out var id) || id <= 0)
+                var idText = Environment.GetEnvironmentVariable("QLSK_ADMIN_ID");
+                if (string.IsNullOrWhiteSpace(idText) && interactive)
+                {
+                    var admins = await db.TaiKhoans.AsNoTracking().Where(x => x.VaiTroId == 4)
+                        .OrderBy(x => x.Id).Select(x => new { x.Id, x.Email, x.HoatDong }).ToListAsync();
+                    if (admins.Count == 0)
+                        throw new SetupValidationException("Chưa có quản trị viên. Hãy chọn tạo admin mới.");
+                    foreach (var admin in admins)
+                        Console.WriteLine($"  ID {admin.Id}: {admin.Email} ({(admin.HoatDong ? "đang hoạt động" : "đã khóa")})");
+                    idText = SetupConsole.ReadRequired("ID admin cần đổi");
+                }
+                if (!int.TryParse(idText, out id) || id <= 0)
                     throw new SetupValidationException("Cần đặt QLSK_ADMIN_ID cho tài khoản quản trị cần cập nhật.");
+                if (!await db.TaiKhoans.AnyAsync(x => x.Id == id && x.VaiTroId == 4))
+                    throw new SetupValidationException("Không tìm thấy tài khoản quản trị đích.");
+            }
+
+            var email = Environment.GetEnvironmentVariable("QLSK_ADMIN_EMAIL") ?? "";
+            var password = Environment.GetEnvironmentVariable("QLSK_ADMIN_PASSWORD") ?? "";
+            if (interactive)
+            {
+                if (string.IsNullOrWhiteSpace(email)) email = SetupConsole.ReadRequired("Email quản trị");
+                if (string.IsNullOrWhiteSpace(password)) password = SetupConsole.ReadNewPassword();
+            }
+            if (args[0] == "update-admin")
+            {
                 await AdminProvisioner.UpdateAsync(db, new PasswordHasher<TaiKhoan>(), id, email, password);
                 Console.WriteLine("Đã đổi thông tin quản trị. Các phiên đăng nhập cũ đã mất hiệu lực.");
                 return 0;
@@ -87,11 +128,14 @@ internal static class SetupProgram
     private static void ShowUsage()
     {
         Console.WriteLine("Công cụ thiết lập QLSK; chỉ chạy khi quản trị viên chủ động thực hiện.");
+        Console.WriteLine("  dotnet run              Mở menu nhập liệu trong terminal.");
         Console.WriteLine("  QLSK.Setup migrate       Cập nhật cấu trúc cơ sở dữ liệu.");
         Console.WriteLine("  QLSK.Setup create-admin  Tạo tài khoản quản trị đầu tiên.");
         Console.WriteLine("  QLSK.Setup update-admin  Đổi email/mật khẩu của QLSK_ADMIN_ID.");
         Console.WriteLine("  QLSK.Setup adopt-legacy-data  Chuyển đổi tài khoản cũ, giữ dữ liệu nghiệp vụ.");
-        Console.WriteLine("Biến môi trường: ConnectionStrings__Default; create-admin cần thêm QLSK_ADMIN_EMAIL và QLSK_ADMIN_PASSWORD.");
+        Console.WriteLine("Trong terminal: tự đọc appsettings.Development.json của mã nguồn nếu chưa đặt ConnectionStrings__Default.");
+        Console.WriteLine("Email, mật khẩu và ID được hỏi trực tiếp khi chưa đặt QLSK_ADMIN_EMAIL, QLSK_ADMIN_PASSWORD, QLSK_ADMIN_ID.");
+        Console.WriteLine("Chạy tự động: bắt buộc cấp các biến môi trường; không hỏi nhập liệu hoặc tự chọn database.");
         Console.WriteLine("Không có tài khoản hoặc mật khẩu mặc định. Không truyền thông tin đăng nhập qua tham số lệnh.");
     }
 }
