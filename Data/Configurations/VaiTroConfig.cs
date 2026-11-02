@@ -6,19 +6,19 @@ namespace QLSK.Data.Configurations;
 
 public class VaiTroConfig : IEntityTypeConfiguration<VaiTro>
 {
-    public void Configure(EntityTypeBuilder<VaiTro> e)
+    public void Configure(EntityTypeBuilder<VaiTro> cauHinhVaiTro)
     {
-        e.ToTable("VaiTro");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.Ten).HasMaxLength(40).IsRequired();
-        e.Property(x => x.MoTa).HasMaxLength(200);
-        e.HasIndex(x => x.Ten).IsUnique();
+        cauHinhVaiTro.ToTable("VaiTro");
+        cauHinhVaiTro.HasKey(vaiTroDb => vaiTroDb.VaiTroId);
+        cauHinhVaiTro.Property(vaiTroDb => vaiTroDb.TenVaiTro).HasMaxLength(40).IsRequired();
+        cauHinhVaiTro.Property(vaiTroDb => vaiTroDb.MoTaVaiTro).HasMaxLength(200);
+        cauHinhVaiTro.HasIndex(vaiTroDb => vaiTroDb.TenVaiTro).IsUnique();
 
-        e.HasData(
-            new VaiTro { Id = 1, Ten = "NguoiDung", MoTa = "Người dùng" },
-            new VaiTro { Id = 2, Ten = "BanToChuc", MoTa = "Ban tổ chức" },
-            new VaiTro { Id = 3, Ten = "QuanLySuKien", MoTa = "Quản lý sự kiện" },
-            new VaiTro { Id = 4, Ten = "QuanTriVien", MoTa = "Quản trị viên" }
+        cauHinhVaiTro.HasData(
+            new VaiTro { VaiTroId = 1, TenVaiTro = "NguoiDung", MoTaVaiTro = "Người dùng" },
+            new VaiTro { VaiTroId = 2, TenVaiTro = "BanToChuc", MoTaVaiTro = "Ban tổ chức" },
+            new VaiTro { VaiTroId = 3, TenVaiTro = "QuanLySuKien", MoTaVaiTro = "Quản lý sự kiện" },
+            new VaiTro { VaiTroId = 4, TenVaiTro = "QuanTriVien", MoTaVaiTro = "Quản trị viên" }
         );
     }
 }

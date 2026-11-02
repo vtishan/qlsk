@@ -6,115 +6,152 @@ using QLSK.Domain.Enums;
 
 using SuKienEntity = QLSK.Domain.Entities.SuKien;
 namespace QLSK.Features.SuKien;
-public class SuKienService(ApplicationDbContext db)
+public class SuKienService(ApplicationDbContext nguCanhDuLieu)
 {
-    public async Task<List<LoaiSuKien>> LayLoai(bool all = false)
-        => await db.LoaiSuKiens.AsNoTracking().Where(x => all || x.HoatDong).OrderBy(x => x.Ten).ToListAsync();
+    public async Task<List<LoaiSuKien>> LayDanhSachLoaiSuKien(bool baoGomNgungHoatDong = false)
+        => await nguCanhDuLieu.DanhSachLoaiSuKien.AsNoTracking().Where(loaiSuKienDb => baoGomNgungHoatDong || loaiSuKienDb.HoatDong).OrderBy(loaiSuKienDb => loaiSuKienDb.TenLoaiSuKien).ToListAsync();
 
-    public async Task<LoaiSuKien> TaoLoai(LoaiSuKienDto dto)
+    public async Task<LoaiSuKien> TaoLoaiSuKien(LoaiSuKienDto duLieuLoaiSuKien)
     {
-        if (await db.LoaiSuKiens.AnyAsync(x => x.Ten == dto.Ten.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
-        var x = new LoaiSuKien { Ten = dto.Ten.Trim(), MoTa = (dto.MoTa ?? "").Trim(), HoatDong = dto.HoatDong };
-        db.LoaiSuKiens.Add(x); await db.SaveChangesAsync(); return x;
+        if (await nguCanhDuLieu.DanhSachLoaiSuKien.AnyAsync(loaiSuKienDb => loaiSuKienDb.TenLoaiSuKien == duLieuLoaiSuKien.TenLoaiSuKien.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
+        var loaiSuKien = new LoaiSuKien { TenLoaiSuKien = duLieuLoaiSuKien.TenLoaiSuKien.Trim(), MoTaLoaiSuKien = (duLieuLoaiSuKien.MoTaLoaiSuKien ?? "").Trim(), HoatDong = duLieuLoaiSuKien.HoatDong };
+        nguCanhDuLieu.DanhSachLoaiSuKien.Add(loaiSuKien); await nguCanhDuLieu.SaveChangesAsync(); return loaiSuKien;
     }
 
-    public async Task<LoaiSuKien> SuaLoai(int id, LoaiSuKienDto dto)
+    public async Task<LoaiSuKien> CapNhatLoaiSuKien(int loaiSuKienId, LoaiSuKienDto duLieuLoaiSuKien)
     {
-        var x = await db.LoaiSuKiens.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy loại sự kiện.");
-        if (await db.LoaiSuKiens.AnyAsync(y => y.Id != id && y.Ten == dto.Ten.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
-        x.Ten = dto.Ten.Trim(); x.MoTa = (dto.MoTa ?? "").Trim(); x.HoatDong = dto.HoatDong; await db.SaveChangesAsync(); return x;
+        var loaiSuKien = await nguCanhDuLieu.DanhSachLoaiSuKien.FindAsync(loaiSuKienId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy loại sự kiện.");
+        if (await nguCanhDuLieu.DanhSachLoaiSuKien.AnyAsync(loaiSuKienDb => loaiSuKienDb.LoaiSuKienId != loaiSuKienId && loaiSuKienDb.TenLoaiSuKien == duLieuLoaiSuKien.TenLoaiSuKien.Trim())) throw new ApiException(409, "TYPE_EXISTS", "Loại sự kiện đã tồn tại.");
+        loaiSuKien.TenLoaiSuKien = duLieuLoaiSuKien.TenLoaiSuKien.Trim(); loaiSuKien.MoTaLoaiSuKien = (duLieuLoaiSuKien.MoTaLoaiSuKien ?? "").Trim(); loaiSuKien.HoatDong = duLieuLoaiSuKien.HoatDong; await nguCanhDuLieu.SaveChangesAsync(); return loaiSuKien;
     }
 
-    public async Task<List<SuKienEntity>> DanhSach(bool manager = false)
+    public async Task<List<SuKienEntity>> LayDanhSachSuKien(bool laNguoiQuanLy = false)
     {
-        var q = db.SuKiens.AsNoTracking().Include(x => x.LoaiSuKien).Include(x => x.BanToChuc).AsQueryable();
-        if (!manager) q = q.Where(x => x.TrangThai == TrangThaiSuKien.DaDuyet || x.TrangThai == TrangThaiSuKien.DangDienRa || x.TrangThai == TrangThaiSuKien.DaKetThuc);
-        return await q.OrderBy(x => x.BatDau).ToListAsync();
+        var truyVanSuKien = nguCanhDuLieu.DanhSachSuKien.AsNoTracking().Include(suKienDb => suKienDb.LoaiSuKien).Include(suKienDb => suKienDb.BanToChuc).AsQueryable();
+        if (!laNguoiQuanLy) truyVanSuKien = truyVanSuKien.Where(suKienDb => suKienDb.TrangThai == TrangThaiSuKien.DaDuyet || suKienDb.TrangThai == TrangThaiSuKien.DangDienRa || suKienDb.TrangThai == TrangThaiSuKien.DaKetThuc);
+        return await truyVanSuKien.OrderBy(suKienDb => suKienDb.ThoiGianBatDau).ToListAsync();
     }
 
-    public async Task<SuKienEntity> Lay(int id, int? userId = null, bool manager = false)
+    public async Task<SuKienEntity> LayChiTietSuKien(int suKienId, int? taiKhoanId = null, bool laNguoiQuanLy = false)
     {
-        var x = await db.SuKiens.AsNoTracking().Include(x => x.LoaiSuKien).Include(x => x.BanToChuc).ThenInclude(x => x.TaiKhoan)
-            .Include(x => x.DatDiaDiem).ThenInclude(x => x!.DiaDiem).Include(x => x.LoaiVes).SingleOrDefaultAsync(x => x.Id == id)
+        var suKien = await nguCanhDuLieu.DanhSachSuKien.AsNoTracking().Include(suKienDb => suKienDb.LoaiSuKien).Include(suKienDb => suKienDb.BanToChuc).ThenInclude(banToChucDb => banToChucDb.TaiKhoan)
+            .Include(suKienDb => suKienDb.DatDiaDiem).ThenInclude(datDiaDiemDb => datDiaDiemDb!.DiaDiem).Include(suKienDb => suKienDb.DanhSachLoaiVe).SingleOrDefaultAsync(suKienDb => suKienDb.SuKienId == suKienId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
-        var publicState = x.TrangThai is TrangThaiSuKien.DaDuyet or TrangThaiSuKien.DangDienRa or TrangThaiSuKien.DaKetThuc;
-        var owner = userId.HasValue && x.BanToChuc.TaiKhoanId == userId.Value;
-        if (!publicState && !manager && !owner) throw new ApiException(403, "FORBIDDEN", "Không có quyền xem sự kiện.");
-        return x;
+        var laTrangThaiCongKhai = suKien.TrangThai is TrangThaiSuKien.DaDuyet or TrangThaiSuKien.DangDienRa or TrangThaiSuKien.DaKetThuc;
+        var laChuSoHuu = taiKhoanId.HasValue && suKien.BanToChuc.TaiKhoanId == taiKhoanId.Value;
+        if (!laTrangThaiCongKhai && !laNguoiQuanLy && !laChuSoHuu) throw new ApiException(403, "FORBIDDEN", "Không có quyền xem sự kiện.");
+        return suKien;
     }
 
-    public async Task<List<SuKienEntity>> CuaToi(int userId)
+    public async Task<List<SuKienEntity>> LaySuKienCuaTaiKhoan(int taiKhoanId)
     {
-        var btcId = await LayBanToChucId(userId);
-        return await db.SuKiens.AsNoTracking().Where(x => x.BanToChucId == btcId).OrderByDescending(x => x.Id).ToListAsync();
+        var banToChucId = await LayBanToChucId(taiKhoanId);
+        return await nguCanhDuLieu.DanhSachSuKien.AsNoTracking().Where(suKienDb => suKienDb.BanToChucId == banToChucId).OrderByDescending(suKienDb => suKienDb.SuKienId).ToListAsync();
     }
 
-    public async Task<SuKienEntity> Tao(int userId, TaoSuKienDto dto)
+    public async Task<SuKienEntity> TaoSuKien(int taiKhoanId, TaoSuKienDto duLieuTaoSuKien)
     {
-        Validate(dto);
-        var btcId = await LayBanToChucId(userId);
-        if (!await db.LoaiSuKiens.AnyAsync(x => x.Id == dto.LoaiSuKienId && x.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
-        var x = new SuKienEntity { BanToChucId = btcId, LoaiSuKienId = dto.LoaiSuKienId, Ten = dto.Ten.Trim(), MoTa = (dto.MoTa ?? "").Trim(), HinhAnh = dto.HinhAnh, BatDau = dto.BatDau, KetThuc = dto.KetThuc, SoNguoi = dto.SoNguoi, TrangThai = TrangThaiSuKien.ChoDuyet };
-        db.SuKiens.Add(x); await db.SaveChangesAsync(); return x;
+        KiemTraDuLieuSuKien(duLieuTaoSuKien);
+        var banToChucId = await LayBanToChucId(taiKhoanId);
+        if (!await nguCanhDuLieu.DanhSachLoaiSuKien.AnyAsync(loaiSuKienDb => loaiSuKienDb.LoaiSuKienId == duLieuTaoSuKien.LoaiSuKienId && loaiSuKienDb.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
+        var suKien = new SuKienEntity { BanToChucId = banToChucId, LoaiSuKienId = duLieuTaoSuKien.LoaiSuKienId, TenSuKien = duLieuTaoSuKien.TenSuKien.Trim(), MoTaSuKien = (duLieuTaoSuKien.MoTaSuKien ?? "").Trim(), HinhAnh = duLieuTaoSuKien.HinhAnh, ThoiGianBatDau = duLieuTaoSuKien.ThoiGianBatDau, ThoiGianKetThuc = duLieuTaoSuKien.ThoiGianKetThuc, SoNguoi = duLieuTaoSuKien.SoNguoi, TrangThai = TrangThaiSuKien.ChoDuyet };
+        nguCanhDuLieu.DanhSachSuKien.Add(suKien); await nguCanhDuLieu.SaveChangesAsync(); return suKien;
     }
 
-    public async Task<SuKienEntity> Sua(int userId, int id, TaoSuKienDto dto)
+    public async Task<SuKienEntity> CapNhatVaGuiLaiSuKien(int taiKhoanId, int suKienId, TaoSuKienDto duLieuTaoSuKien)
     {
-        Validate(dto);
-        var x = await LayCuaChu(userId, id);
-        if (x.TrangThai is not (TrangThaiSuKien.ChoDuyet or TrangThaiSuKien.TuChoi)) throw new ApiException(409, "EVENT_INVALID_STATE", "Không thể sửa sự kiện ở trạng thái hiện tại.");
-        if (!await db.LoaiSuKiens.AnyAsync(y => y.Id == dto.LoaiSuKienId && y.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
-        x.LoaiSuKienId = dto.LoaiSuKienId; x.Ten = dto.Ten.Trim(); x.MoTa = (dto.MoTa ?? "").Trim(); x.HinhAnh = dto.HinhAnh; x.BatDau = dto.BatDau; x.KetThuc = dto.KetThuc; x.SoNguoi = dto.SoNguoi; x.TrangThai = TrangThaiSuKien.ChoDuyet;
-        await db.SaveChangesAsync(); return x;
+        KiemTraDuLieuSuKien(duLieuTaoSuKien);
+        var suKien = await LaySuKienVaKiemTraChuSoHuu(taiKhoanId, suKienId);
+        if (suKien.TrangThai is not (TrangThaiSuKien.ChoDuyet or TrangThaiSuKien.TuChoi)) throw new ApiException(409, "EVENT_INVALID_STATE", "Không thể sửa sự kiện ở trạng thái hiện tại.");
+        if (!await nguCanhDuLieu.DanhSachLoaiSuKien.AnyAsync(loaiSuKienDb => loaiSuKienDb.LoaiSuKienId == duLieuTaoSuKien.LoaiSuKienId && loaiSuKienDb.HoatDong)) throw new ApiException(400, "VALIDATION_ERROR", "Loại sự kiện không hoạt động.");
+        suKien.LoaiSuKienId = duLieuTaoSuKien.LoaiSuKienId; suKien.TenSuKien = duLieuTaoSuKien.TenSuKien.Trim(); suKien.MoTaSuKien = (duLieuTaoSuKien.MoTaSuKien ?? "").Trim(); suKien.HinhAnh = duLieuTaoSuKien.HinhAnh; suKien.ThoiGianBatDau = duLieuTaoSuKien.ThoiGianBatDau; suKien.ThoiGianKetThuc = duLieuTaoSuKien.ThoiGianKetThuc; suKien.SoNguoi = duLieuTaoSuKien.SoNguoi; suKien.TrangThai = TrangThaiSuKien.ChoDuyet;
+        await nguCanhDuLieu.SaveChangesAsync(); return suKien;
     }
 
-    public async Task<SuKienEntity> GuiDuyet(int userId, int id)
+    public async Task<SuKienEntity> GuiDuyetSuKien(int taiKhoanId, int suKienId)
     {
-        var x = await LayCuaChu(userId, id);
-        if (x.TrangThai is not (TrangThaiSuKien.ChoDuyet or TrangThaiSuKien.TuChoi)) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không thể gửi duyệt.");
-        x.TrangThai = TrangThaiSuKien.ChoDuyet; await db.SaveChangesAsync(); return x;
+        var suKien = await LaySuKienVaKiemTraChuSoHuu(taiKhoanId, suKienId);
+        if (suKien.TrangThai is not (TrangThaiSuKien.ChoDuyet or TrangThaiSuKien.TuChoi)) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không thể gửi duyệt.");
+        suKien.TrangThai = TrangThaiSuKien.ChoDuyet; await nguCanhDuLieu.SaveChangesAsync(); return suKien;
     }
 
-    public async Task Duyet(int managerId, int id)
+    public async Task DuyetSuKien(int nguoiDuyetId, int suKienId)
     {
-        var x = await db.SuKiens.Include(x => x.BanToChuc).SingleOrDefaultAsync(x => x.Id == id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
-        if (x.TrangThai != TrangThaiSuKien.ChoDuyet) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không ở trạng thái chờ duyệt.");
-        if (x.BanToChuc.TaiKhoanId == managerId) throw new ApiException(403, "FORBIDDEN", "Người tạo không được tự duyệt sự kiện.");
-        x.TrangThai = TrangThaiSuKien.DaDuyet; await db.SaveChangesAsync();
+        var suKien = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.BanToChuc).SingleOrDefaultAsync(suKienDb => suKienDb.SuKienId == suKienId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
+        if (suKien.TrangThai != TrangThaiSuKien.ChoDuyet) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không ở trạng thái chờ duyệt.");
+        if (suKien.BanToChuc.TaiKhoanId == nguoiDuyetId) throw new ApiException(403, "FORBIDDEN", "Người tạo không được tự duyệt sự kiện.");
+        suKien.TrangThai = TrangThaiSuKien.DaDuyet; await nguCanhDuLieu.SaveChangesAsync();
     }
 
-    public async Task TuChoi(int managerId, int id, string lyDo)
+    public async Task TuChoiSuKien(int nguoiDuyetId, int suKienId, string lyDoTuChoi)
     {
-        var x = await db.SuKiens.Include(x => x.BanToChuc).SingleOrDefaultAsync(x => x.Id == id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
-        if (x.TrangThai != TrangThaiSuKien.ChoDuyet) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không ở trạng thái chờ duyệt.");
-        if (x.BanToChuc.TaiKhoanId == managerId) throw new ApiException(403, "FORBIDDEN", "Người tạo không được tự xử lý sự kiện.");
-        x.TrangThai = TrangThaiSuKien.TuChoi;
-        x.MoTa = string.IsNullOrWhiteSpace(lyDo) ? x.MoTa : $"{x.MoTa}\n[Lý do từ chối: {lyDo.Trim()}]";
-        await db.SaveChangesAsync();
+        var suKien = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.BanToChuc).SingleOrDefaultAsync(suKienDb => suKienDb.SuKienId == suKienId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
+        if (suKien.TrangThai != TrangThaiSuKien.ChoDuyet) throw new ApiException(409, "EVENT_INVALID_STATE", "Sự kiện không ở trạng thái chờ duyệt.");
+        if (suKien.BanToChuc.TaiKhoanId == nguoiDuyetId) throw new ApiException(403, "FORBIDDEN", "Người tạo không được tự xử lý sự kiện.");
+        suKien.TrangThai = TrangThaiSuKien.TuChoi;
+        suKien.MoTaSuKien = string.IsNullOrWhiteSpace(lyDoTuChoi) ? suKien.MoTaSuKien : $"{suKien.MoTaSuKien}\n[Lý do từ chối: {lyDoTuChoi.Trim()}]";
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 
-    public async Task Huy(int userId, int id)
+    public async Task HuySuKien(int taiKhoanId, int suKienId)
     {
-        var x = await LayCuaChu(userId, id);
-        if (x.TrangThai is TrangThaiSuKien.DaKetThuc or TrangThaiSuKien.DaHuy) throw new ApiException(409, "EVENT_INVALID_STATE", "Không thể hủy sự kiện.");
-        x.TrangThai = TrangThaiSuKien.DaHuy; await db.SaveChangesAsync();
+        var suKien = await LaySuKienVaKiemTraChuSoHuu(taiKhoanId, suKienId);
+        if (suKien.TrangThai is TrangThaiSuKien.DaKetThuc or TrangThaiSuKien.DaHuy) throw new ApiException(409, "EVENT_INVALID_STATE", "Không thể hủy sự kiện.");
+        suKien.TrangThai = TrangThaiSuKien.DaHuy; await nguCanhDuLieu.SaveChangesAsync();
     }
 
-    async Task<int> LayBanToChucId(int userId)
+    async Task<int> LayBanToChucId(int taiKhoanId)
     {
-        var btc = await db.BanToChucs.AsNoTracking().SingleOrDefaultAsync(x => x.TaiKhoanId == userId)
+        var banToChuc = await nguCanhDuLieu.DanhSachBanToChuc.AsNoTracking().SingleOrDefaultAsync(banToChucDb => banToChucDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(403, "ORGANIZER_NOT_VERIFIED", "Ban tổ chức chưa được xác thực.");
-        return btc.Id;
+        return banToChuc.BanToChucId;
     }
-    async Task<SuKienEntity> LayCuaChu(int userId, int id)
+    async Task<SuKienEntity> LaySuKienVaKiemTraChuSoHuu(int taiKhoanId, int suKienId)
     {
-        var x = await db.SuKiens.Include(x => x.BanToChuc).SingleOrDefaultAsync(x => x.Id == id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
-        if (x.BanToChuc.TaiKhoanId != userId) throw new ApiException(403, "FORBIDDEN", "Không phải sự kiện của bạn.");
-        return x;
+        var suKien = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.BanToChuc).SingleOrDefaultAsync(suKienDb => suKienDb.SuKienId == suKienId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy sự kiện.");
+        if (suKien.BanToChuc.TaiKhoanId != taiKhoanId) throw new ApiException(403, "FORBIDDEN", "Không phải sự kiện của bạn.");
+        return suKien;
     }
-    static void Validate(TaoSuKienDto dto)
+    static void KiemTraDuLieuSuKien(TaoSuKienDto duLieuTaoSuKien)
     {
-        if (dto.KetThuc <= dto.BatDau) throw new ApiException(400, "VALIDATION_ERROR", "Thời gian kết thúc phải sau thời gian bắt đầu.");
-        if (dto.SoNguoi <= 0) throw new ApiException(400, "VALIDATION_ERROR", "Số người phải lớn hơn 0.");
+        if (duLieuTaoSuKien.ThoiGianKetThuc <= duLieuTaoSuKien.ThoiGianBatDau) throw new ApiException(400, "VALIDATION_ERROR", "Thời gian kết thúc phải sau thời gian bắt đầu.");
+        if (duLieuTaoSuKien.SoNguoi <= 0) throw new ApiException(400, "VALIDATION_ERROR", "Số người phải lớn hơn 0.");
+    }
+    public async Task CapNhatVongDoiSuKienTheoThoiGian(CancellationToken tokenDungWorker)
+    {
+        var thoiDiemHienTai = DateTime.UtcNow;
+
+        var suKienDangBatDau = await nguCanhDuLieu.DanhSachSuKien
+            .Where(suKienDb =>
+                suKienDb.TrangThai == TrangThaiSuKien.DaDuyet &&
+                suKienDb.ThoiGianBatDau <= thoiDiemHienTai &&
+                suKienDb.ThoiGianKetThuc > thoiDiemHienTai)
+            .ToListAsync(tokenDungWorker);
+
+        foreach (var suKien in suKienDangBatDau)
+        {
+            suKien.TrangThai =
+                TrangThaiSuKien.DangDienRa;
+        }
+
+        var suKienDaKetThuc = await nguCanhDuLieu.DanhSachSuKien
+            .Where(suKienDb =>
+                (
+                    suKienDb.TrangThai == TrangThaiSuKien.DaDuyet ||
+                    suKienDb.TrangThai == TrangThaiSuKien.DangDienRa
+                )
+                && suKienDb.ThoiGianKetThuc <= thoiDiemHienTai)
+            .ToListAsync(tokenDungWorker);
+
+        foreach (var suKien in suKienDaKetThuc)
+        {
+            suKien.TrangThai =
+                TrangThaiSuKien.DaKetThuc;
+        }
+
+        if (suKienDangBatDau.Count + suKienDaKetThuc.Count > 0)
+        {
+            await nguCanhDuLieu.SaveChangesAsync(tokenDungWorker);
+        }
     }
 }

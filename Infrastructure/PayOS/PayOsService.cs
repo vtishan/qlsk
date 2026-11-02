@@ -8,60 +8,60 @@ using QLSK.Common.Exceptions;
 namespace QLSK.Infrastructure.PayOS;
 
 public class PayOsService(
-    HttpClient http,
-    IOptions<PayOsOptions> options)
+    HttpClient clientHttp,
+    IOptions<PayOsOptions> tuyChonPayOs)
 {
-    private readonly PayOsOptions cfg = options.Value;
+    private readonly PayOsOptions cauHinh = tuyChonPayOs.Value;
 
-    public async Task<PayOsLink> Tao(
-        long orderCode,
-        decimal amount,
-        string moTa,
-        DateTime? expiredAt = null)
+    public async Task<PayOsLink> TaoLienKetThanhToan(
+        long maDonVe,
+        decimal soTienThanhToan,
+        string moTaThanhToan,
+        DateTime? thoiDiemHetHanLienKet = null)
     {
-        KiemTraSoTien(amount);
+        KiemTraSoTienThanhToan(soTienThanhToan);
 
-        if (ChuaCauHinh())
+        if (ThieuCauHinhThanhToan())
         {
             throw new ApiException(503, "PAYMENT_NOT_CONFIGURED", "Thanh toán trực tuyến hiện chưa khả dụng. Vui lòng thử lại sau.");
         }
 
-        var money = decimal.ToInt64(amount);
-        var desc = RutGonMoTa(moTa);
+        var soTienNguyen = decimal.ToInt64(soTienThanhToan);
+        var moTaRutGon = RutGonMoTaThanhToan(moTaThanhToan);
 
-        var raw = TaoChuoiKy(
-            orderCode,
-            money,
-            desc
+        var chuoiCanKy = TaoChuoiKyLienKetThanhToan(
+            maDonVe,
+            soTienNguyen,
+            moTaRutGon
         );
 
-        var body = new
+        var noiDungYeuCau = new
         {
-            orderCode,
-            amount = money,
-            description = desc,
-            returnUrl = cfg.ReturnUrl,
-            cancelUrl = cfg.CancelUrl,
-            expiredAt = ChuyenHanThanhToan(expiredAt),
-            signature = Hmac(raw)
+            orderCode = maDonVe,
+            amount = soTienNguyen,
+            description = moTaRutGon,
+            returnUrl = cauHinh.ReturnUrl,
+            cancelUrl = cauHinh.CancelUrl,
+            expiredAt = ChuyenHanThanhToanSangUnix(thoiDiemHetHanLienKet),
+            signature = TaoChuKyHmac(chuoiCanKy)
         };
 
-        using var req = new HttpRequestMessage(
+        using var yeuCauHttp = new HttpRequestMessage(
             HttpMethod.Post,
             "v2/payment-requests"
         )
         {
-            Content = JsonContent.Create(body)
+            Content = JsonContent.Create(noiDungYeuCau)
         };
 
-        req.Headers.Add("x-client-id", cfg.ClientId);
-        req.Headers.Add("x-api-key", cfg.ApiKey);
+        yeuCauHttp.Headers.Add("x-client-id", cauHinh.ClientId);
+        yeuCauHttp.Headers.Add("x-api-key", cauHinh.ApiKey);
 
-        using var res = await http.SendAsync(req);
+        using var phanHoiHttp = await clientHttp.SendAsync(yeuCauHttp);
 
-        var text = await res.Content.ReadAsStringAsync();
+        var noiDungPhanHoi = await phanHoiHttp.Content.ReadAsStringAsync();
 
-        if (!res.IsSuccessStatusCode)
+        if (!phanHoiHttp.IsSuccessStatusCode)
         {
             throw new ApiException(
                 502,
@@ -70,12 +70,12 @@ public class PayOsService(
             );
         }
 
-        using var doc = JsonDocument.Parse(text);
+        using var taiLieuJson = JsonDocument.Parse(noiDungPhanHoi);
 
-        var root = doc.RootElement;
-        var code = root.GetProperty("code").GetString();
+        var gocJson = taiLieuJson.RootElement;
+        var maKetQua = gocJson.GetProperty("code").GetString();
 
-        if (code != "00")
+        if (maKetQua != "00")
         {
             throw new ApiException(
                 502,
@@ -84,37 +84,37 @@ public class PayOsService(
             );
         }
 
-        var data = root.GetProperty("data");
+        var duLieuJson = gocJson.GetProperty("data");
 
         var checkoutUrl =
-            data.GetProperty("checkoutUrl").GetString() ?? "";
+            duLieuJson.GetProperty("checkoutUrl").GetString() ?? "";
 
-        var paymentLinkId =
-            data.TryGetProperty("paymentLinkId", out var link)
-                ? link.GetString()
+        var maLienKetThanhToan =
+            duLieuJson.TryGetProperty("paymentLinkId", out var lienKetJson)
+                ? lienKetJson.GetString()
                 : null;
 
         return new PayOsLink(
             checkoutUrl,
-            paymentLinkId
+            maLienKetThanhToan
         );
     }
 
-    public PayOsWebhookData Verify(PayOsWebhook webhook)
+    public PayOsWebhookData XacThucVaDocWebhook(PayOsWebhook webhook)
     {
-        KiemTraChecksumKey();
+        KiemTraKhoaXacThucWebhook();
 
-        var raw = TaoChuoiWebhook(webhook.Data);
-        var expected = Hmac(raw);
+        var chuoiCanKy = TaoChuoiKyDuLieuWebhook(webhook.DuLieuWebhook);
+        var chuKyMongDoi = TaoChuKyHmac(chuoiCanKy);
 
-        var hopLe = CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(expected.ToLowerInvariant()),
+        var chuKyHopLe = CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(chuKyMongDoi.ToLowerInvariant()),
             Encoding.UTF8.GetBytes(
-                webhook.Signature.ToLowerInvariant()
+                webhook.ChuKyWebhook.ToLowerInvariant()
             )
         );
 
-        if (!hopLe)
+        if (!chuKyHopLe)
         {
             throw new ApiException(
                 400,
@@ -123,47 +123,47 @@ public class PayOsService(
             );
         }
 
-        var data = webhook.Data;
+        var duLieuJson = webhook.DuLieuWebhook;
 
-        var orderCode =
-            data.GetProperty("orderCode").GetInt64();
+        var maDonVe =
+            duLieuJson.GetProperty("orderCode").GetInt64();
 
-        var amount =
-            data.GetProperty("amount").GetDecimal();
+        var soTienThanhToan =
+            duLieuJson.GetProperty("amount").GetDecimal();
 
-        var reference =
-            data.TryGetProperty("reference", out var r)
-                ? r.GetString() ?? ""
+        var maThamChieuThanhToan =
+            duLieuJson.TryGetProperty("reference", out var maThamChieuJson)
+                ? maThamChieuJson.GetString() ?? ""
                 : "";
 
-        var paymentLinkId =
-            data.TryGetProperty("paymentLinkId", out var link)
-                ? link.GetString()
+        var maLienKetThanhToan =
+            duLieuJson.TryGetProperty("paymentLinkId", out var lienKetJson)
+                ? lienKetJson.GetString()
                 : null;
 
-        var code =
-            data.TryGetProperty("code", out var c)
-                ? c.GetString() ?? ""
+        var maKetQua =
+            duLieuJson.TryGetProperty("code", out var maKetQuaJson)
+                ? maKetQuaJson.GetString() ?? ""
                 : "";
 
-        var desc =
-            data.TryGetProperty("desc", out var d)
-                ? d.GetString() ?? ""
+        var moTaGiaoDich =
+            duLieuJson.TryGetProperty("desc", out var moTaJson)
+                ? moTaJson.GetString() ?? ""
                 : "";
 
         return new PayOsWebhookData(
-            orderCode,
-            amount,
-            reference,
-            paymentLinkId,
-            code,
-            desc
+            maDonVe,
+            soTienThanhToan,
+            maThamChieuThanhToan,
+            maLienKetThanhToan,
+            maKetQua,
+            moTaGiaoDich
         );
     }
 
-    private void KiemTraSoTien(decimal amount)
+    private void KiemTraSoTienThanhToan(decimal soTienThanhToan)
     {
-        if (amount <= 0 || amount != decimal.Truncate(amount))
+        if (soTienThanhToan <= 0 || soTienThanhToan != decimal.Truncate(soTienThanhToan))
         {
             throw new ApiException(
                 400,
@@ -173,50 +173,50 @@ public class PayOsService(
         }
     }
 
-    private bool ChuaCauHinh()
+    private bool ThieuCauHinhThanhToan()
     {
         return
-            string.IsNullOrWhiteSpace(cfg.ClientId) ||
-            string.IsNullOrWhiteSpace(cfg.ApiKey) ||
-            string.IsNullOrWhiteSpace(cfg.ChecksumKey);
+            string.IsNullOrWhiteSpace(cauHinh.ClientId) ||
+            string.IsNullOrWhiteSpace(cauHinh.ApiKey) ||
+            string.IsNullOrWhiteSpace(cauHinh.ChecksumKey);
     }
 
-    private static string RutGonMoTa(string moTa)
+    private static string RutGonMoTaThanhToan(string moTaThanhToan)
     {
-        return moTa.Length > 25
-            ? moTa[..25]
-            : moTa;
+        return moTaThanhToan.Length > 25
+            ? moTaThanhToan[..25]
+            : moTaThanhToan;
     }
 
-    private string TaoChuoiKy(
-        long orderCode,
-        long amount,
-        string description)
+    private string TaoChuoiKyLienKetThanhToan(
+        long maDonVe,
+        long soTienThanhToan,
+        string moTaSuKien)
     {
         return
-            $"amount={amount}" +
-            $"&cancelUrl={cfg.CancelUrl}" +
-            $"&description={description}" +
-            $"&orderCode={orderCode}" +
-            $"&returnUrl={cfg.ReturnUrl}";
+            $"amount={soTienThanhToan}" +
+            $"&cancelUrl={cauHinh.CancelUrl}" +
+            $"&description={moTaSuKien}" +
+            $"&orderCode={maDonVe}" +
+            $"&returnUrl={cauHinh.ReturnUrl}";
     }
 
-    private static long? ChuyenHanThanhToan(
-        DateTime? expiredAt)
+    private static long? ChuyenHanThanhToanSangUnix(
+        DateTime? thoiDiemHetHanLienKet)
     {
-        if (!expiredAt.HasValue)
+        if (!thoiDiemHetHanLienKet.HasValue)
         {
             return null;
         }
 
         return new DateTimeOffset(
-            expiredAt.Value
+            thoiDiemHetHanLienKet.Value
         ).ToUnixTimeSeconds();
     }
 
-    private void KiemTraChecksumKey()
+    private void KiemTraKhoaXacThucWebhook()
     {
-        if (string.IsNullOrWhiteSpace(cfg.ChecksumKey))
+        if (string.IsNullOrWhiteSpace(cauHinh.ChecksumKey))
         {
             throw new ApiException(
                 503,
@@ -226,42 +226,42 @@ public class PayOsService(
         }
     }
 
-    private string TaoChuoiWebhook(JsonElement data)
+    private string TaoChuoiKyDuLieuWebhook(JsonElement duLieuJson)
     {
-        var pairs = new List<string>();
+        var capThuocTinh = new List<string>();
 
-        foreach (var p in data
+        foreach (var thuocTinhJson in duLieuJson
             .EnumerateObject()
-            .OrderBy(x => x.Name, StringComparer.Ordinal))
+            .OrderBy(thuocTinhJson => thuocTinhJson.Name, StringComparer.Ordinal))
         {
-            pairs.Add(
-                $"{p.Name}={ToValue(p.Value)}"
+            capThuocTinh.Add(
+                $"{thuocTinhJson.Name}={ChuyenGiaTriJsonDeKy(thuocTinhJson.Value)}"
             );
         }
 
-        return string.Join("&", pairs);
+        return string.Join("&", capThuocTinh);
     }
 
-    private string Hmac(string raw)
+    private string TaoChuKyHmac(string chuoiCanKy)
     {
-        var key = Encoding.UTF8.GetBytes(
-            cfg.ChecksumKey
+        var khoaKyHmac = Encoding.UTF8.GetBytes(
+            cauHinh.ChecksumKey
         );
 
-        var data = Encoding.UTF8.GetBytes(raw);
+        var duLieuCanKy = Encoding.UTF8.GetBytes(chuoiCanKy);
 
-        using var hmac = new HMACSHA256(key);
+        using var boBamHmac = new HMACSHA256(khoaKyHmac);
 
-        var hash = hmac.ComputeHash(data);
+        var chuKyHmac = boBamHmac.ComputeHash(duLieuCanKy);
 
         return Convert
-            .ToHexString(hash)
+            .ToHexString(chuKyHmac)
             .ToLowerInvariant();
     }
 
-    private static string ToValue(JsonElement value)
+    private static string ChuyenGiaTriJsonDeKy(JsonElement giaTriJsonCanXuLy)
     {
-        return value.ValueKind switch
+        return giaTriJsonCanXuLy.ValueKind switch
         {
             JsonValueKind.Null
                 or JsonValueKind.Undefined
@@ -274,49 +274,49 @@ public class PayOsService(
                 => "false",
 
             JsonValueKind.Number
-                => value.GetRawText(),
+                => giaTriJsonCanXuLy.GetRawText(),
 
             JsonValueKind.String
-                => value.GetString() ?? "",
+                => giaTriJsonCanXuLy.GetString() ?? "",
 
             JsonValueKind.Array
                 => JsonSerializer.Serialize(
-                    value
+                    giaTriJsonCanXuLy
                         .EnumerateArray()
-                        .Select(x =>
-                            x.ValueKind == JsonValueKind.Object
-                                ? (object)SortObject(x)
-                                : x
+                        .Select(phanTuJson =>
+                            phanTuJson.ValueKind == JsonValueKind.Object
+                                ? (object)SapXepThuocTinhJson(phanTuJson)
+                                : phanTuJson
                         )
                 ),
 
             JsonValueKind.Object
                 => JsonSerializer.Serialize(
-                    SortObject(value)
+                    SapXepThuocTinhJson(giaTriJsonCanXuLy)
                 ),
 
-            _ => value.ToString()
+            _ => giaTriJsonCanXuLy.ToString()
         };
     }
 
     private static SortedDictionary<string, object?>
-        SortObject(JsonElement value)
+        SapXepThuocTinhJson(JsonElement giaTriJsonCanXuLy)
     {
-        var result =
+        var thuocTinhDaSapXep =
             new SortedDictionary<string, object?>(
                 StringComparer.Ordinal
             );
 
-        foreach (var p in value
+        foreach (var thuocTinhJson in giaTriJsonCanXuLy
             .EnumerateObject()
-            .OrderBy(x => x.Name, StringComparer.Ordinal))
+            .OrderBy(thuocTinhJson => thuocTinhJson.Name, StringComparer.Ordinal))
         {
-            result[p.Name] =
-                p.Value.ValueKind == JsonValueKind.String
-                    ? p.Value.GetString()
-                    : p.Value.GetRawText();
+            thuocTinhDaSapXep[thuocTinhJson.Name] =
+                thuocTinhJson.Value.ValueKind == JsonValueKind.String
+                    ? thuocTinhJson.Value.GetString()
+                    : thuocTinhJson.Value.GetRawText();
         }
 
-        return result;
+        return thuocTinhDaSapXep;
     }
 }

@@ -15,283 +15,283 @@ using QLSK.Infrastructure.PayOS;
 using Xunit;
 namespace QLSK.Tests;
 
-public class ApiRegressionTests(ApiFactory factory) : IClassFixture<ApiFactory>
+public class ApiRegressionTests(ApiFactory mayChuKiemThu) : IClassFixture<ApiFactory>
 {
     [Fact(DisplayName = "PUT /api/accounts/{id}/role - token cũ mất quyền")]
     public async Task Put_api_accounts_id_role_revokes_old_token()
     {
-        var data = await ApiTestData.ScenarioAsync(factory);
-        var oldManagerClient = factory.CreateAuthenticatedClient(data.ManagerId, "QuanLySuKien");
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(mayChuKiemThu);
+        var clientQuanLyTruocDoiVaiTro = mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.ManagerId, "QuanLySuKien");
 
-        var changeRole = await factory.CreateAuthenticatedClient(data.AdminId, "QuanTriVien").PutAsJsonAsync(
-            $"/api/accounts/{data.ManagerId}/role",
+        var changeRole = await mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.AdminId, "QuanTriVien").PutAsJsonAsync(
+            $"/api/accounts/{kichBanKiemThu.ManagerId}/role",
             new DoiVaiTroDto { VaiTroId = 1 });
         Assert.Equal(HttpStatusCode.OK, changeRole.StatusCode);
 
-        var response = await oldManagerClient.GetAsync("/api/events/manage");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        var phanHoiYeuCauHttp = await clientQuanLyTruocDoiVaiTro.GetAsync("/api/events/manage");
+        Assert.Equal(HttpStatusCode.Unauthorized, phanHoiYeuCauHttp.StatusCode);
     }
 
     [Fact(DisplayName = "PUT /api/auth/change-password - token cũ mất hiệu lực")]
     public async Task Put_api_auth_change_password_revokes_old_token()
     {
-        using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<TaiKhoan>>();
-        var userId = await ApiTestData.AddPasswordUserAsync(db, hasher);
-        var oldClient = factory.CreateAuthenticatedClient(userId, "NguoiDung");
+        using var phamViDichVu = mayChuKiemThu.Services.CreateScope();
+        var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var boBamMatKhau = phamViDichVu.ServiceProvider.GetRequiredService<IPasswordHasher<TaiKhoan>>();
+        var taiKhoanId = await ApiTestData.AddPasswordUserAsync(nguCanhDuLieu, boBamMatKhau);
+        var clientTruocDoiMatKhau = mayChuKiemThu.CreateAuthenticatedClient(taiKhoanId, "NguoiDung");
 
-        var changePassword = await oldClient.PutAsJsonAsync(
+        var changePassword = await clientTruocDoiMatKhau.PutAsJsonAsync(
             "/api/auth/change-password",
             new DoiMatKhauDto { MatKhauCu = "Old@123456", MatKhauMoi = "New@123456" });
         Assert.Equal(HttpStatusCode.OK, changePassword.StatusCode);
 
-        var response = await oldClient.GetAsync("/api/accounts/me");
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        var phanHoiYeuCauHttp = await clientTruocDoiMatKhau.GetAsync("/api/accounts/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, phanHoiYeuCauHttp.StatusCode);
     }
 
     [Fact(DisplayName = "GET /api/events/{id} - không lộ mật khẩu tài khoản")]
     public async Task Get_api_events_id_does_not_expose_password_hash()
     {
-        var data = await ApiTestData.ScenarioAsync(factory);
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(mayChuKiemThu);
 
-        var response = await factory.CreateClient().GetAsync($"/api/events/{data.EventId}");
-        var body = await response.Content.ReadAsStringAsync();
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().GetAsync($"/api/events/{kichBanKiemThu.EventId}");
+        var noiDungYeuCauHttp = await phanHoiYeuCauHttp.Content.ReadAsStringAsync();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.DoesNotContain("MatKhau", body, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
+        Assert.DoesNotContain("MatKhau", noiDungYeuCauHttp, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "GET /api/events/{eventId}/ticket-types - chặn sự kiện riêng tư")]
     public async Task Get_api_events_eventId_ticket_types_hides_private_event()
     {
-        var data = await ApiTestData.ScenarioAsync(factory, TrangThaiSuKien.ChoDuyet);
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(mayChuKiemThu, TrangThaiSuKien.ChoDuyet);
 
-        var response = await factory.CreateClient().GetAsync($"/api/events/{data.EventId}/ticket-types");
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().GetAsync($"/api/events/{kichBanKiemThu.EventId}/ticket-types");
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, phanHoiYeuCauHttp.StatusCode);
     }
 
     [Fact(DisplayName = "POST /api/check-in - chặn ngoài thời gian sự kiện")]
     public async Task Post_api_check_in_rejects_event_not_in_progress()
     {
-        var data = await ApiTestData.ScenarioAsync(factory, TrangThaiSuKien.DaDuyet);
-        var code = await factory.WithDb(db => db.Ves
-            .Where(x => x.Id == data.TicketId)
-            .Select(x => x.MaQR)
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(mayChuKiemThu, TrangThaiSuKien.DaDuyet);
+        var maVeTraCuu = await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(nguCanhDuLieu => nguCanhDuLieu.DanhSachVe
+            .Where(veDaPhatHanhDb => veDaPhatHanhDb.VeId == kichBanKiemThu.TicketId)
+            .Select(veDaPhatHanhDb => veDaPhatHanhDb.NoiDungMaQr)
             .SingleAsync());
 
-        var response = await factory.CreateAuthenticatedClient(data.ManagerId, "QuanLySuKien")
-            .PostAsJsonAsync("/api/check-in", new { ma = code });
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.ManagerId, "QuanLySuKien")
+            .PostAsJsonAsync("/api/check-in", new { ma = maVeTraCuu });
 
-        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, phanHoiYeuCauHttp.StatusCode);
     }
 
     [Fact(DisplayName = "POST /api/payments - đơn miễn phí phát vé không tạo payment")]
     public async Task Post_api_payments_completes_free_order()
     {
-        var data = await ApiTestData.ScenarioAsync(
-            factory,
-            orderState: TrangThaiDon.ChoThanhToan,
-            paymentState: TrangThaiThanhToan.DangXuLy);
-        await factory.WithDb(async db =>
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(
+            mayChuKiemThu,
+            trangThaiDonVe: TrangThaiDon.ChoThanhToan,
+            trangThaiThanhToan: TrangThaiThanhToan.DangXuLy);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            var order = await db.DonVes.Include(x => x.ChiTiets).Include(x => x.ThanhToans).Include(x => x.Ves)
-                .SingleAsync(x => x.Id == data.OrderId);
-            var type = await db.LoaiVes.SingleAsync(x => x.Id == data.TicketTypeId);
-            db.Ves.RemoveRange(order.Ves);
-            db.ThanhToans.RemoveRange(order.ThanhToans);
-            order.TongTien = 0;
-            foreach (var detail in order.ChiTiets)
+            var donVeDangXuLy = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.ChiTietDonVe).Include(donVeDb => donVeDb.DanhSachThanhToan).Include(donVeDb => donVeDb.DanhSachVe)
+                .SingleAsync(donVeDb => donVeDb.DonVeId == kichBanKiemThu.OrderId);
+            var loaiVeDangXuLy = await nguCanhDuLieu.DanhSachLoaiVe.SingleAsync(loaiVeDb => loaiVeDb.LoaiVeId == kichBanKiemThu.TicketTypeId);
+            nguCanhDuLieu.DanhSachVe.RemoveRange(donVeDangXuLy.DanhSachVe);
+            nguCanhDuLieu.DanhSachThanhToan.RemoveRange(donVeDangXuLy.DanhSachThanhToan);
+            donVeDangXuLy.TongTien = 0;
+            foreach (var chiTietSuKien in donVeDangXuLy.ChiTietDonVe)
             {
-                detail.DonGia = 0;
-                detail.ThanhTien = 0;
+                chiTietSuKien.DonGia = 0;
+                chiTietSuKien.ThanhTien = 0;
             }
-            type.Gia = 0;
-            type.DaBan = 0;
-            type.DangGiu = 1;
-            await db.SaveChangesAsync();
+            loaiVeDangXuLy.GiaVe = 0;
+            loaiVeDangXuLy.SoLuongDaBan = 0;
+            loaiVeDangXuLy.SoLuongDangGiu = 1;
+            await nguCanhDuLieu.SaveChangesAsync();
         });
 
-        var response = await factory.CreateAuthenticatedClient(data.UserId, "NguoiDung")
-            .PostAsJsonAsync("/api/payments", new TaoThanhToanDto { DonVeId = data.OrderId });
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.UserId, "NguoiDung")
+            .PostAsJsonAsync("/api/payments", new TaoThanhToanDto { DonVeId = kichBanKiemThu.OrderId });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        await factory.WithDb(async db =>
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            var order = await db.DonVes.Include(x => x.ThanhToans).Include(x => x.Ves)
-                .SingleAsync(x => x.Id == data.OrderId);
-            Assert.Equal(TrangThaiDon.ThanhCong, order.TrangThai);
-            Assert.Empty(order.ThanhToans);
-            Assert.Single(order.Ves);
+            var donVeDangXuLy = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.DanhSachThanhToan).Include(donVeDb => donVeDb.DanhSachVe)
+                .SingleAsync(donVeDb => donVeDb.DonVeId == kichBanKiemThu.OrderId);
+            Assert.Equal(TrangThaiDon.ThanhCong, donVeDangXuLy.TrangThai);
+            Assert.Empty(donVeDangXuLy.DanhSachThanhToan);
+            Assert.Single(donVeDangXuLy.DanhSachVe);
         });
     }
 
     [Fact(DisplayName = "POST /api/payments/webhook - không phát vé dở dang")]
     public async Task Post_api_payments_webhook_is_atomic_when_inventory_invalid()
     {
-        var data = await ApiTestData.ScenarioAsync(
-            factory,
-            orderState: TrangThaiDon.ChoThanhToan,
-            paymentState: TrangThaiThanhToan.DangXuLy);
-        var secondTypeId = await factory.WithDb(async db =>
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(
+            mayChuKiemThu,
+            trangThaiDonVe: TrangThaiDon.ChoThanhToan,
+            trangThaiThanhToan: TrangThaiThanhToan.DangXuLy);
+        var loaiVeThuHaiId = await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            var order = await db.DonVes.Include(x => x.Ves).SingleAsync(x => x.Id == data.OrderId);
-            db.Ves.RemoveRange(order.Ves);
-            var secondType = new LoaiVe
+            var donVeDangXuLy = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.DanhSachVe).SingleAsync(donVeDb => donVeDb.DonVeId == kichBanKiemThu.OrderId);
+            nguCanhDuLieu.DanhSachVe.RemoveRange(donVeDangXuLy.DanhSachVe);
+            var loaiVeThuHai = new LoaiVe
             {
-                SuKienId = data.EventId,
-                Ten = $"Vé hết-{Guid.NewGuid():N}",
-                Gia = 50_000,
+                SuKienId = kichBanKiemThu.EventId,
+                TenLoaiVe = $"Vé hết-{Guid.NewGuid():N}",
+                GiaVe = 50_000,
                 SoLuong = 1,
-                DaBan = 1,
-                DangGiu = 0,
-                MoBan = DateTime.UtcNow.AddDays(-1),
-                DongBan = DateTime.UtcNow.AddDays(1)
+                SoLuongDaBan = 1,
+                SoLuongDangGiu = 0,
+                ThoiGianMoBan = DateTime.UtcNow.AddDays(-1),
+                ThoiGianDongBan = DateTime.UtcNow.AddDays(1)
             };
-            order.ChiTiets.Add(new ChiTietDonVe
+            donVeDangXuLy.ChiTietDonVe.Add(new ChiTietDonVe
             {
-                LoaiVe = secondType,
+                LoaiVe = loaiVeThuHai,
                 SoLuong = 1,
                 DonGia = 50_000,
                 ThanhTien = 50_000
             });
-            order.SoLuong = 2;
-            order.TongTien = 150_000;
-            var payment = await db.ThanhToans.SingleAsync(x => x.Id == data.PaymentId);
-            payment.SoTien = order.TongTien;
-            await db.SaveChangesAsync();
-            return secondType.Id;
+            donVeDangXuLy.SoLuong = 2;
+            donVeDangXuLy.TongTien = 150_000;
+            var thanhToanKiemThu = await nguCanhDuLieu.DanhSachThanhToan.SingleAsync(thanhToanDb => thanhToanDb.ThanhToanId == kichBanKiemThu.PaymentId);
+            thanhToanKiemThu.SoTien = donVeDangXuLy.TongTien;
+            await nguCanhDuLieu.SaveChangesAsync();
+            return loaiVeThuHai.LoaiVeId;
         });
-        var before = await factory.WithDb(db => db.LoaiVes.AsNoTracking()
-            .Where(x => x.Id == data.TicketTypeId)
-            .Select(x => new { x.DaBan, x.DangGiu })
+        var tonVeTruocWebhook = await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(nguCanhDuLieu => nguCanhDuLieu.DanhSachLoaiVe.AsNoTracking()
+            .Where(loaiVeDb => loaiVeDb.LoaiVeId == kichBanKiemThu.TicketTypeId)
+            .Select(loaiVeDb => new { DaBan = loaiVeDb.SoLuongDaBan, DangGiu = loaiVeDb.SoLuongDangGiu })
             .SingleAsync());
-        var webhook = Webhook(data.OrderId, 150_000, $"REF-{Guid.NewGuid():N}", $"LINK-{Guid.NewGuid():N}");
+        var webhook = TaoWebhookThanhToan(kichBanKiemThu.OrderId, 150_000, $"REF-{Guid.NewGuid():N}", $"LINK-{Guid.NewGuid():N}");
 
-        var response = await factory.CreateClient().PostAsJsonAsync("/api/payments/webhook", webhook);
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().PostAsJsonAsync("/api/payments/webhook", webhook);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        await factory.WithDb(async db =>
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            var first = await db.LoaiVes.AsNoTracking().SingleAsync(x => x.Id == data.TicketTypeId);
-            var second = await db.LoaiVes.AsNoTracking().SingleAsync(x => x.Id == secondTypeId);
-            Assert.Equal(before.DaBan, first.DaBan);
-            Assert.Equal(before.DangGiu, first.DangGiu);
-            Assert.Equal(1, second.DaBan);
-            Assert.Equal(0, await db.Ves.CountAsync(x => x.DonVeId == data.OrderId));
+            var loaiVeDauTien = await nguCanhDuLieu.DanhSachLoaiVe.AsNoTracking().SingleAsync(loaiVeDb => loaiVeDb.LoaiVeId == kichBanKiemThu.TicketTypeId);
+            var ketQuaThuHai = await nguCanhDuLieu.DanhSachLoaiVe.AsNoTracking().SingleAsync(loaiVeDb => loaiVeDb.LoaiVeId == loaiVeThuHaiId);
+            Assert.Equal(tonVeTruocWebhook.DaBan, loaiVeDauTien.SoLuongDaBan);
+            Assert.Equal(tonVeTruocWebhook.DangGiu, loaiVeDauTien.SoLuongDangGiu);
+            Assert.Equal(1, ketQuaThuHai.SoLuongDaBan);
+            Assert.Equal(0, await nguCanhDuLieu.DanhSachVe.CountAsync(veDaPhatHanhDb => veDaPhatHanhDb.DonVeId == kichBanKiemThu.OrderId));
             Assert.Equal(TrangThaiThanhToan.NghiVan,
-                await db.ThanhToans.Where(x => x.Id == data.PaymentId).Select(x => x.TrangThai).SingleAsync());
+                await nguCanhDuLieu.DanhSachThanhToan.Where(thanhToanDb => thanhToanDb.ThanhToanId == kichBanKiemThu.PaymentId).Select(thanhToanDb => thanhToanDb.TrangThai).SingleAsync());
         });
     }
 
     [Fact(DisplayName = "POST /api/payments/webhook - ghép đúng paymentLinkId")]
     public async Task Post_api_payments_webhook_matches_payment_link()
     {
-        var data = await ApiTestData.ScenarioAsync(
-            factory,
-            orderState: TrangThaiDon.ChoThanhToan,
-            paymentState: TrangThaiThanhToan.DangXuLy);
-        const string firstLink = "payment-link-a";
-        const string secondLink = "payment-link-b";
-        var secondPaymentId = await factory.WithDb(async db =>
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(
+            mayChuKiemThu,
+            trangThaiDonVe: TrangThaiDon.ChoThanhToan,
+            trangThaiThanhToan: TrangThaiThanhToan.DangXuLy);
+        const string lienKetThanhToanDauTien = "payment-link-a";
+        const string lienKetThanhToanThuHai = "payment-link-b";
+        var thanhToanThuHaiId = await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            db.Ves.RemoveRange(await db.Ves.Where(x => x.DonVeId == data.OrderId).ToListAsync());
-            var first = await db.ThanhToans.SingleAsync(x => x.Id == data.PaymentId);
-            first.MaLienKet = firstLink;
-            var second = new ThanhToan
+            nguCanhDuLieu.DanhSachVe.RemoveRange(await nguCanhDuLieu.DanhSachVe.Where(veDaPhatHanhDb => veDaPhatHanhDb.DonVeId == kichBanKiemThu.OrderId).ToListAsync());
+            var thanhToanDauTien = await nguCanhDuLieu.DanhSachThanhToan.SingleAsync(thanhToanDb => thanhToanDb.ThanhToanId == kichBanKiemThu.PaymentId);
+            thanhToanDauTien.MaLienKet = lienKetThanhToanDauTien;
+            var ketQuaThuHai = new ThanhToan
             {
-                DonVeId = data.OrderId,
+                DonVeId = kichBanKiemThu.OrderId,
                 SoTien = 100_000,
-                MaLienKet = secondLink,
+                MaLienKet = lienKetThanhToanThuHai,
                 TrangThai = TrangThaiThanhToan.DangXuLy
             };
-            db.ThanhToans.Add(second);
-            await db.SaveChangesAsync();
-            return second.Id;
+            nguCanhDuLieu.DanhSachThanhToan.Add(ketQuaThuHai);
+            await nguCanhDuLieu.SaveChangesAsync();
+            return ketQuaThuHai.ThanhToanId;
         });
-        var reference = $"REF-{Guid.NewGuid():N}";
+        var maThamChieuThanhToan = $"REF-{Guid.NewGuid():N}";
 
-        var response = await factory.CreateClient().PostAsJsonAsync(
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().PostAsJsonAsync(
             "/api/payments/webhook",
-            Webhook(data.OrderId, 100_000, reference, firstLink));
+            TaoWebhookThanhToan(kichBanKiemThu.OrderId, 100_000, maThamChieuThanhToan, lienKetThanhToanDauTien));
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        await factory.WithDb(async db =>
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            var first = await db.ThanhToans.AsNoTracking().SingleAsync(x => x.Id == data.PaymentId);
-            var second = await db.ThanhToans.AsNoTracking().SingleAsync(x => x.Id == secondPaymentId);
-            Assert.Equal(reference, first.MaGiaoDich);
-            Assert.Equal(TrangThaiThanhToan.ThanhCong, first.TrangThai);
-            Assert.Equal(TrangThaiThanhToan.ThatBai, second.TrangThai);
+            var thanhToanDauTien = await nguCanhDuLieu.DanhSachThanhToan.AsNoTracking().SingleAsync(thanhToanDb => thanhToanDb.ThanhToanId == kichBanKiemThu.PaymentId);
+            var ketQuaThuHai = await nguCanhDuLieu.DanhSachThanhToan.AsNoTracking().SingleAsync(thanhToanDb => thanhToanDb.ThanhToanId == thanhToanThuHaiId);
+            Assert.Equal(maThamChieuThanhToan, thanhToanDauTien.MaGiaoDich);
+            Assert.Equal(TrangThaiThanhToan.ThanhCong, thanhToanDauTien.TrangThai);
+            Assert.Equal(TrangThaiThanhToan.ThatBai, ketQuaThuHai.TrangThai);
         });
     }
 
     [Fact(DisplayName = "POST /api/payments/{id}/refund - hoàn tồn vé")]
     public async Task Post_api_payments_id_refund_restores_inventory()
     {
-        var data = await ApiTestData.ScenarioAsync(factory, orderState: TrangThaiDon.ThanhCong);
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(mayChuKiemThu, trangThaiDonVe: TrangThaiDon.ThanhCong);
 
-        var response = await factory.CreateAuthenticatedClient(data.ManagerId, "QuanLySuKien").PostAsJsonAsync(
-            $"/api/payments/{data.PaymentId}/refund",
-            new HoanTienDto { SoTien = 100_000, MaHoanTien = $"REFUND-{Guid.NewGuid():N}" });
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.ManagerId, "QuanLySuKien").PostAsJsonAsync(
+            $"/api/payments/{kichBanKiemThu.PaymentId}/refund",
+            new HoanTienDto { SoTienHoan = 100_000, MaHoanTien = $"REFUND-{Guid.NewGuid():N}" });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        await factory.WithDb(async db =>
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            Assert.Equal(0, await db.LoaiVes.Where(x => x.Id == data.TicketTypeId).Select(x => x.DaBan).SingleAsync());
+            Assert.Equal(0, await nguCanhDuLieu.DanhSachLoaiVe.Where(loaiVeDb => loaiVeDb.LoaiVeId == kichBanKiemThu.TicketTypeId).Select(loaiVeDb => loaiVeDb.SoLuongDaBan).SingleAsync());
             Assert.Equal(TrangThaiVe.DaHoanTien,
-                await db.Ves.Where(x => x.Id == data.TicketId).Select(x => x.TrangThai).SingleAsync());
+                await nguCanhDuLieu.DanhSachVe.Where(veDaPhatHanhDb => veDaPhatHanhDb.VeId == kichBanKiemThu.TicketId).Select(veDaPhatHanhDb => veDaPhatHanhDb.TrangThai).SingleAsync());
         });
     }
 
     [Fact(DisplayName = "POST /api/payments/{id}/refund - chặn vé đã check-in")]
     public async Task Post_api_payments_id_refund_rejects_checked_in_ticket()
     {
-        var data = await ApiTestData.ScenarioAsync(
-            factory,
-            orderState: TrangThaiDon.ThanhCong,
-            ticketState: TrangThaiVe.DaCheckIn);
+        var kichBanKiemThu = await ApiTestData.TaoKichBanKiemThuAsync(
+            mayChuKiemThu,
+            trangThaiDonVe: TrangThaiDon.ThanhCong,
+            trangThaiVe: TrangThaiVe.DaCheckIn);
 
-        var response = await factory.CreateAuthenticatedClient(data.ManagerId, "QuanLySuKien").PostAsJsonAsync(
-            $"/api/payments/{data.PaymentId}/refund",
-            new HoanTienDto { SoTien = 100_000, MaHoanTien = $"REFUND-{Guid.NewGuid():N}" });
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateAuthenticatedClient(kichBanKiemThu.ManagerId, "QuanLySuKien").PostAsJsonAsync(
+            $"/api/payments/{kichBanKiemThu.PaymentId}/refund",
+            new HoanTienDto { SoTienHoan = 100_000, MaHoanTien = $"REFUND-{Guid.NewGuid():N}" });
 
-        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, phanHoiYeuCauHttp.StatusCode);
     }
 
-    private static PayOsWebhook Webhook(int orderId, decimal amount, string reference, string paymentLinkId)
+    private static PayOsWebhook TaoWebhookThanhToan(int donVeId, decimal soTienThanhToan, string maThamChieuThanhToan, string maLienKetThanhToan)
     {
-        var data = JsonSerializer.SerializeToElement(new
+        var duLieuWebhookJson = JsonSerializer.SerializeToElement(new
         {
-            orderCode = orderId,
-            amount,
-            reference,
-            paymentLinkId,
+            orderCode = donVeId,
+            amount = soTienThanhToan,
+            reference = maThamChieuThanhToan,
+            paymentLinkId = maLienKetThanhToan,
             code = "00",
             desc = "success"
         });
         return new PayOsWebhook
         {
-            Code = "00",
-            Desc = "success",
-            Success = true,
-            Data = data,
-            Signature = Sign(data)
+            MaKetQua = "00",
+            MoTaKetQua = "success",
+            ThanhCong = true,
+            DuLieuWebhook = duLieuWebhookJson,
+            ChuKyWebhook = KyDuLieuWebhook(duLieuWebhookJson)
         };
     }
 
-    private static string Sign(JsonElement data)
+    private static string KyDuLieuWebhook(JsonElement duLieuWebhookJson)
     {
-        var raw = string.Join("&", data.EnumerateObject()
-            .OrderBy(x => x.Name, StringComparer.Ordinal)
-            .Select(x => $"{x.Name}={x.Value.ValueKind switch
+        var noiDungJsonGoc = string.Join("&", duLieuWebhookJson.EnumerateObject()
+            .OrderBy(thuocTinhJson => thuocTinhJson.Name, StringComparer.Ordinal)
+            .Select(thuocTinhJson => $"{thuocTinhJson.Name}={thuocTinhJson.Value.ValueKind switch
             {
-                JsonValueKind.String => x.Value.GetString() ?? "",
+                JsonValueKind.String => thuocTinhJson.Value.GetString() ?? "",
                 JsonValueKind.Null or JsonValueKind.Undefined => "",
-                _ => x.Value.GetRawText()
+                _ => thuocTinhJson.Value.GetRawText()
             }}"));
-        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes("test-checksum-key"));
-        return Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes(raw))).ToLowerInvariant();
+        using var boBamHmac = new HMACSHA256(Encoding.UTF8.GetBytes("test-checksum-key"));
+        return Convert.ToHexString(boBamHmac.ComputeHash(Encoding.UTF8.GetBytes(noiDungJsonGoc))).ToLowerInvariant();
     }
 }

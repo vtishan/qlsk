@@ -6,15 +6,15 @@ namespace QLSK.Data.Configurations;
 
 public class YeuCauXacThucToChucConfig : IEntityTypeConfiguration<YeuCauXacThucToChuc>
 {
-    public void Configure(EntityTypeBuilder<YeuCauXacThucToChuc> e)
+    public void Configure(EntityTypeBuilder<YeuCauXacThucToChuc> cauHinhYeuCauXacThucToChuc)
     {
-        e.ToTable("YeuCauXacThucToChuc");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.TenToChuc).HasMaxLength(200).IsRequired();
-        e.Property(x => x.GiayTo).HasMaxLength(500).IsRequired();
-        e.Property(x => x.LyDo).HasMaxLength(500);
-        e.HasIndex(x => x.TaiKhoanId).IsUnique();
-        e.HasOne(x => x.TaiKhoan).WithOne(x => x.YeuCauXacThuc).HasForeignKey<YeuCauXacThucToChuc>(x => x.TaiKhoanId).OnDelete(DeleteBehavior.Cascade);
-        e.HasOne(x => x.NguoiXuLy).WithMany().HasForeignKey(x => x.NguoiXuLyId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhYeuCauXacThucToChuc.ToTable("YeuCauXacThucToChuc");
+        cauHinhYeuCauXacThucToChuc.HasKey(yeuCauXacThucDb => yeuCauXacThucDb.YeuCauXacThucToChucId);
+        cauHinhYeuCauXacThucToChuc.Property(yeuCauXacThucDb => yeuCauXacThucDb.TenToChuc).HasMaxLength(200).IsRequired();
+        cauHinhYeuCauXacThucToChuc.Property(yeuCauXacThucDb => yeuCauXacThucDb.GiayTo).HasMaxLength(500).IsRequired();
+        cauHinhYeuCauXacThucToChuc.Property(yeuCauXacThucDb => yeuCauXacThucDb.LyDo).HasMaxLength(500);
+        cauHinhYeuCauXacThucToChuc.HasIndex(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoanId).IsUnique();
+        cauHinhYeuCauXacThucToChuc.HasOne(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoan).WithOne(taiKhoanDb => taiKhoanDb.YeuCauXacThuc).HasForeignKey<YeuCauXacThucToChuc>(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoanId).OnDelete(DeleteBehavior.Cascade);
+        cauHinhYeuCauXacThucToChuc.HasOne(yeuCauXacThucDb => yeuCauXacThucDb.NguoiXuLy).WithMany().HasForeignKey(yeuCauXacThucDb => yeuCauXacThucDb.NguoiXuLyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

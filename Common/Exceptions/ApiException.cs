@@ -1,6 +1,6 @@
 namespace QLSK.Common.Exceptions;
-public class ApiException(int status, string code, string message) : Exception(message)
+public class ApiException(int maTrangThaiHttp, string maKetQua, string thongDiepLoi) : Exception(thongDiepLoi)
 {
-    public int Status { get; } = status;
-    public string Code { get; } = code;
+    [System.Text.Json.Serialization.JsonPropertyName("status")] public int MaTrangThaiHttp { get; } = maTrangThaiHttp;
+    [System.Text.Json.Serialization.JsonPropertyName("code")] public string MaLoi { get; } = maKetQua;
 }

@@ -6,13 +6,13 @@ namespace QLSK.Data.Configurations;
 
 public class BanToChucConfig : IEntityTypeConfiguration<BanToChuc>
 {
-    public void Configure(EntityTypeBuilder<BanToChuc> e)
+    public void Configure(EntityTypeBuilder<BanToChuc> cauHinhBanToChuc)
     {
-        e.ToTable("BanToChuc");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.Ten).HasMaxLength(200).IsRequired();
-        e.Property(x => x.MoTa).HasMaxLength(1000);
-        e.HasIndex(x => x.TaiKhoanId).IsUnique();
-        e.HasOne(x => x.TaiKhoan).WithOne(x => x.BanToChuc).HasForeignKey<BanToChuc>(x => x.TaiKhoanId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhBanToChuc.ToTable("BanToChuc");
+        cauHinhBanToChuc.HasKey(banToChucDb => banToChucDb.BanToChucId);
+        cauHinhBanToChuc.Property(banToChucDb => banToChucDb.TenBanToChuc).HasMaxLength(200).IsRequired();
+        cauHinhBanToChuc.Property(banToChucDb => banToChucDb.MoTaBanToChuc).HasMaxLength(1000);
+        cauHinhBanToChuc.HasIndex(banToChucDb => banToChucDb.TaiKhoanId).IsUnique();
+        cauHinhBanToChuc.HasOne(banToChucDb => banToChucDb.TaiKhoan).WithOne(taiKhoanDb => taiKhoanDb.BanToChuc).HasForeignKey<BanToChuc>(banToChucDb => banToChucDb.TaiKhoanId).OnDelete(DeleteBehavior.Restrict);
     }
 }

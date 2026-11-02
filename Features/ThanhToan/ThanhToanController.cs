@@ -5,9 +5,9 @@ using QLSK.Common.Models;
 using QLSK.Infrastructure.PayOS;
 namespace QLSK.Features.ThanhToan;
 [ApiController, Route("api/payments")]
-public class ThanhToanController(ThanhToanService service) : ControllerBase
+public class ThanhToanController(ThanhToanService dichVuThanhToan) : ControllerBase
 {
-    [HttpPost, Authorize] public async Task<IActionResult> Tao(TaoThanhToanDto dto) => Ok(ApiResponse.Ok(await service.Tao(User.LayId(), dto.DonVeId)));
-    [HttpPost("webhook"), AllowAnonymous] public async Task<IActionResult> Webhook(PayOsWebhook webhook) { await service.XuLyWebhook(webhook); return Ok(new { success = true }); }
-    [HttpPost("{id:int}/refund"), Authorize(Roles = "QuanTriVien,QuanLySuKien")] public async Task<IActionResult> Hoan(int id, HoanTienDto dto) { await service.HoanTien(id, dto.SoTien, dto.MaHoanTien); return Ok(ApiResponse.Ok(new { message = "Đã ghi nhận hoàn tiền." })); }
+    [HttpPost, Authorize] public async Task<IActionResult> BatDauThanhToanDonVe(TaoThanhToanDto duLieuTaoThanhToan) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuThanhToan.BatDauThanhToanDonVe(User.LayTaiKhoanId(), duLieuTaoThanhToan.DonVeId)));
+    [HttpPost("webhook"), AllowAnonymous] public async Task<IActionResult> XuLyWebhookThanhToan(PayOsWebhook webhook) { await dichVuThanhToan.XuLyWebhookThanhToan(webhook); return Ok(new { success = true }); }
+    [HttpPost("{id:int}/refund"), Authorize(Roles = "QuanTriVien,QuanLySuKien")] public async Task<IActionResult> GhiNhanHoanTien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int thanhToanId, HoanTienDto duLieuHoanTien) { await dichVuThanhToan.GhiNhanHoanTien(thanhToanId, duLieuHoanTien.SoTienHoan, duLieuHoanTien.MaHoanTien); return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã ghi nhận hoàn tiền." })); }
 }

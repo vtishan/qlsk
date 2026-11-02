@@ -1,17 +1,22 @@
 using System.Text;
 using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using QuestPDF.Infrastructure;
+
 using QLSK.Common.Auth;
 using QLSK.Common.Exceptions;
 using QLSK.Common.Models;
+
 using QLSK.Data;
 using QLSK.Domain.Entities;
+
 using QLSK.Features.DiaDiem;
 using QLSK.Features.DonVe;
 using QLSK.Features.LoaiVe;
@@ -23,117 +28,417 @@ using QLSK.Features.ThongKe;
 using QLSK.Features.Ve;
 using QLSK.Features.XacThucToChuc;
 using QLSK.Features.XuatVe;
+
 using QLSK.Infrastructure;
 using QLSK.Infrastructure.Email;
 using QLSK.Infrastructure.File;
 using QLSK.Infrastructure.PayOS;
 using QLSK.Infrastructure.QR;
 
-var builder = WebApplication.CreateBuilder(args);
+
+// ================================
+// 1. KHỞI TẠO ỨNG DỤNG
+// ================================
+
+var boDungUngDung = WebApplication.CreateBuilder(args);
+
 QuestPDF.Settings.License = LicenseType.Community;
 
-builder.Services.AddControllers(o => o.Filters.Add<ActiveUserFilter>())
-    .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddScoped<ActiveUserFilter>();
-var connectionString = builder.Configuration.GetConnectionString("Default");
-if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("Cần cấu hình ConnectionStrings:Default trước khi khởi động.");
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(connectionString));
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
-builder.Services.Configure<PayOsOptions>(builder.Configuration.GetSection("PayOS"));
-builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
-builder.Services.AddScoped<IPasswordHasher<TaiKhoan>, PasswordHasher<TaiKhoan>>();
-builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<TaiKhoanService>();
-builder.Services.AddScoped<XacThucService>();
-builder.Services.AddScoped<SuKienService>();
-builder.Services.AddScoped<DiaDiemService>();
-builder.Services.AddScoped<LoaiVeService>();
-builder.Services.AddScoped<DonVeService>();
-builder.Services.AddScoped<ThanhToanService>();
-builder.Services.AddScoped<VeService>();
-builder.Services.AddScoped<XuatVeService>();
-builder.Services.AddScoped<ThongKeService>();
-builder.Services.AddScoped<QuanTriService>();
-builder.Services.AddSingleton<QrService>();
-builder.Services.AddSingleton<VePdfService>();
-builder.Services.AddScoped<EmailService>();
-builder.Services.AddHttpClient<PayOsService>(c => c.BaseAddress = new Uri("https://api-merchant.payos.vn/"));
-builder.Services.AddHostedService<ExpiredOrderWorker>();
-builder.Services.AddHostedService<EventStateWorker>();
 
-var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
-if (Encoding.UTF8.GetByteCount(jwt.Key) < 32) throw new InvalidOperationException("Jwt:Key phải có ít nhất 32 byte.");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
-{
-    o.TokenValidationParameters = new TokenValidationParameters
+// ================================
+// 2. CONTROLLER + JSON
+// ================================
+
+boDungUngDung.Services
+    .AddControllers(tuyChonMvc =>
     {
-        ValidateIssuer = true, ValidateAudience = true, ValidateLifetime = true, ValidateIssuerSigningKey = true,
-        ValidIssuer = jwt.Issuer, ValidAudience = jwt.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)), ClockSkew = TimeSpan.Zero
-    };
-});
-builder.Services.AddAuthorization();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o =>
-{
-    o.SwaggerDoc("v1", new OpenApiInfo { Title = "QLSK", Version = "v1" });
-    o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        tuyChonMvc.Filters.Add<ActiveUserFilter>();
+    })
+    .AddJsonOptions(tuyChonJson =>
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Nhập JWT theo dạng: Bearer {token}"
+        tuyChonJson.JsonSerializerOptions.ReferenceHandler =
+            ReferenceHandler.IgnoreCycles;
     });
-    o.AddSecurityRequirement(new OpenApiSecurityRequirement
+
+boDungUngDung.Services.AddScoped<ActiveUserFilter>();
+
+
+// ================================
+// 3. DATABASE
+// ================================
+
+var chuoiKetNoiCoSoDuLieu =
+    boDungUngDung.Configuration.GetConnectionString("Default");
+
+if (string.IsNullOrWhiteSpace(chuoiKetNoiCoSoDuLieu))
+{
+    throw new InvalidOperationException(
+        "Cần cấu hình ConnectionStrings:Default trước khi khởi động."
+    );
+}
+
+boDungUngDung.Services.AddDbContext<ApplicationDbContext>(tuyChonDb =>
+{
+    tuyChonDb.UseSqlServer(chuoiKetNoiCoSoDuLieu);
+});
+
+
+// ================================
+// 4. CẤU HÌNH OPTIONS
+// ================================
+
+boDungUngDung.Services.Configure<JwtOptions>(
+    boDungUngDung.Configuration.GetSection("Jwt")
+);
+
+boDungUngDung.Services.Configure<PayOsOptions>(
+    boDungUngDung.Configuration.GetSection("PayOS")
+);
+
+boDungUngDung.Services.Configure<EmailOptions>(
+    boDungUngDung.Configuration.GetSection("Email")
+);
+
+
+// ================================
+// 5. ĐĂNG KÝ SERVICE
+// ================================
+
+// Tài khoản + xác thực
+boDungUngDung.Services.AddScoped<
+    IPasswordHasher<TaiKhoan>,
+    PasswordHasher<TaiKhoan>
+>();
+
+boDungUngDung.Services.AddScoped<JwtService>();
+boDungUngDung.Services.AddScoped<TaiKhoanService>();
+boDungUngDung.Services.AddScoped<XacThucService>();
+
+// Nghiệp vụ sự kiện
+boDungUngDung.Services.AddScoped<SuKienService>();
+boDungUngDung.Services.AddScoped<DiaDiemService>();
+boDungUngDung.Services.AddScoped<LoaiVeService>();
+boDungUngDung.Services.AddScoped<DonVeService>();
+
+// Thanh toán + vé
+boDungUngDung.Services.AddScoped<ThanhToanService>();
+boDungUngDung.Services.AddScoped<VeService>();
+boDungUngDung.Services.AddScoped<XuatVeService>();
+
+// Quản trị + thống kê
+boDungUngDung.Services.AddScoped<ThongKeService>();
+boDungUngDung.Services.AddScoped<QuanTriService>();
+
+// Hạ tầng
+boDungUngDung.Services.AddSingleton<QrService>();
+boDungUngDung.Services.AddSingleton<VePdfService>();
+boDungUngDung.Services.AddScoped<EmailService>();
+
+
+// ================================
+// 6. PAYOS
+// ================================
+
+boDungUngDung.Services.AddHttpClient<PayOsService>(
+    clientHttpThanhToan =>
     {
+        clientHttpThanhToan.BaseAddress =
+            new Uri("https://api-merchant.payos.vn/");
+    }
+);
+
+
+// ================================
+// 7. BACKGROUND WORKER
+// ================================
+
+boDungUngDung.Services.AddHostedService<ExpiredOrderWorker>();
+boDungUngDung.Services.AddHostedService<EventStateWorker>();
+
+
+// ================================
+// 8. JWT AUTHENTICATION
+// ================================
+
+var cauHinhTokenDangNhap =
+    boDungUngDung.Configuration
+        .GetSection("Jwt")
+        .Get<JwtOptions>()
+    ?? new JwtOptions();
+
+if (Encoding.UTF8.GetByteCount(cauHinhTokenDangNhap.KhoaKyJwt) < 32)
+{
+    throw new InvalidOperationException(
+        "Jwt:Key phải có ít nhất 32 byte."
+    );
+}
+
+boDungUngDung.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(tuyChonJwt =>
+    {
+        tuyChonJwt.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = cauHinhTokenDangNhap.Issuer,
+                ValidAudience = cauHinhTokenDangNhap.Audience,
+
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(
+                        cauHinhTokenDangNhap.KhoaKyJwt
+                    )
+                ),
+
+                ClockSkew = TimeSpan.Zero
+            };
+    });
+
+boDungUngDung.Services.AddAuthorization();
+
+
+// ================================
+// 9. SWAGGER
+// ================================
+
+boDungUngDung.Services.AddEndpointsApiExplorer();
+
+boDungUngDung.Services.AddSwaggerGen(tuyChonSwagger =>
+{
+    tuyChonSwagger.SwaggerDoc(
+        "v1",
+        new OpenApiInfo
         {
-            new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
-            Array.Empty<string>()
+            Title = "QLSK",
+            Version = "v1"
         }
-    });
-});
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:5000", "http://127.0.0.1:5000"];
-builder.Services.AddCors(o => o.AddPolicy("Frontend", p => p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
-builder.Services.Configure<ApiBehaviorOptions>(o => o.InvalidModelStateResponseFactory = context =>
-{
-    var loi = context.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault();
-    return new BadRequestObjectResult(ApiResponse.Fail("VALIDATION_ERROR", string.IsNullOrWhiteSpace(loi) ? "Dữ liệu không hợp lệ." : loi));
+    );
+
+    tuyChonSwagger.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Nhập JWT theo dạng: Bearer {token}"
+        }
+    );
+
+    tuyChonSwagger.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        }
+    );
 });
 
-var app = builder.Build();
-app.UseMiddleware<ApiExceptionMiddleware>();
-app.UseCors("Frontend");
-app.UseDefaultFiles();
-app.UseStaticFiles();
-if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
-app.UseStatusCodePages(async context =>
+
+// ================================
+// 10. CORS
+// ================================
+
+var allowedOrigins =
+    boDungUngDung.Configuration
+        .GetSection("Cors:AllowedOrigins")
+        .Get<string[]>()
+    ?? [
+        "http://localhost:5000",
+        "http://127.0.0.1:5000"
+    ];
+
+boDungUngDung.Services.AddCors(tuyChonCors =>
 {
-    var response = context.HttpContext.Response;
-    if (response.HasStarted || response.ContentLength.GetValueOrDefault() > 0) return;
-    response.ContentType = "application/json";
-    var status = response.StatusCode;
-    var code = status switch
+    tuyChonCors.AddPolicy(
+        "Frontend",
+        chinhSachCors =>
+        {
+            chinhSachCors
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
+
+
+// ================================
+// 11. VALIDATION RESPONSE
+// ================================
+
+boDungUngDung.Services.Configure<ApiBehaviorOptions>(
+    tuyChonApi =>
     {
-        StatusCodes.Status400BadRequest => "VALIDATION_ERROR",
-        StatusCodes.Status401Unauthorized => "UNAUTHORIZED",
-        StatusCodes.Status403Forbidden => "FORBIDDEN",
-        StatusCodes.Status404NotFound => "NOT_FOUND",
-        _ => "REQUEST_ERROR"
-    };
-    await response.WriteAsJsonAsync(ApiResponse.Fail(code, $"Yêu cầu thất bại với mã {status}."));
-});
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.Lifetime.ApplicationStarted.Register(() =>
-{
-    app.Logger.LogInformation("Serving frontend from: {WebRootPath}", app.Environment.WebRootPath);
-    foreach (var url in app.Urls)
-        app.Logger.LogInformation("Frontend: {FrontendUrl}/ | Backend API: {ApiUrl}/api", url.TrimEnd('/'), url.TrimEnd('/'));
-});
-app.Run();
+        tuyChonApi.InvalidModelStateResponseFactory =
+            nguCanhAction =>
+            {
+                var thongDiepLoi =
+                    nguCanhAction.ModelState.Values
+                        .SelectMany(
+                            trangThaiModel => trangThaiModel.Errors
+                        )
+                        .Select(
+                            loiModel => loiModel.ErrorMessage
+                        )
+                        .FirstOrDefault();
 
-public partial class Program { }
+                var noiDungLoi =
+                    string.IsNullOrWhiteSpace(thongDiepLoi)
+                        ? "Dữ liệu không hợp lệ."
+                        : thongDiepLoi;
+
+                return new BadRequestObjectResult(
+                    ApiResponse.TaoPhanHoiThatBai(
+                        "VALIDATION_ERROR",
+                        noiDungLoi
+                    )
+                );
+            };
+    }
+);
+
+
+// ================================
+// 12. BUILD ỨNG DỤNG
+// ================================
+
+var ungDungWeb = boDungUngDung.Build();
+
+
+// ================================
+// 13. HTTP PIPELINE
+// ================================
+
+ungDungWeb.UseMiddleware<ApiExceptionMiddleware>();
+
+ungDungWeb.UseCors("Frontend");
+
+ungDungWeb.UseDefaultFiles();
+ungDungWeb.UseStaticFiles();
+
+
+// Swagger chỉ chạy ở Development
+if (ungDungWeb.Environment.IsDevelopment())
+{
+    ungDungWeb.UseSwagger();
+    ungDungWeb.UseSwaggerUI();
+}
+
+
+// ================================
+// 14. XỬ LÝ HTTP STATUS CODE
+// ================================
+
+ungDungWeb.UseStatusCodePages(
+    async nguCanhKetQuaTrangThai =>
+    {
+        var phanHoiYeuCauHttp =
+            nguCanhKetQuaTrangThai.HttpContext.Response;
+
+        if (
+            phanHoiYeuCauHttp.HasStarted ||
+            phanHoiYeuCauHttp.ContentLength.GetValueOrDefault() > 0
+        )
+        {
+            return;
+        }
+
+        phanHoiYeuCauHttp.ContentType = "application/json";
+
+        var maTrangThaiHttp =
+            phanHoiYeuCauHttp.StatusCode;
+
+        var maKetQua = maTrangThaiHttp switch
+        {
+            StatusCodes.Status400BadRequest =>
+                "VALIDATION_ERROR",
+
+            StatusCodes.Status401Unauthorized =>
+                "UNAUTHORIZED",
+
+            StatusCodes.Status403Forbidden =>
+                "FORBIDDEN",
+
+            StatusCodes.Status404NotFound =>
+                "NOT_FOUND",
+
+            _ =>
+                "REQUEST_ERROR"
+        };
+
+        await phanHoiYeuCauHttp.WriteAsJsonAsync(
+            ApiResponse.TaoPhanHoiThatBai(
+                maKetQua,
+                $"Yêu cầu thất bại với mã {maTrangThaiHttp}."
+            )
+        );
+    }
+);
+
+
+// ================================
+// 15. AUTHENTICATION + AUTHORIZATION
+// ================================
+
+ungDungWeb.UseAuthentication();
+ungDungWeb.UseAuthorization();
+
+
+// ================================
+// 16. MAP API
+// ================================
+
+ungDungWeb.MapControllers();
+
+
+// ================================
+// 17. LOG KHI ỨNG DỤNG KHỞI ĐỘNG
+// ================================
+
+ungDungWeb.Lifetime.ApplicationStarted.Register(() =>
+{
+    ungDungWeb.Logger.LogInformation(
+        "Serving frontend from: {WebRootPath}",
+        ungDungWeb.Environment.WebRootPath
+    );
+
+    foreach (var urlUngDung in ungDungWeb.Urls)
+    {
+        var url = urlUngDung.TrimEnd('/');
+
+        ungDungWeb.Logger.LogInformation(
+            "Frontend: {FrontendUrl}/ | Backend API: {ApiUrl}/api",
+            url,
+            url
+        );
+    }
+});
+
+
+// ================================
+// 18. CHẠY ỨNG DỤNG
+// ================================
+
+ungDungWeb.Run();
+
+
+// Dùng cho WebApplicationFactory trong project test
+public partial class Program
+{
+}

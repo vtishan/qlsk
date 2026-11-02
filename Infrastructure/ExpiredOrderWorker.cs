@@ -3,48 +3,48 @@ using QLSK.Features.DonVe;
 namespace QLSK.Infrastructure;
 
 public class ExpiredOrderWorker(
-    IServiceScopeFactory scopeFactory,
-    ILogger<ExpiredOrderWorker> logger)
+    IServiceScopeFactory boTaoPhamViDichVu,
+    ILogger<ExpiredOrderWorker> boGhiLog)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(
-        CancellationToken stoppingToken)
+        CancellationToken tokenDungWorker)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!tokenDungWorker.IsCancellationRequested)
         {
             try
             {
                 await XuLyDonHetHan();
             }
-            catch (Exception ex)
+            catch (Exception ngoaiLe)
             {
-                logger.LogError(
-                    ex,
+                boGhiLog.LogError(
+                    ngoaiLe,
                     "Expire order worker failed"
                 );
             }
 
             await Task.Delay(
                 TimeSpan.FromSeconds(30),
-                stoppingToken
+                tokenDungWorker
             );
         }
     }
 
     private async Task XuLyDonHetHan()
     {
-        using var scope = scopeFactory.CreateScope();
+        using var phamViDichVu = boTaoPhamViDichVu.CreateScope();
 
-        var service = scope.ServiceProvider
+        var dichVuDonVe = phamViDichVu.ServiceProvider
             .GetRequiredService<DonVeService>();
 
-        var count = await service.HetHan();
+        var soDonHetHan = await dichVuDonVe.XuLyCacDonVeHetHan();
 
-        if (count > 0)
+        if (soDonHetHan > 0)
         {
-            logger.LogInformation(
+            boGhiLog.LogInformation(
                 "Expired {Count} orders",
-                count
+                soDonHetHan
             );
         }
     }

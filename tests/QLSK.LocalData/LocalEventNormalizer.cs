@@ -4,7 +4,7 @@ using QLSK.Domain.Entities;
 
 namespace QLSK.LocalData;
 
-public sealed record NormalizationResult(int Accounts, int Organizers, int Venues, int Events);
+public sealed record NormalizationResult([property: System.Text.Json.Serialization.JsonPropertyName("accounts")] int SoTaiKhoanDaChuanHoa, [property: System.Text.Json.Serialization.JsonPropertyName("organizers")] int SoBanToChucDaChuanHoa, [property: System.Text.Json.Serialization.JsonPropertyName("venues")] int SoDiaDiemDaChuanHoa, [property: System.Text.Json.Serialization.JsonPropertyName("events")] int SoSuKienDaChuanHoa);
 
 public static partial class LocalEventSeeder
 {
@@ -27,83 +27,83 @@ public static partial class LocalEventSeeder
 
     // This explicit local maintenance command updates recognized records in place.
     // Reading the plan is detached so --dry-run never changes tracked entities or the database.
-    public static async Task<NormalizationResult> NormalizeExistingAsync(ApplicationDbContext db, bool dryRun = false)
+    public static async Task<NormalizationResult> ChuanHoaDuLieuMauHienCoAsync(ApplicationDbContext nguCanhDuLieu, bool chiXemTruocThayDoi = false)
     {
-        var changes = new List<(object Entity, Dictionary<string, object?> Values)>();
-        var accounts = await db.TaiKhoans.AsNoTracking().ToListAsync();
-        var organizers = await db.BanToChucs.AsNoTracking().ToListAsync();
-        var ownedOrganizerIds = new HashSet<int>();
-        var accountChanges = 0;
-        var organizerChanges = 0;
-        for (var i = 1; i <= OrganizerNames.Length; i++)
+        var cacThayDoiDuLieu = new List<(object Entity, Dictionary<string, object?> Values)>();
+        var danhSachTaiKhoanHienCo = await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking().ToListAsync();
+        var danhSachBanToChucHienCo = await nguCanhDuLieu.DanhSachBanToChuc.AsNoTracking().ToListAsync();
+        var tapBanToChucMauId = new HashSet<int>();
+        var soTaiKhoanCanChuanHoa = 0;
+        var soBanToChucCanChuanHoa = 0;
+        for (var chiSo = 1; chiSo <= OrganizerNames.Length; chiSo++)
         {
-            var oldEmail = $"demo.btc{i:00}@qlsk.local";
-            var newEmail = $"organizer{i:00}@qlsk.local";
-            var user = accounts.SingleOrDefault(x => x.Email == oldEmail || x.Email == newEmail);
-            if (user is null || user.VaiTroId != 2) continue;
-            var values = new Dictionary<string, object?>();
-            if (user.Email == oldEmail)
+            var emailTruocChuanHoa = $"demo.btc{chiSo:00}@qlsk.local";
+            var emailSauChuanHoa = $"organizer{chiSo:00}@qlsk.local";
+            var taiKhoanNguoiDung = danhSachTaiKhoanHienCo.SingleOrDefault(taiKhoanDb => taiKhoanDb.Email == emailTruocChuanHoa || taiKhoanDb.Email == emailSauChuanHoa);
+            if (taiKhoanNguoiDung is null || taiKhoanNguoiDung.VaiTroId != 2) continue;
+            var giaTriThuocTinhCanCapNhat = new Dictionary<string, object?>();
+            if (taiKhoanNguoiDung.Email == emailTruocChuanHoa)
             {
-                if (accounts.Any(x => x.Id != user.Id && x.Email.Equals(newEmail, StringComparison.OrdinalIgnoreCase)))
+                if (danhSachTaiKhoanHienCo.Any(taiKhoanDb => taiKhoanDb.TaiKhoanId != taiKhoanNguoiDung.TaiKhoanId && taiKhoanDb.Email.Equals(emailSauChuanHoa, StringComparison.OrdinalIgnoreCase)))
                     throw new InvalidOperationException("The local organizer address is already assigned to another account.");
-                values[nameof(TaiKhoan.Email)] = newEmail;
+                giaTriThuocTinhCanCapNhat[nameof(TaiKhoan.Email)] = emailSauChuanHoa;
             }
-            if (user.HoTen == $"Ban tổ chức mẫu {i:00}") values[nameof(TaiKhoan.HoTen)] = OrganizerNames[i - 1];
-            if (values.Count > 0) { changes.Add((user, values)); accountChanges++; }
+            if (taiKhoanNguoiDung.HoTen == $"Ban tổ chức mẫu {chiSo:00}") giaTriThuocTinhCanCapNhat[nameof(TaiKhoan.HoTen)] = OrganizerNames[chiSo - 1];
+            if (giaTriThuocTinhCanCapNhat.Count > 0) { cacThayDoiDuLieu.Add((taiKhoanNguoiDung, giaTriThuocTinhCanCapNhat)); soTaiKhoanCanChuanHoa++; }
 
-            var organizer = organizers.SingleOrDefault(x => x.TaiKhoanId == user.Id);
-            if (organizer is null) continue;
-            ownedOrganizerIds.Add(organizer.Id);
-            values = new Dictionary<string, object?>();
-            if (organizer.Ten == $"SựKiện Hub Demo {i:00}") values[nameof(BanToChuc.Ten)] = OrganizerNames[i - 1];
-            if (organizer.MoTa == "Ban tổ chức mẫu phục vụ trải nghiệm hệ thống.")
-                values[nameof(BanToChuc.MoTa)] = OrganizerDescriptions[i - 1];
-            if (values.Count > 0) { changes.Add((organizer, values)); organizerChanges++; }
+            var banToChucHienCo = danhSachBanToChucHienCo.SingleOrDefault(banToChucDb => banToChucDb.TaiKhoanId == taiKhoanNguoiDung.TaiKhoanId);
+            if (banToChucHienCo is null) continue;
+            tapBanToChucMauId.Add(banToChucHienCo.BanToChucId);
+            giaTriThuocTinhCanCapNhat = new Dictionary<string, object?>();
+            if (banToChucHienCo.TenBanToChuc == $"SựKiện Hub Demo {chiSo:00}") giaTriThuocTinhCanCapNhat[nameof(BanToChuc.TenBanToChuc)] = OrganizerNames[chiSo - 1];
+            if (banToChucHienCo.MoTaBanToChuc == "Ban tổ chức mẫu phục vụ trải nghiệm hệ thống.")
+                giaTriThuocTinhCanCapNhat[nameof(BanToChuc.MoTaBanToChuc)] = OrganizerDescriptions[chiSo - 1];
+            if (giaTriThuocTinhCanCapNhat.Count > 0) { cacThayDoiDuLieu.Add((banToChucHienCo, giaTriThuocTinhCanCapNhat)); soBanToChucCanChuanHoa++; }
         }
 
-        var venues = await db.DiaDiems.AsNoTracking().ToListAsync();
-        var venueChanges = 0;
-        for (var i = 0; i < Cities.Length; i++)
+        var danhSachDiaDiemHienCo = await nguCanhDuLieu.DanhSachDiaDiem.AsNoTracking().ToListAsync();
+        var soDiaDiemCanChuanHoa = 0;
+        for (var chiSo = 0; chiSo < Cities.Length; chiSo++)
         {
-            var oldName = $"Không gian sự kiện Demo {i + 1:00} - {Cities[i]}";
-            var oldAddress = $"Khu trải nghiệm mẫu {i + 1:00}, {Cities[i]} (địa điểm giả lập)";
-            var venue = venues.SingleOrDefault(x => x.Ten == oldName && x.DiaChi == oldAddress);
-            if (venue is null) continue;
-            var newAddress = $"Khu trung tâm, {Cities[i]}";
-            if (venues.Any(x => x.Id != venue.Id && x.Ten == VenueNames[i] && x.DiaChi == newAddress))
+            var tenTruocChuanHoa = $"Không gian sự kiện Demo {chiSo + 1:00} - {Cities[chiSo]}";
+            var diaChiTruocChuanHoa = $"Khu trải nghiệm mẫu {chiSo + 1:00}, {Cities[chiSo]} (địa điểm giả lập)";
+            var diaDiemSuKien = danhSachDiaDiemHienCo.SingleOrDefault(diaDiemDb => diaDiemDb.TenDiaDiem == tenTruocChuanHoa && diaDiemDb.DiaChi == diaChiTruocChuanHoa);
+            if (diaDiemSuKien is null) continue;
+            var diaChiSauChuanHoa = $"Khu trung tâm, {Cities[chiSo]}";
+            if (danhSachDiaDiemHienCo.Any(diaDiemDb => diaDiemDb.DiaDiemId != diaDiemSuKien.DiaDiemId && diaDiemDb.TenDiaDiem == VenueNames[chiSo] && diaDiemDb.DiaChi == diaChiSauChuanHoa))
                 throw new InvalidOperationException("The local venue name and address are already assigned to another venue.");
-            changes.Add((venue, new Dictionary<string, object?>
+            cacThayDoiDuLieu.Add((diaDiemSuKien, new Dictionary<string, object?>
             {
-                [nameof(DiaDiem.Ten)] = VenueNames[i], [nameof(DiaDiem.DiaChi)] = newAddress
+                [nameof(DiaDiem.TenDiaDiem)] = VenueNames[chiSo], [nameof(DiaDiem.DiaChi)] = diaChiSauChuanHoa
             }));
-            venueChanges++;
+            soDiaDiemCanChuanHoa++;
         }
 
-        var eventChanges = 0;
-        var images = Enumerable.Range(1, EventCount).Select(i => $"/assets/images/events/event-{i:000}.jpg").ToHashSet();
-        var events = await db.SuKiens.AsNoTracking().Where(x => ownedOrganizerIds.Contains(x.BanToChucId)).ToListAsync();
-        foreach (var item in events)
+        var soSuKienCanChuanHoa = 0;
+        var tapDuongDanAnh = Enumerable.Range(1, EventCount).Select(chiSo => $"/assets/images/events/event-{chiSo:000}.jpg").ToHashSet();
+        var danhSachSuKienHienCo = await nguCanhDuLieu.DanhSachSuKien.AsNoTracking().Where(suKienDb => tapBanToChucMauId.Contains(suKienDb.BanToChucId)).ToListAsync();
+        foreach (var suKienDangXuLy in danhSachSuKienHienCo)
         {
-            if (item.HinhAnh is null || !images.Contains(item.HinhAnh) || !item.MoTa.Contains(LegacyDescriptionMarker)) continue;
-            changes.Add((item, new Dictionary<string, object?>
+            if (suKienDangXuLy.HinhAnh is null || !tapDuongDanAnh.Contains(suKienDangXuLy.HinhAnh) || !suKienDangXuLy.MoTaSuKien.Contains(LegacyDescriptionMarker)) continue;
+            cacThayDoiDuLieu.Add((suKienDangXuLy, new Dictionary<string, object?>
             {
-                [nameof(SuKien.MoTa)] = item.MoTa.Replace(LegacyDescriptionMarker, "", StringComparison.Ordinal)
+                [nameof(SuKien.MoTaSuKien)] = suKienDangXuLy.MoTaSuKien.Replace(LegacyDescriptionMarker, "", StringComparison.Ordinal)
             }));
-            eventChanges++;
+            soSuKienCanChuanHoa++;
         }
 
-        if (!dryRun)
+        if (!chiXemTruocThayDoi)
         {
-            foreach (var (entity, values) in changes)
+            foreach (var (entityCanXuLy, giaTriThuocTinhCanCapNhat) in cacThayDoiDuLieu)
             {
-                var id = (int)db.Entry(entity).Property("Id").CurrentValue!;
-                var tracked = db.ChangeTracker.Entries().SingleOrDefault(x =>
-                    x.Entity.GetType() == entity.GetType() && (int)x.Property("Id").CurrentValue! == id);
-                var entry = tracked ?? db.Attach(entity);
-                foreach (var (property, value) in values) entry.Property(property).CurrentValue = value;
+                var banGhiId = (int)nguCanhDuLieu.Entry(entityCanXuLy).Property(nguCanhDuLieu.Entry(entityCanXuLy).Metadata.FindPrimaryKey()!.Properties.Single().Name).CurrentValue!;
+                var entityDangDuocTheoDoi = nguCanhDuLieu.ChangeTracker.Entries().SingleOrDefault(banGhiTheoDoi =>
+                    banGhiTheoDoi.Entity.GetType() == entityCanXuLy.GetType() && (int)banGhiTheoDoi.Property(banGhiTheoDoi.Metadata.FindPrimaryKey()!.Properties.Single().Name).CurrentValue! == banGhiId);
+                var banGhiTheoDoiThayDoi = entityDangDuocTheoDoi ?? nguCanhDuLieu.Attach(entityCanXuLy);
+                foreach (var (tenThuocTinh, giaTriCanXuLy) in giaTriThuocTinhCanCapNhat) banGhiTheoDoiThayDoi.Property(tenThuocTinh).CurrentValue = giaTriCanXuLy;
             }
-            if (changes.Count > 0) await db.SaveChangesAsync();
+            if (cacThayDoiDuLieu.Count > 0) await nguCanhDuLieu.SaveChangesAsync();
         }
-        return new NormalizationResult(accountChanges, organizerChanges, venueChanges, eventChanges);
+        return new NormalizationResult(soTaiKhoanCanChuanHoa, soBanToChucCanChuanHoa, soDiaDiemCanChuanHoa, soSuKienCanChuanHoa);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -8,9 +8,9 @@ namespace QLSK.Migrations
     public partial class AddUniquePaymentLinkIndex : Migration
     {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+        protected override void Up(MigrationBuilder boDungMigration)
         {
-            migrationBuilder.CreateIndex(
+            boDungMigration.CreateIndex(
                 name: "IX_ThanhToan_MaLienKet",
                 table: "ThanhToan",
                 column: "MaLienKet",
@@ -19,9 +19,9 @@ namespace QLSK.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+        protected override void Down(MigrationBuilder boDungMigration)
         {
-            migrationBuilder.DropIndex(
+            boDungMigration.DropIndex(
                 name: "IX_ThanhToan_MaLienKet",
                 table: "ThanhToan");
         }

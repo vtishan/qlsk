@@ -5,37 +5,37 @@ import argparse
 import hashlib
 import re
 
-root = Path(__file__).resolve().parents[1] / 'wwwroot'
-pattern = re.compile(r'(?P<attr>\b(?:src|href))=(?P<quote>["\'])(?P<url>[^"\']+)(?P=quote)')
+thu_muc_web = Path(__file__).resolve().parents[1] / 'wwwroot'
+mau_url_tai_nguyen = re.compile(r'(?P<attr>\b(?:src|href))=(?P<quote>["\'])(?P<url>[^"\']+)(?P=quote)')
 
 
-def version_pages(check=False):
-    changed = []
-    for page in root.rglob('*.html'):
-        original = page.read_text(encoding='utf-8')
+def cap_nhat_phien_ban_tai_nguyen_html(chi_kiem_tra=False):
+    cac_trang_da_thay_doi = []
+    for tep_html in thu_muc_web.rglob('*.html'):
+        noi_dung_html_goc = tep_html.read_text(encoding='utf-8')
 
-        def replace(match):
-            url = urlsplit(match['url'])
-            if url.scheme or url.netloc or not url.path.endswith(('.js', '.css')):
-                return match[0]
-            asset = ((root if url.path.startswith('/') else page.parent) / unquote(url.path.lstrip('/'))).resolve()
-            if not asset.is_relative_to(root.resolve()) or not asset.is_file():
-                raise ValueError(f'Missing local asset: {page}: {url.path}')
-            version = hashlib.sha256(asset.read_bytes()).hexdigest()[:12]
-            return f'{match["attr"]}={match["quote"]}{url.path}?v={version}{match["quote"]}'
+        def thay_url_tai_nguyen(ket_qua_khop_url):
+            thanh_phan_url = urlsplit(ket_qua_khop_url['url'])
+            if thanh_phan_url.scheme or thanh_phan_url.netloc or not thanh_phan_url.path.endswith(('.js', '.css')):
+                return ket_qua_khop_url[0]
+            tep_tai_nguyen = ((thu_muc_web if thanh_phan_url.path.startswith('/') else tep_html.parent) / unquote(thanh_phan_url.path.lstrip('/'))).resolve()
+            if not tep_tai_nguyen.is_relative_to(thu_muc_web.resolve()) or not tep_tai_nguyen.is_file():
+                raise ValueError(f'Missing local asset: {tep_html}: {thanh_phan_url.path}')
+            ma_phien_ban_tai_nguyen = hashlib.sha256(tep_tai_nguyen.read_bytes()).hexdigest()[:12]
+            return f'{ket_qua_khop_url["attr"]}={ket_qua_khop_url["quote"]}{thanh_phan_url.path}?v={ma_phien_ban_tai_nguyen}{ket_qua_khop_url["quote"]}'
 
-        updated = pattern.sub(replace, original)
-        if updated != original:
-            changed.append(page.relative_to(root).as_posix())
-            if not check:
-                page.write_text(updated, encoding='utf-8')
-    return changed
+        noi_dung_html_moi = mau_url_tai_nguyen.sub(thay_url_tai_nguyen, noi_dung_html_goc)
+        if noi_dung_html_moi != noi_dung_html_goc:
+            cac_trang_da_thay_doi.append(tep_html.relative_to(thu_muc_web).as_posix())
+            if not chi_kiem_tra:
+                tep_html.write_text(noi_dung_html_moi, encoding='utf-8')
+    return cac_trang_da_thay_doi
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--check', action='store_true')
-    args = parser.parse_args()
-    changed = version_pages(args.check)
-    print(f'{len(changed)} pages {"need updated" if args.check else "received updated"} asset versions.')
-    raise SystemExit(1 if args.check and changed else 0)
+    bo_doc_tham_so = argparse.ArgumentParser()
+    bo_doc_tham_so.add_argument('--check', action='store_true')
+    tham_so_dong_lenh = bo_doc_tham_so.parse_args()
+    cac_trang_da_thay_doi = cap_nhat_phien_ban_tai_nguyen_html(tham_so_dong_lenh.check)
+    print(f'{len(cac_trang_da_thay_doi)} pages {"need updated" if tham_so_dong_lenh.check else "received updated"} asset versions.')
+    raise SystemExit(1 if tham_so_dong_lenh.check and cac_trang_da_thay_doi else 0)

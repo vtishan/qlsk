@@ -1,12 +1,50 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace QLSK.Infrastructure.PayOS;
-public record PayOsLink(string CheckoutUrl, string? PaymentLinkId);
+
+public record PayOsLink(
+    [property: JsonPropertyName("checkoutUrl")]
+    string UrlThanhToan,
+
+    [property: JsonPropertyName("paymentLinkId")]
+    string? MaLienKetThanhToan
+);
+
 public class PayOsWebhook
 {
-    public string Code { get; set; } = "";
-    public string Desc { get; set; } = "";
-    public bool Success { get; set; }
-    public JsonElement Data { get; set; }
-    public string Signature { get; set; } = "";
+    [JsonPropertyName("code")]
+    public string MaKetQua { get; set; } = "";
+
+    [JsonPropertyName("desc")]
+    public string MoTaKetQua { get; set; } = "";
+
+    [JsonPropertyName("success")]
+    public bool ThanhCong { get; set; }
+
+    [JsonPropertyName("data")]
+    public JsonElement DuLieuWebhook { get; set; }
+
+    [JsonPropertyName("signature")]
+    public string ChuKyWebhook { get; set; } = "";
 }
-public record PayOsWebhookData(long OrderCode, decimal Amount, string Reference, string? PaymentLinkId, string Code, string Desc);
+
+public record PayOsWebhookData(
+    [property: JsonPropertyName("orderCode")]
+    long MaDonVe,
+
+    [property: JsonPropertyName("amount")]
+    decimal SoTienGiaoDich,
+
+    [property: JsonPropertyName("reference")]
+    string MaThamChieu,
+
+    [property: JsonPropertyName("paymentLinkId")]
+    string? MaLienKetThanhToan,
+
+    [property: JsonPropertyName("code")]
+    string MaKetQua,
+
+    [property: JsonPropertyName("desc")]
+    string MoTaGiaoDich
+);

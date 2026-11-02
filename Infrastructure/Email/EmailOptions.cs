@@ -2,10 +2,10 @@ namespace QLSK.Infrastructure.Email;
 
 public class EmailOptions
 {
-    public string Host { get; set; } = "";
-    public int Port { get; set; } = 587;
-    public string User { get; set; } = "";
-    public string Password { get; set; } = "";
-    public string From { get; set; } = "";
-    public bool EnableSsl { get; set; } = true;
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("Host")] public string MayChuSmtp { get; set; } = "";
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("Port")] public int CongSmtp { get; set; } = 587;
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("User")] public string TenDangNhapSmtp { get; set; } = "";
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("Password")] public string MatKhauSmtp { get; set; } = "";
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("From")] public string EmailGui { get; set; } = "";
+    [Microsoft.Extensions.Configuration.ConfigurationKeyName("EnableSsl")] public bool BatMaHoaSsl { get; set; } = true;
 }

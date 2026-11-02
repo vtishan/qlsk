@@ -1,111 +1,326 @@
 "use strict";
-var danhMucQuanTri = null;
-var veQuanTri = [];
-var dangLuuQuanTri = false;
 
-function dienQuanTri(id, value) { document.getElementById(id).value = value == null ? "" : value; }
-function ngayNhapQuanTri(value) {
-  var date = ngayDuLieu(value);
-  return isNaN(date) ? "" : new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+var danhMucQuanTri = null;
+var danhSachLoaiVeQuanTri = [];
+var dangLuuQuanTri = false;
+function dienGiaTriQuanTri(idTruongNhap, giaTriCanXuLy) {
+  document.getElementById(idTruongNhap).value = giaTriCanXuLy == null ? "" : giaTriCanXuLy;
 }
-function luaChonQuanTri(id, rows, label) {
-  document.getElementById(id).innerHTML = '<option value="">Chọn…</option>' + rows.map(function (x) {
-    return '<option value="' + Number(x.Id) + '">' + esc(label(x)) + '</option>';
-  }).join("");
+function ngayNhapQuanTri(giaTriCanXuLy) {
+  var ngayDuocChuyenDoi = chuyenNgayDuLieuSangDate(giaTriCanXuLy);
+  return isNaN(ngayDuocChuyenDoi)
+    ? ""
+    : new Date(ngayDuocChuyenDoi.getTime() - ngayDuocChuyenDoi.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+}
+function luaChonQuanTri(idOChon, danhSachLuaChon, layNhanLuaChon) {
+  document.getElementById(idOChon).innerHTML =
+    '<option value="">Chọn…</option>' +
+    danhSachLuaChon
+      .map(function (luaChon) {
+        return '<option value="' + Number(luaChon.Id) + '">' + maHoaKyTuHtml(layNhanLuaChon(luaChon)) + "</option>";
+      })
+      .join("");
 }
 async function taiDanhMucQuanTri() {
-  if (store.vaiTro !== "QuanTriVien") return;
+  if (phienDangNhap.vaiTro !== "QuanTriVien") return;
+  ["qt-ds-sk", "qt-ds-tc", "qt-ds-tk"].forEach(function (idKhungDanhMuc) {
+    hienKhungDangTai(idKhungDanhMuc, 3);
+  });
   try {
-    var result = await apiFetch("/api/admin/catalog");
-    danhMucQuanTri = result.data;
-    luaChonQuanTri("qt-sk-btc", danhMucQuanTri.ToChuc, function (x) { return x.Ten; });
-    luaChonQuanTri("qt-sk-loai", danhMucQuanTri.LoaiSuKien, function (x) { return x.Ten; });
-    luaChonQuanTri("qt-tc-tk", danhMucQuanTri.TaiKhoan, function (x) { return x.HoTen + " · " + x.Email; });
-    luaChonQuanTri("qt-ve-sk", danhMucQuanTri.SuKien, function (x) { return x.Ten; });
-    document.getElementById("qt-ds-sk").innerHTML = bangHTML(
-      [["Id", "Mã"], ["Ten", "Sự kiện"], ["TrangThaiTen", "Trạng thái"]],
-      danhMucQuanTri.SuKien.map(function (x) { return Object.assign({}, x, { TrangThaiTen: trangThaiSuKienHienThi(x.TrangThai) }); }),
-      function (x) { return nutQuanTri("events", x.Id, "suaSuKienQuanTri"); });
-    document.getElementById("qt-ds-tc").innerHTML = bangHTML([["Id", "Mã"], ["Ten", "Ban tổ chức"], ["MoTa", "Mô tả"]], danhMucQuanTri.ToChuc,
-      function (x) { return nutQuanTri("organizers", x.Id, "suaToChucQuanTri"); });
-    document.getElementById("qt-ds-tk").innerHTML = bangHTML([["Id", "Mã"], ["HoTen", "Họ tên"], ["Email", "Email"], ["HoatDong", "Hoạt động"]], danhMucQuanTri.TaiKhoan,
-      function (x) { return '<button class="phu sm" onclick="suaTaiKhoanQuanTri(' + Number(x.Id) + ')">Sửa</button>'; });
-  } catch (error) { thongBao(error.message, "loi"); }
+    var phanHoiDanhMuc = await guiYeuCauApi("/api/admin/catalog");
+    danhMucQuanTri = phanHoiDanhMuc.data;
+    luaChonQuanTri("qt-sk-btc", danhMucQuanTri.ToChuc, function (suKien) {
+      return suKien.Ten;
+    });
+    luaChonQuanTri("qt-sk-loai", danhMucQuanTri.LoaiSuKien, function (banToChuc) {
+      return banToChuc.Ten;
+    });
+    luaChonQuanTri("qt-tc-tk", danhMucQuanTri.TaiKhoan, function (taiKhoan) {
+      return taiKhoan.HoTen + " · " + taiKhoan.Email;
+    });
+    luaChonQuanTri("qt-ve-sk", danhMucQuanTri.SuKien, function (loaiSuKien) {
+      return loaiSuKien.Ten;
+    });
+    document.getElementById("qt-ds-sk").innerHTML = taoHtmlBang(
+      [
+        ["Id", "Mã"],
+        ["Ten", "Sự kiện"],
+        ["TrangThaiTen", "Trạng thái"],
+      ],
+      danhMucQuanTri.SuKien.map(function (suKien) {
+        return Object.assign({}, suKien, {
+          TrangThaiTen: trangThaiSuKienHienThi(suKien.TrangThai),
+        });
+      }),
+      function (suKien) {
+        return nutQuanTri("events", suKien.Id, "dienFormSuaSuKienQuanTri");
+      },
+    );
+    document.getElementById("qt-ds-tc").innerHTML = taoHtmlBang(
+      [
+        ["Id", "Mã"],
+        ["Ten", "Ban tổ chức"],
+        ["MoTa", "Mô tả"],
+      ],
+      danhMucQuanTri.ToChuc,
+      function (banToChuc) {
+        return nutQuanTri("organizers", banToChuc.Id, "dienFormSuaToChucQuanTri");
+      },
+    );
+    document.getElementById("qt-ds-tk").innerHTML = taoHtmlBang(
+      [
+        ["Id", "Mã"],
+        ["HoTen", "Họ tên"],
+        ["Email", "Email"],
+        ["HoatDong", "Hoạt động"],
+      ],
+      danhMucQuanTri.TaiKhoan.map(function (taiKhoan) {
+        return Object.assign({}, taiKhoan, {
+          HoatDong: taiKhoan.HoatDong ? "Đang hoạt động" : "Đã khóa",
+        });
+      }),
+      function (taiKhoan) {
+        return (
+          '<button class="phu sm" onclick="dienFormSuaTaiKhoanQuanTri(' +
+          Number(taiKhoan.Id) +
+          ')">Sửa</button>'
+        );
+      },
+    );
+  } catch (loiXuLy) {
+    ["qt-ds-sk", "qt-ds-tc", "qt-ds-tk"].forEach(function (idKhungDanhMuc) {
+      hienLoiTai(idKhungDanhMuc, loiXuLy, taiDanhMucQuanTri);
+    });
+    thongBao(loiXuLy.message, "loi");
+  }
 }
-function nutQuanTri(kind, id, edit) {
-  return '<button class="phu sm" onclick="' + edit + '(' + Number(id) + ')">Sửa</button> <button class="phu sm" onclick="xoaBanGhiQuanTri(\'' + kind + '\',' + Number(id) + ')">Xóa</button>';
+function nutQuanTri(loaiDanhMuc, banGhiId, tenHamDienFormSua) {
+  return (
+    '<button class="phu sm" onclick="' +
+    tenHamDienFormSua +
+    "(" +
+    Number(banGhiId) +
+    ')">Sửa</button> <button class="phu sm" onclick="xoaBanGhiQuanTri(\'' +
+    loaiDanhMuc +
+    "'," +
+    Number(banGhiId) +
+    ')">Xóa</button>'
+  );
 }
-function suaSuKienQuanTri(id) {
-  var x = danhMucQuanTri.SuKien.find(function (x) { return x.Id === id; });
-  if (!x) return;
-  [["id", x.Id], ["ten", x.Ten], ["mota", x.MoTa], ["anh", x.HinhAnh], ["btc", x.BanToChucId], ["loai", x.LoaiSuKienId], ["sl", x.SoNguoi], ["bd", ngayNhapQuanTri(x.BatDau)], ["kt", ngayNhapQuanTri(x.KetThuc)]].forEach(function (p) { dienQuanTri("qt-sk-" + p[0], p[1]); });
+function dienFormSuaSuKienQuanTri(suKienId) {
+  var suKien = danhMucQuanTri.SuKien.find(function (suKien) {
+    return suKien.Id === suKienId;
+  });
+  if (!suKien) return;
+  [
+    ["id", suKien.Id],
+    ["ten", suKien.Ten],
+    ["mota", suKien.MoTa],
+    ["anh", suKien.HinhAnh],
+    ["btc", suKien.BanToChucId],
+    ["loai", suKien.LoaiSuKienId],
+    ["sl", suKien.SoNguoi],
+    ["bd", ngayNhapQuanTri(suKien.BatDau)],
+    ["kt", ngayNhapQuanTri(suKien.KetThuc)],
+  ].forEach(function (capTruongGiaTri) {
+    dienGiaTriQuanTri("qt-sk-" + capTruongGiaTri[0], capTruongGiaTri[1]);
+  });
   document.getElementById("qt-sk-ten").focus();
 }
-function suaToChucQuanTri(id) {
-  var x = danhMucQuanTri.ToChuc.find(function (x) { return x.Id === id; });
-  [["id", x.Id], ["ten", x.Ten], ["mota", x.MoTa], ["tk", x.TaiKhoanId]].forEach(function (p) { dienQuanTri("qt-tc-" + p[0], p[1]); });
+function dienFormSuaToChucQuanTri(banToChucId) {
+  var banToChuc = danhMucQuanTri.ToChuc.find(function (banToChuc) {
+    return banToChuc.Id === banToChucId;
+  });
+  [
+    ["id", banToChuc.Id],
+    ["ten", banToChuc.Ten],
+    ["mota", banToChuc.MoTa],
+    ["tk", banToChuc.TaiKhoanId],
+  ].forEach(function (capTruongGiaTri) {
+    dienGiaTriQuanTri("qt-tc-" + capTruongGiaTri[0], capTruongGiaTri[1]);
+  });
   document.getElementById("qt-tc-ten").focus();
 }
-function suaTaiKhoanQuanTri(id) {
-  var x = danhMucQuanTri.TaiKhoan.find(function (x) { return x.Id === id; });
-  [["id", x.Id], ["ten", x.HoTen], ["email", x.Email], ["mk", ""]].forEach(function (p) { dienQuanTri("qt-tk-" + p[0], p[1]); });
+function dienFormSuaTaiKhoanQuanTri(taiKhoanId) {
+  var taiKhoan = danhMucQuanTri.TaiKhoan.find(function (taiKhoan) {
+    return taiKhoan.Id === taiKhoanId;
+  });
+  [
+    ["id", taiKhoan.Id],
+    ["ten", taiKhoan.HoTen],
+    ["email", taiKhoan.Email],
+    ["mk", ""],
+  ].forEach(function (capTruongGiaTri) {
+    dienGiaTriQuanTri("qt-tk-" + capTruongGiaTri[0], capTruongGiaTri[1]);
+  });
   document.getElementById("qt-tk-ten").focus();
 }
-async function luuQuanTri(event, kind) {
-  event.preventDefault();
+async function guiFormQuanTri(suKienDom, taoRequest) {
+  suKienDom.preventDefault();
   if (dangLuuQuanTri) return;
   dangLuuQuanTri = true;
-  var id, body, path;
   try {
-    if (kind === "events") {
-      id = num("qt-sk-id");
-      body = { Ten: val("qt-sk-ten"), MoTa: val("qt-sk-mota"), HinhAnh: val("qt-sk-anh") || null, BanToChucId: num("qt-sk-btc"), LoaiSuKienId: num("qt-sk-loai"), SoNguoi: num("qt-sk-sl"), BatDau: new Date(val("qt-sk-bd")).toISOString(), KetThuc: new Date(val("qt-sk-kt")).toISOString() };
-      if (id) {
-        var original = danhMucQuanTri.SuKien.find(function (x) { return x.Id === id; });
-        if (new Date(val("qt-sk-bd")).getTime() === new Date(ngayNhapQuanTri(original.BatDau)).getTime()) body.BatDau = ngayDuLieu(original.BatDau).toISOString();
-        if (new Date(val("qt-sk-kt")).getTime() === new Date(ngayNhapQuanTri(original.KetThuc)).getTime()) body.KetThuc = ngayDuLieu(original.KetThuc).toISOString();
-      }
-    } else if (kind === "organizers") {
-      id = num("qt-tc-id"); body = { Ten: val("qt-tc-ten"), MoTa: val("qt-tc-mota"), TaiKhoanId: num("qt-tc-tk") };
-    } else {
-      id = num("qt-tk-id"); body = { HoTen: val("qt-tk-ten"), Email: val("qt-tk-email"), MatKhauMoi: val("qt-tk-mk") || null };
-    }
-    path = kind === "accounts" && !id ? "/api/auth/register" : "/api/admin/catalog/" + kind + (id ? "/" + id : "");
-    if (kind === "accounts" && !id) { body.MatKhau = body.MatKhauMoi; delete body.MatKhauMoi; }
-    await apiFetch(path, id ? "PUT" : "POST", body);
-    event.target.reset();
+    var cauHinhYeuCauQuanTri = taoRequest();
+    await guiYeuCauApi(cauHinhYeuCauQuanTri.path, cauHinhYeuCauQuanTri.method, cauHinhYeuCauQuanTri.body);
+    suKienDom.target.reset();
     thongBao("Đã lưu thay đổi.");
     await taiDanhMucQuanTri();
-  } catch (error) { thongBao(error.message, "loi"); }
-  finally { dangLuuQuanTri = false; }
+  } catch (loiXuLy) {
+    thongBao(loiXuLy.message, "loi");
+  } finally {
+    dangLuuQuanTri = false;
+  }
 }
-async function xoaBanGhiQuanTri(kind, id) {
+function luuSuKienQuanTri(suKienDom) {
+  return guiFormQuanTri(suKienDom, function () {
+    var suKienId = docSoTuInput("qt-sk-id");
+    var duLieuSuKien = {
+      Ten: docGiaTriInput("qt-sk-ten"),
+      MoTa: docGiaTriInput("qt-sk-mota"),
+      HinhAnh: docGiaTriInput("qt-sk-anh") || null,
+      BanToChucId: docSoTuInput("qt-sk-btc"),
+      LoaiSuKienId: docSoTuInput("qt-sk-loai"),
+      SoNguoi: docSoTuInput("qt-sk-sl"),
+      BatDau: new Date(docGiaTriInput("qt-sk-bd")).toISOString(),
+      KetThuc: new Date(docGiaTriInput("qt-sk-kt")).toISOString(),
+    };
+    if (suKienId) {
+      var suKienTruocCapNhat = danhMucQuanTri.SuKien.find(function (suKien) {
+        return suKien.Id === suKienId;
+      });
+      if (
+        new Date(docGiaTriInput("qt-sk-bd")).getTime() ===
+        new Date(ngayNhapQuanTri(suKienTruocCapNhat.BatDau)).getTime()
+      )
+        duLieuSuKien.BatDau = chuyenNgayDuLieuSangDate(suKienTruocCapNhat.BatDau).toISOString();
+      if (
+        new Date(docGiaTriInput("qt-sk-kt")).getTime() ===
+        new Date(ngayNhapQuanTri(suKienTruocCapNhat.KetThuc)).getTime()
+      )
+        duLieuSuKien.KetThuc = chuyenNgayDuLieuSangDate(suKienTruocCapNhat.KetThuc).toISOString();
+    }
+    return {
+      path: "/api/admin/catalog/events" + (suKienId ? "/" + suKienId : ""),
+      method: suKienId ? "PUT" : "POST",
+      body: duLieuSuKien,
+    };
+  });
+}
+function luuToChucQuanTri(suKienDom) {
+  return guiFormQuanTri(suKienDom, function () {
+    var banToChucId = docSoTuInput("qt-tc-id");
+    return {
+      path: "/api/admin/catalog/organizers" + (banToChucId ? "/" + banToChucId : ""),
+      method: banToChucId ? "PUT" : "POST",
+      body: {
+        Ten: docGiaTriInput("qt-tc-ten"),
+        MoTa: docGiaTriInput("qt-tc-mota"),
+        TaiKhoanId: docSoTuInput("qt-tc-tk"),
+      },
+    };
+  });
+}
+function luuTaiKhoanQuanTri(suKienDom) {
+  return guiFormQuanTri(suKienDom, function () {
+    var taiKhoanId = docSoTuInput("qt-tk-id");
+    var duLieuTaiKhoan = {
+      HoTen: docGiaTriInput("qt-tk-ten"),
+      Email: docGiaTriInput("qt-tk-email"),
+      MatKhauMoi: docGiaTriInput("qt-tk-mk") || null,
+    };
+    if (!taiKhoanId) {
+      duLieuTaiKhoan.MatKhau = duLieuTaiKhoan.MatKhauMoi;
+      delete duLieuTaiKhoan.MatKhauMoi;
+    }
+    return {
+      path: taiKhoanId ? "/api/admin/catalog/accounts/" + taiKhoanId : "/api/auth/register",
+      method: taiKhoanId ? "PUT" : "POST",
+      body: duLieuTaiKhoan,
+    };
+  });
+}
+async function xoaBanGhiQuanTri(loaiDanhMuc, banGhiId) {
   if (!confirm("Xóa bản ghi này? Chỉ xóa được khi chưa có dữ liệu liên quan.")) return;
   try {
-    await apiFetch("/api/admin/catalog/" + kind + "/" + id, "DELETE");
+    await guiYeuCauApi("/api/admin/catalog/" + loaiDanhMuc + "/" + banGhiId, "DELETE");
     thongBao("Đã xóa bản ghi.");
-    if (kind === "ticket-types") await taiVeQuanTri(); else await taiDanhMucQuanTri();
-  } catch (error) { thongBao(error.message, "loi"); }
+    if (loaiDanhMuc === "ticket-types") await taiLoaiVeQuanTri();
+    else await taiDanhMucQuanTri();
+  } catch (loiXuLy) {
+    thongBao(loiXuLy.message, "loi");
+  }
 }
-async function taiVeQuanTri() {
-  var id = num("qt-ve-sk"); if (!id) return;
+async function taiLoaiVeQuanTri() {
+  var suKienId = docSoTuInput("qt-ve-sk");
+  danhSachLoaiVeQuanTri = [];
+  if (!suKienId) {
+    document.getElementById("qt-ds-ve").innerHTML =
+      '<div class="empty"><p>Chọn sự kiện để xem các hạng vé.</p></div>';
+    return;
+  }
+  hienKhungDangTai("qt-ds-ve", 3);
   try {
-    var result = await apiFetch("/api/events/" + id + "/ticket-types"); veQuanTri = result.data;
-    document.getElementById("qt-ds-ve").innerHTML = bangHTML([["Id", "Mã"], ["Ten", "Hạng vé"], ["Gia", "Giá", "tien"], ["SoLuong", "Số lượng"], ["DaBan", "Đã bán"], ["DangGiu", "Đang giữ"]], veQuanTri,
-      function (x) { return nutQuanTri("ticket-types", x.Id, "suaVeQuanTri"); });
-  } catch (error) { thongBao(error.message, "loi"); }
+    var phanHoiLoaiVe = await guiYeuCauApi("/api/events/" + suKienId + "/ticket-types");
+    danhSachLoaiVeQuanTri = phanHoiLoaiVe.data;
+    document.getElementById("qt-ds-ve").innerHTML = taoHtmlBang(
+      [
+        ["Id", "Mã"],
+        ["Ten", "Hạng vé"],
+        ["Gia", "Giá", "tien"],
+        ["SoLuong", "Số lượng"],
+        ["DaBan", "Đã bán"],
+        ["DangGiu", "Đang giữ"],
+      ],
+      danhSachLoaiVeQuanTri,
+      function (loaiVe) {
+        return nutQuanTri("ticket-types", loaiVe.Id, "dienFormSuaLoaiVeQuanTri");
+      },
+    );
+  } catch (loiXuLy) {
+    hienLoiTai("qt-ds-ve", loiXuLy, taiLoaiVeQuanTri);
+    thongBao(loiXuLy.message, "loi");
+  }
 }
-function suaVeQuanTri(id) {
-  var x = veQuanTri.find(function (x) { return x.Id === id; });
-  [["id", x.Id], ["ten", x.Ten], ["gia", x.Gia], ["sl", x.SoLuong], ["mo", ngayNhapQuanTri(x.MoBan)], ["dong", ngayNhapQuanTri(x.DongBan)]].forEach(function (p) { dienQuanTri("qt-ve-" + p[0], p[1]); });
+function dienFormSuaLoaiVeQuanTri(loaiVeId) {
+  var loaiVe = danhSachLoaiVeQuanTri.find(function (loaiVe) {
+    return loaiVe.Id === loaiVeId;
+  });
+  [
+    ["id", loaiVe.Id],
+    ["ten", loaiVe.Ten],
+    ["gia", loaiVe.Gia],
+    ["sl", loaiVe.SoLuong],
+    ["mo", ngayNhapQuanTri(loaiVe.MoBan)],
+    ["dong", ngayNhapQuanTri(loaiVe.DongBan)],
+  ].forEach(function (capTruongGiaTri) {
+    dienGiaTriQuanTri("qt-ve-" + capTruongGiaTri[0], capTruongGiaTri[1]);
+  });
 }
-async function luuVeQuanTri(event) {
-  event.preventDefault(); if (dangLuuQuanTri) return; dangLuuQuanTri = true;
+async function luuLoaiVeQuanTri(suKienDom) {
+  suKienDom.preventDefault();
+  if (dangLuuQuanTri) return;
+  dangLuuQuanTri = true;
   try {
-    var id = num("qt-ve-id"), sk = num("qt-ve-sk");
-    await apiFetch(id ? "/api/ticket-types/" + id : "/api/events/" + sk + "/ticket-types", id ? "PUT" : "POST", { Ten: val("qt-ve-ten"), Gia: num("qt-ve-gia"), SoLuong: num("qt-ve-sl"), MoBan: new Date(val("qt-ve-mo")).toISOString(), DongBan: new Date(val("qt-ve-dong")).toISOString() });
-    thongBao("Đã lưu hạng vé."); dienQuanTri("qt-ve-id", ""); await taiVeQuanTri();
-  } catch (error) { thongBao(error.message, "loi"); }
-  finally { dangLuuQuanTri = false; }
+    var loaiVeId = docSoTuInput("qt-ve-id"),
+      suKienId = docSoTuInput("qt-ve-sk");
+    await guiYeuCauApi(
+      loaiVeId ? "/api/ticket-types/" + loaiVeId : "/api/events/" + suKienId + "/ticket-types",
+      loaiVeId ? "PUT" : "POST",
+      {
+        Ten: docGiaTriInput("qt-ve-ten"),
+        Gia: docSoTuInput("qt-ve-gia"),
+        SoLuong: docSoTuInput("qt-ve-sl"),
+        MoBan: new Date(docGiaTriInput("qt-ve-mo")).toISOString(),
+        DongBan: new Date(docGiaTriInput("qt-ve-dong")).toISOString(),
+      },
+    );
+    thongBao("Đã lưu hạng vé.");
+    dienGiaTriQuanTri("qt-ve-id", "");
+    await taiLoaiVeQuanTri();
+  } catch (loiXuLy) {
+    thongBao(loiXuLy.message, "loi");
+  } finally {
+    dangLuuQuanTri = false;
+  }
 }
 document.addEventListener("DOMContentLoaded", taiDanhMucQuanTri);

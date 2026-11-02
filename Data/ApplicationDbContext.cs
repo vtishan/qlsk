@@ -1,29 +1,41 @@
+// Đây là "cổng trung gian" giữa code C# và database.
+// Mỗi DbSet bên dưới tương ứng với một bảng, dùng để đọc/thêm/sửa/xóa dữ liệu.
+// Khi thao tác với DbSet, Entity Framework Core sẽ tự tạo câu lệnh SQL phù hợp để làm việc với database.
+
 using Microsoft.EntityFrameworkCore;
 using QLSK.Domain.Entities;
 
 namespace QLSK.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> tuyChonCoSoDuLieu)
+    : DbContext(tuyChonCoSoDuLieu)
 {
-    public DbSet<VaiTro> VaiTros => Set<VaiTro>();
-    public DbSet<TaiKhoan> TaiKhoans => Set<TaiKhoan>();
-    public DbSet<YeuCauXacThucToChuc> YeuCauXacThucToChucs => Set<YeuCauXacThucToChuc>();
-    public DbSet<LichSuYeuCauXacThucToChuc> LichSuYeuCauXacThucToChucs => Set<LichSuYeuCauXacThucToChuc>();
-    public DbSet<BanToChuc> BanToChucs => Set<BanToChuc>();
-    public DbSet<LoaiSuKien> LoaiSuKiens => Set<LoaiSuKien>();
-    public DbSet<SuKien> SuKiens => Set<SuKien>();
-    public DbSet<DiaDiem> DiaDiems => Set<DiaDiem>();
-    public DbSet<DatDiaDiem> DatDiaDiems => Set<DatDiaDiem>();
-    public DbSet<LoaiVe> LoaiVes => Set<LoaiVe>();
-    public DbSet<DonVe> DonVes => Set<DonVe>();
-    public DbSet<ChiTietDonVe> ChiTietDonVes => Set<ChiTietDonVe>();
-    public DbSet<ThanhToan> ThanhToans => Set<ThanhToan>();
-    public DbSet<Ve> Ves => Set<Ve>();
-    public DbSet<XuatVe> XuatVes => Set<XuatVe>();
+    // Cho phép code truy cập và thao tác với bảng VaiTro.
+    public DbSet<VaiTro> DanhSachVaiTro => Set<VaiTro>();
 
-    protected override void OnModelCreating(ModelBuilder model)
+    public DbSet<TaiKhoan> DanhSachTaiKhoan => Set<TaiKhoan>();
+    public DbSet<YeuCauXacThucToChuc> YeuCauXacThucToChuc => Set<YeuCauXacThucToChuc>();
+    public DbSet<LichSuYeuCauXacThucToChuc> LichSuYeuCauXacThucToChuc => Set<LichSuYeuCauXacThucToChuc>();
+    public DbSet<BanToChuc> DanhSachBanToChuc => Set<BanToChuc>();
+    public DbSet<LoaiSuKien> DanhSachLoaiSuKien => Set<LoaiSuKien>();
+    public DbSet<SuKien> DanhSachSuKien => Set<SuKien>();
+    public DbSet<DiaDiem> DanhSachDiaDiem => Set<DiaDiem>();
+    public DbSet<DatDiaDiem> DanhSachDatDiaDiem => Set<DatDiaDiem>();
+    public DbSet<LoaiVe> DanhSachLoaiVe => Set<LoaiVe>();
+    public DbSet<DonVe> DanhSachDonVe => Set<DonVe>();
+    public DbSet<ChiTietDonVe> ChiTietDonVe => Set<ChiTietDonVe>();
+    public DbSet<ThanhToan> DanhSachThanhToan => Set<ThanhToan>();
+    public DbSet<Ve> DanhSachVe => Set<Ve>();
+    public DbSet<XuatVe> LichSuXuatVe => Set<XuatVe>();
+
+    // Khi EF Core khởi tạo database model, tự tìm các file Config
+    // để biết khóa chính, khóa ngoại, độ dài, quan hệ và các ràng buộc của từng bảng.
+    protected override void OnModelCreating(ModelBuilder boDungModelDuLieu)
     {
-        base.OnModelCreating(model);
-        model.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        base.OnModelCreating(boDungModelDuLieu);
+
+        boDungModelDuLieu.ApplyConfigurationsFromAssembly(
+            typeof(ApplicationDbContext).Assembly
+        );
     }
 }

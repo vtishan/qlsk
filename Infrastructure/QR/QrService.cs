@@ -4,17 +4,17 @@ namespace QLSK.Infrastructure.QR;
 
 public class QrService
 {
-    public byte[] Tao(string text)
+    public byte[] TaoAnhQrPng(string noiDungMaQr)
     {
-        using var boTao = new QRCodeGenerator();
+        using var boTaoMaQr = new QRCodeGenerator();
 
-        using var duLieu = boTao.CreateQrCode(
-            text,
+        using var duLieuQr = boTaoMaQr.CreateQrCode(
+            noiDungMaQr,
             QRCodeGenerator.ECCLevel.Q
         );
 
-        var maQr = new PngByteQRCode(duLieu);
+        var anhMaQr = new PngByteQRCode(duLieuQr);
 
-        return maQr.GetGraphic(12);
+        return anhMaQr.GetGraphic(12);
     }
 }

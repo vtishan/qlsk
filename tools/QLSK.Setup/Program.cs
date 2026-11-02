@@ -8,21 +8,21 @@ namespace QLSK.Setup;
 
 internal static class SetupProgram
 {
-    public static async Task<int> Main(string[] args)
+    public static async Task<int> Main(string[] thamSoDongLenh)
     {
         var interactive = !Console.IsInputRedirected;
-        if (args is ["--help"] or ["-h"] || args.Length == 0 && !interactive)
+        if (thamSoDongLenh is ["--help"] or ["-h"] || thamSoDongLenh.Length == 0 && !interactive)
         {
             ShowUsage();
             return 0;
         }
-        if (args.Length == 0)
+        if (thamSoDongLenh.Length == 0)
         {
-            var command = SetupConsole.ChooseCommand();
-            if (command is null) return 0;
-            args = [command];
+            var lenhThietLap = SetupConsole.ChooseCommand();
+            if (lenhThietLap is null) return 0;
+            thamSoDongLenh = [lenhThietLap];
         }
-        if (args.Length != 1 || args[0] is not ("migrate" or "create-admin" or "update-admin" or "adopt-legacy-data"))
+        if (thamSoDongLenh.Length != 1 || thamSoDongLenh[0] is not ("migrate" or "create-admin" or "update-admin" or "adopt-legacy-data"))
         {
             Console.Error.WriteLine("Lệnh không hợp lệ.");
             ShowUsage();
@@ -31,90 +31,90 @@ internal static class SetupProgram
 
         try
         {
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Default");
-            if (string.IsNullOrWhiteSpace(connectionString) && interactive)
-                connectionString = DevelopmentSettings.FindConnectionString(Directory.GetCurrentDirectory())
+            var chuoiKetNoiCoSoDuLieu = Environment.GetEnvironmentVariable("ConnectionStrings__Default");
+            if (string.IsNullOrWhiteSpace(chuoiKetNoiCoSoDuLieu) && interactive)
+                chuoiKetNoiCoSoDuLieu = DevelopmentSettings.FindConnectionString(Directory.GetCurrentDirectory())
                     ?? DevelopmentSettings.FindConnectionString(AppContext.BaseDirectory);
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(chuoiKetNoiCoSoDuLieu))
                 throw new SetupValidationException("Cần đặt biến môi trường ConnectionStrings__Default cho cơ sở dữ liệu đích.");
 
-            SqlConnectionStringBuilder parsed;
-            try { parsed = new SqlConnectionStringBuilder(connectionString); }
+            SqlConnectionStringBuilder giaTriDaPhanTich;
+            try { giaTriDaPhanTich = new SqlConnectionStringBuilder(chuoiKetNoiCoSoDuLieu); }
             catch (ArgumentException)
             {
                 throw new SetupValidationException("Cấu hình kết nối cơ sở dữ liệu không hợp lệ.");
             }
-            if (string.IsNullOrWhiteSpace(parsed.DataSource) || string.IsNullOrWhiteSpace(parsed.InitialCatalog) ||
-                new[] { "master", "model", "msdb", "tempdb" }.Contains(parsed.InitialCatalog, StringComparer.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(giaTriDaPhanTich.DataSource) || string.IsNullOrWhiteSpace(giaTriDaPhanTich.InitialCatalog) ||
+                new[] { "master", "model", "msdb", "tempdb" }.Contains(giaTriDaPhanTich.InitialCatalog, StringComparer.OrdinalIgnoreCase))
                 throw new SetupValidationException("Cần chỉ định máy chủ và cơ sở dữ liệu ứng dụng riêng.");
 
             if (interactive)
-                Console.WriteLine($"Database: {parsed.DataSource} / {parsed.InitialCatalog}");
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlServer(connectionString)
+                Console.WriteLine($"Database: {giaTriDaPhanTich.DataSource} / {giaTriDaPhanTich.InitialCatalog}");
+            var tuyChonCoSoDuLieu = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlServer(chuoiKetNoiCoSoDuLieu)
                 .Options;
-            await using var db = new ApplicationDbContext(options);
-            if (args[0] == "migrate")
+            await using var nguCanhDuLieu = new ApplicationDbContext(tuyChonCoSoDuLieu);
+            if (thamSoDongLenh[0] == "migrate")
             {
-                await db.Database.MigrateAsync();
+                await nguCanhDuLieu.Database.MigrateAsync();
                 Console.WriteLine("Đã cập nhật cấu trúc cơ sở dữ liệu. Không thêm sự kiện hoặc tài khoản.");
                 return 0;
             }
 
-            if (args[0] == "create-admin" && await db.TaiKhoans.AnyAsync(x => x.VaiTroId == 4))
+            if (thamSoDongLenh[0] == "create-admin" && await nguCanhDuLieu.DanhSachTaiKhoan.AnyAsync(taiKhoanDb => taiKhoanDb.VaiTroId == 4))
             {
                 Console.WriteLine("Đã có tài khoản quản trị. Chọn đổi thông tin admin hoặc chạy update-admin.");
                 return 0;
             }
 
-            var id = 0;
-            if (args[0] == "update-admin")
+            var taiKhoanId = 0;
+            if (thamSoDongLenh[0] == "update-admin")
             {
-                var idText = Environment.GetEnvironmentVariable("QLSK_ADMIN_ID");
-                if (string.IsNullOrWhiteSpace(idText) && interactive)
+                var chuoiTaiKhoanId = Environment.GetEnvironmentVariable("QLSK_ADMIN_ID");
+                if (string.IsNullOrWhiteSpace(chuoiTaiKhoanId) && interactive)
                 {
-                    var admins = await db.TaiKhoans.AsNoTracking().Where(x => x.VaiTroId == 4)
-                        .OrderBy(x => x.Id).Select(x => new { x.Id, x.Email, x.HoatDong }).ToListAsync();
-                    if (admins.Count == 0)
+                    var danhSachQuanTriVien = await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking().Where(taiKhoanDb => taiKhoanDb.VaiTroId == 4)
+                        .OrderBy(taiKhoanDb => taiKhoanDb.TaiKhoanId).Select(taiKhoanDb => new { Id = taiKhoanDb.TaiKhoanId, taiKhoanDb.Email, taiKhoanDb.HoatDong }).ToListAsync();
+                    if (danhSachQuanTriVien.Count == 0)
                         throw new SetupValidationException("Chưa có quản trị viên. Hãy chọn tạo admin mới.");
-                    foreach (var admin in admins)
-                        Console.WriteLine($"  ID {admin.Id}: {admin.Email} ({(admin.HoatDong ? "đang hoạt động" : "đã khóa")})");
-                    idText = SetupConsole.ReadRequired("ID admin cần đổi");
+                    foreach (var taiKhoanQuanTri in danhSachQuanTriVien)
+                        Console.WriteLine($"  ID {taiKhoanQuanTri.Id}: {taiKhoanQuanTri.Email} ({(taiKhoanQuanTri.HoatDong ? "đang hoạt động" : "đã khóa")})");
+                    chuoiTaiKhoanId = SetupConsole.ReadRequiredInput("ID admin cần đổi");
                 }
-                if (!int.TryParse(idText, out id) || id <= 0)
+                if (!int.TryParse(chuoiTaiKhoanId, out taiKhoanId) || taiKhoanId <= 0)
                     throw new SetupValidationException("Cần đặt QLSK_ADMIN_ID cho tài khoản quản trị cần cập nhật.");
-                if (!await db.TaiKhoans.AnyAsync(x => x.Id == id && x.VaiTroId == 4))
+                if (!await nguCanhDuLieu.DanhSachTaiKhoan.AnyAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId && taiKhoanDb.VaiTroId == 4))
                     throw new SetupValidationException("Không tìm thấy tài khoản quản trị đích.");
             }
 
-            var email = Environment.GetEnvironmentVariable("QLSK_ADMIN_EMAIL") ?? "";
-            var password = Environment.GetEnvironmentVariable("QLSK_ADMIN_PASSWORD") ?? "";
+            var emailTaiKhoan = Environment.GetEnvironmentVariable("QLSK_ADMIN_EMAIL") ?? "";
+            var matKhauNhapLieu = Environment.GetEnvironmentVariable("QLSK_ADMIN_PASSWORD") ?? "";
             if (interactive)
             {
-                if (string.IsNullOrWhiteSpace(email)) email = SetupConsole.ReadRequired("Email quản trị");
-                if (string.IsNullOrWhiteSpace(password)) password = SetupConsole.ReadNewPassword();
+                if (string.IsNullOrWhiteSpace(emailTaiKhoan)) emailTaiKhoan = SetupConsole.ReadRequiredInput("Email quản trị");
+                if (string.IsNullOrWhiteSpace(matKhauNhapLieu)) matKhauNhapLieu = SetupConsole.ReadNewPassword();
             }
-            if (args[0] == "update-admin")
+            if (thamSoDongLenh[0] == "update-admin")
             {
-                await AdminProvisioner.UpdateAsync(db, new PasswordHasher<TaiKhoan>(), id, email, password);
+                await AdminProvisioner.UpdateAdminCredentialsAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), taiKhoanId, emailTaiKhoan, matKhauNhapLieu);
                 Console.WriteLine("Đã đổi thông tin quản trị. Các phiên đăng nhập cũ đã mất hiệu lực.");
                 return 0;
             }
-            if (args[0] == "adopt-legacy-data")
+            if (thamSoDongLenh[0] == "adopt-legacy-data")
             {
-                var count = await LegacyDataMigrator.AdoptAsync(db, new PasswordHasher<TaiKhoan>(), email, password);
-                Console.WriteLine($"Đã chuyển đổi dữ liệu cũ, thu hồi thông tin đăng nhập của {count} tài khoản sở hữu cũ. Giữ nguyên các bản ghi nghiệp vụ.");
+                var soTaiKhoanDaThuHoi = await LegacyDataMigrator.AdoptLegacyAccountsAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), emailTaiKhoan, matKhauNhapLieu);
+                Console.WriteLine($"Đã chuyển đổi dữ liệu cũ, thu hồi thông tin đăng nhập của {soTaiKhoanDaThuHoi} tài khoản sở hữu cũ. Giữ nguyên các bản ghi nghiệp vụ.");
                 return 0;
             }
-            var result = await AdminProvisioner.CreateFirstAsync(db, new PasswordHasher<TaiKhoan>(), email, password);
-            Console.WriteLine(result == AdminProvisioningResult.Created
+            var ketQuaTaoQuanTri = await AdminProvisioner.CreateFirstAdminAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), emailTaiKhoan, matKhauNhapLieu);
+            Console.WriteLine(ketQuaTaoQuanTri == AdminProvisioningResult.Created
                 ? "Đã tạo tài khoản quản trị đầu tiên."
                 : "Đã có tài khoản quản trị. Không thay đổi tài khoản hoặc mật khẩu hiện có.");
             return 0;
         }
-        catch (SetupValidationException error)
+        catch (SetupValidationException loiXuLy)
         {
-            Console.Error.WriteLine(error.Message);
+            Console.Error.WriteLine(loiXuLy.Message);
             return 2;
         }
         catch

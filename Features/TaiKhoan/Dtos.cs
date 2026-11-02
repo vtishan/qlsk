@@ -24,5 +24,5 @@ public class DoiVaiTroDto
 {
     [Range(1, 4)] public int VaiTroId { get; set; }
 }
-public record TaiKhoanDto(int Id, string HoTen, string Email, string VaiTro, bool HoatDong, DateTime NgayTao);
+public record TaiKhoanDto([property: System.Text.Json.Serialization.JsonPropertyName("id")] int TaiKhoanId, string HoTen, string Email, string VaiTro, bool HoatDong, DateTime NgayTao);
 public record DangNhapResult(string Token, TaiKhoanDto TaiKhoan);

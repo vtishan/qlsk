@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -8,9 +8,9 @@ namespace QLSK.Migrations
     public partial class AddEventImagePath : Migration
     {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+        protected override void Up(MigrationBuilder boDungMigration)
         {
-            migrationBuilder.AddColumn<string>(
+            boDungMigration.AddColumn<string>(
                 name: "HinhAnh",
                 table: "SuKien",
                 type: "nvarchar(500)",
@@ -19,9 +19,9 @@ namespace QLSK.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+        protected override void Down(MigrationBuilder boDungMigration)
         {
-            migrationBuilder.DropColumn(
+            boDungMigration.DropColumn(
                 name: "HinhAnh",
                 table: "SuKien");
         }

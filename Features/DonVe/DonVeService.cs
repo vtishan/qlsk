@@ -1,93 +1,94 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using QLSK.Common.Exceptions;
+using QLSK.Common.Inventory;
 using QLSK.Data;
 using QLSK.Domain.Entities;
 using QLSK.Domain.Enums;
 
 using DonVeEntity = QLSK.Domain.Entities.DonVe;
 namespace QLSK.Features.DonVe;
-public class DonVeService(ApplicationDbContext db, IConfiguration config)
+public class DonVeService(ApplicationDbContext nguCanhDuLieu, IConfiguration cauHinhUngDung)
 {
-    public async Task<DonVeEntity> Tao(int userId, TaoDonDto dto)
+    public async Task<DonVeEntity> TaoDonVaGiuVe(int taiKhoanId, TaoDonDto duLieuTaoDon)
     {
-        if (dto.Items.Count == 0) throw new ApiException(400, "VALIDATION_ERROR", "Đơn phải có ít nhất một loại vé.");
-        if (dto.Items.GroupBy(x => x.LoaiVeId).Any(g => g.Count() > 1)) throw new ApiException(400, "VALIDATION_ERROR", "Không được lặp loại vé trong đơn.");
-        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        var ids = dto.Items.Select(x => x.LoaiVeId).OrderBy(x => x).ToList();
-        var types = await db.LoaiVes.Include(x => x.SuKien).Where(x => ids.Contains(x.Id)).OrderBy(x => x.Id).ToListAsync();
-        if (types.Count != ids.Count) throw new ApiException(404, "NOT_FOUND", "Có loại vé không tồn tại.");
-        var eventId = types[0].SuKienId;
-        if (types.Any(x => x.SuKienId != eventId)) throw new ApiException(400, "VALIDATION_ERROR", "Các loại vé phải thuộc cùng sự kiện.");
-        if (types[0].SuKien.TrangThai != TrangThaiSuKien.DaDuyet) throw new ApiException(409, "EVENT_NOT_APPROVED", "Sự kiện chưa được duyệt.");
-        var now = DateTime.UtcNow;
-        decimal total = 0; int count = 0;
-        foreach (var type in types)
+        if (duLieuTaoDon.ChiTietDatVe.Count == 0) throw new ApiException(400, "VALIDATION_ERROR", "Đơn phải có ít nhất một loại vé.");
+        if (duLieuTaoDon.ChiTietDatVe.GroupBy(mucDatVe => mucDatVe.LoaiVeId).Any(nhomLoaiVe => nhomLoaiVe.Count() > 1)) throw new ApiException(400, "VALIDATION_ERROR", "Không được lặp loại vé trong đơn.");
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var danhSachLoaiVeId = duLieuTaoDon.ChiTietDatVe.Select(mucDatVe => mucDatVe.LoaiVeId).OrderBy(loaiVeId => loaiVeId).ToList();
+        var danhSachLoaiVe = await nguCanhDuLieu.DanhSachLoaiVe.Include(loaiVeDb => loaiVeDb.SuKien).Where(loaiVeDb => danhSachLoaiVeId.Contains(loaiVeDb.LoaiVeId)).OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).ToListAsync();
+        if (danhSachLoaiVe.Count != danhSachLoaiVeId.Count) throw new ApiException(404, "NOT_FOUND", "Có loại vé không tồn tại.");
+        var suKienId = danhSachLoaiVe[0].SuKienId;
+        if (danhSachLoaiVe.Any(loaiVeDb => loaiVeDb.SuKienId != suKienId)) throw new ApiException(400, "VALIDATION_ERROR", "Các loại vé phải thuộc cùng sự kiện.");
+        if (danhSachLoaiVe[0].SuKien.TrangThai != TrangThaiSuKien.DaDuyet) throw new ApiException(409, "EVENT_NOT_APPROVED", "Sự kiện chưa được duyệt.");
+        var thoiDiemHienTai = DateTime.UtcNow;
+        decimal tongTien = 0; int tongSoVe = 0;
+        foreach (var loaiVe in danhSachLoaiVe)
         {
-            var item = dto.Items.Single(x => x.LoaiVeId == type.Id);
-            if (item.SoLuong <= 0 || item.SoLuong > 20) throw new ApiException(400, "TICKET_LIMIT_EXCEEDED", "Số lượng vé không hợp lệ.");
-            if (now < type.MoBan || now > type.DongBan) throw new ApiException(409, "TICKET_NOT_ON_SALE", $"Loại vé {type.Ten} chưa mở bán hoặc đã đóng bán.");
-            if (type.DaBan + type.DangGiu + item.SoLuong > type.SoLuong) throw new ApiException(409, "TICKET_SOLD_OUT", $"Loại vé {type.Ten} không đủ số lượng.");
-            type.DangGiu += item.SoLuong;
-            count += item.SoLuong; total += type.Gia * item.SoLuong;
+            var chiTietDatVe = duLieuTaoDon.ChiTietDatVe.Single(mucDatVe => mucDatVe.LoaiVeId == loaiVe.LoaiVeId);
+            if (chiTietDatVe.SoLuong <= 0 || chiTietDatVe.SoLuong > 20) throw new ApiException(400, "TICKET_LIMIT_EXCEEDED", "Số lượng vé không hợp lệ.");
+            if (thoiDiemHienTai < loaiVe.ThoiGianMoBan || thoiDiemHienTai > loaiVe.ThoiGianDongBan) throw new ApiException(409, "TICKET_NOT_ON_SALE", $"Loại vé {loaiVe.TenLoaiVe} chưa mở bán hoặc đã đóng bán.");
+            if (loaiVe.SoLuongDaBan + loaiVe.SoLuongDangGiu + chiTietDatVe.SoLuong > loaiVe.SoLuong) throw new ApiException(409, "TICKET_SOLD_OUT", $"Loại vé {loaiVe.TenLoaiVe} không đủ số lượng.");
+            QuanLyTonVe.GiuSoLuongVeChoDon(loaiVe, chiTietDatVe.SoLuong);
+            tongSoVe += chiTietDatVe.SoLuong; tongTien += loaiVe.GiaVe * chiTietDatVe.SoLuong;
         }
-        var minutes = Math.Clamp(config.GetValue("Order:ExpireMinutes", 15), 1, 120);
-        var order = new DonVeEntity { TaiKhoanId = userId, SuKienId = eventId, SoLuong = count, TongTien = total, HetHan = now.AddMinutes(minutes) };
-        foreach (var type in types)
+        var soPhutGiuVe = Math.Clamp(cauHinhUngDung.GetValue("Order:ExpireMinutes", 15), 1, 120);
+        var donVe = new DonVeEntity { TaiKhoanId = taiKhoanId, SuKienId = suKienId, SoLuong = tongSoVe, TongTien = tongTien, ThoiGianHetHan = thoiDiemHienTai.AddMinutes(soPhutGiuVe) };
+        foreach (var loaiVe in danhSachLoaiVe)
         {
-            var item = dto.Items.Single(x => x.LoaiVeId == type.Id);
-            order.ChiTiets.Add(new ChiTietDonVe { LoaiVeId = type.Id, SoLuong = item.SoLuong, DonGia = type.Gia, ThanhTien = type.Gia * item.SoLuong });
+            var chiTietDatVe = duLieuTaoDon.ChiTietDatVe.Single(mucDatVe => mucDatVe.LoaiVeId == loaiVe.LoaiVeId);
+            donVe.ChiTietDonVe.Add(new ChiTietDonVe { LoaiVeId = loaiVe.LoaiVeId, SoLuong = chiTietDatVe.SoLuong, DonGia = loaiVe.GiaVe, ThanhTien = loaiVe.GiaVe * chiTietDatVe.SoLuong });
         }
-        db.DonVes.Add(order); await db.SaveChangesAsync(); await tx.CommitAsync(); return await Lay(userId, order.Id, false);
+        nguCanhDuLieu.DanhSachDonVe.Add(donVe); await nguCanhDuLieu.SaveChangesAsync(); await giaoDich.CommitAsync(); return await LayChiTietDonVe(taiKhoanId, donVe.DonVeId, false);
     }
 
-    public async Task<List<DonVeEntity>> CuaToi(int userId)
-        => await db.DonVes.AsNoTracking().Where(x => x.TaiKhoanId == userId).Include(x => x.SuKien).Include(x => x.ChiTiets).ThenInclude(x => x.LoaiVe).OrderByDescending(x => x.Id).ToListAsync();
+    public async Task<List<DonVeEntity>> LayDonVeCuaTaiKhoan(int taiKhoanId)
+        => await nguCanhDuLieu.DanhSachDonVe.AsNoTracking().Where(donVeDb => donVeDb.TaiKhoanId == taiKhoanId).Include(donVeDb => donVeDb.SuKien).Include(donVeDb => donVeDb.ChiTietDonVe).ThenInclude(chiTietDonVeDb => chiTietDonVeDb.LoaiVe).OrderByDescending(donVeDb => donVeDb.DonVeId).ToListAsync();
 
-    public async Task<DonVeEntity> Lay(int userId, int id, bool manager)
+    public async Task<DonVeEntity> LayChiTietDonVe(int taiKhoanId, int donVeId, bool laNguoiQuanLy)
     {
-        var x = await db.DonVes.AsNoTracking().Include(x => x.SuKien).ThenInclude(x => x.BanToChuc).Include(x => x.ChiTiets).ThenInclude(x => x.LoaiVe).Include(x => x.ThanhToans).Include(x => x.Ves).SingleOrDefaultAsync(x => x.Id == id)
+        var donVe = await nguCanhDuLieu.DanhSachDonVe.AsNoTracking().Include(donVeDb => donVeDb.SuKien).ThenInclude(suKienDb => suKienDb.BanToChuc).Include(donVeDb => donVeDb.ChiTietDonVe).ThenInclude(chiTietDonVeDb => chiTietDonVeDb.LoaiVe).Include(donVeDb => donVeDb.DanhSachThanhToan).Include(donVeDb => donVeDb.DanhSachVe).SingleOrDefaultAsync(donVeDb => donVeDb.DonVeId == donVeId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy đơn vé.");
-        var owner = x.TaiKhoanId == userId;
-        var organizer = x.SuKien.BanToChuc.TaiKhoanId == userId;
-        if (!owner && !organizer && !manager) throw new ApiException(403, "FORBIDDEN", "Không có quyền xem đơn.");
-        return x;
+        var laChuSoHuu = donVe.TaiKhoanId == taiKhoanId;
+        var laBanToChuc = donVe.SuKien.BanToChuc.TaiKhoanId == taiKhoanId;
+        if (!laChuSoHuu && !laBanToChuc && !laNguoiQuanLy) throw new ApiException(403, "FORBIDDEN", "Không có quyền xem đơn.");
+        return donVe;
     }
 
-    public async Task Huy(int userId, int id)
+    public async Task HuyDonVe(int taiKhoanId, int donVeId)
     {
-        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        var order = await db.DonVes.Include(x => x.ChiTiets).SingleOrDefaultAsync(x => x.Id == id && x.TaiKhoanId == userId)
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var donVe = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.ChiTietDonVe).SingleOrDefaultAsync(donVeDb => donVeDb.DonVeId == donVeId && donVeDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy đơn vé.");
-        if (order.TrangThai != TrangThaiDon.ChoThanhToan) throw new ApiException(409, "ORDER_INVALID_STATE", "Đơn không thể hủy.");
-        await TraVeGiu(order);
-        order.TrangThai = TrangThaiDon.DaHuy;
-        await db.SaveChangesAsync(); await tx.CommitAsync();
+        if (donVe.TrangThai != TrangThaiDon.ChoThanhToan) throw new ApiException(409, "ORDER_INVALID_STATE", "Đơn không thể hủy.");
+        await GiaiPhongVeDangGiuCuaDon(donVe);
+        donVe.TrangThai = TrangThaiDon.DaHuy;
+        await nguCanhDuLieu.SaveChangesAsync(); await giaoDich.CommitAsync();
     }
 
-    public async Task<int> HetHan()
+    public async Task<int> XuLyCacDonVeHetHan()
     {
-        var now = DateTime.UtcNow;
-        var ids = await db.DonVes.AsNoTracking().Where(x => x.TrangThai == TrangThaiDon.ChoThanhToan && x.HetHan < now).OrderBy(x => x.HetHan).ThenBy(x => x.Id).Select(x => x.Id).Take(100).ToListAsync();
-        var done = 0;
-        foreach (var id in ids)
+        var thoiDiemHienTai = DateTime.UtcNow;
+        var danhSachDonVeId = await nguCanhDuLieu.DanhSachDonVe.AsNoTracking().Where(donVeDb => donVeDb.TrangThai == TrangThaiDon.ChoThanhToan && donVeDb.ThoiGianHetHan < thoiDiemHienTai).OrderBy(donVeDb => donVeDb.ThoiGianHetHan).ThenBy(donVeDb => donVeDb.DonVeId).Select(donVeDb => donVeDb.DonVeId).Take(100).ToListAsync();
+        var soDonDaXuLy = 0;
+        foreach (var donVeId in danhSachDonVeId)
         {
-            await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-            var order = await db.DonVes.Include(x => x.ChiTiets).SingleOrDefaultAsync(x => x.Id == id);
-            if (order == null || order.TrangThai != TrangThaiDon.ChoThanhToan || order.HetHan >= DateTime.UtcNow) { await tx.RollbackAsync(); continue; }
-            await TraVeGiu(order); order.TrangThai = TrangThaiDon.HetHan; await db.SaveChangesAsync(); await tx.CommitAsync(); done++;
+            await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            var donVe = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.ChiTietDonVe).SingleOrDefaultAsync(donVeDb => donVeDb.DonVeId == donVeId);
+            if (donVe == null || donVe.TrangThai != TrangThaiDon.ChoThanhToan || donVe.ThoiGianHetHan >= DateTime.UtcNow) { await giaoDich.RollbackAsync(); continue; }
+            await GiaiPhongVeDangGiuCuaDon(donVe); donVe.TrangThai = TrangThaiDon.HetHan; await nguCanhDuLieu.SaveChangesAsync(); await giaoDich.CommitAsync(); soDonDaXuLy++;
         }
-        return done;
+        return soDonDaXuLy;
     }
 
-    async Task TraVeGiu(DonVeEntity order)
+    async Task GiaiPhongVeDangGiuCuaDon(DonVeEntity donVe)
     {
-        var ids = order.ChiTiets.Select(x => x.LoaiVeId).OrderBy(x => x).ToList();
-        var types = await db.LoaiVes.Where(x => ids.Contains(x.Id)).OrderBy(x => x.Id).ToListAsync();
-        foreach (var detail in order.ChiTiets)
+        var danhSachLoaiVeId = donVe.ChiTietDonVe.Select(chiTietDonVeDb => chiTietDonVeDb.LoaiVeId).OrderBy(loaiVeId => loaiVeId).ToList();
+        var danhSachLoaiVe = await nguCanhDuLieu.DanhSachLoaiVe.Where(loaiVeDb => danhSachLoaiVeId.Contains(loaiVeDb.LoaiVeId)).OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).ToListAsync();
+        foreach (var chiTietDonVe in donVe.ChiTietDonVe)
         {
-            var type = types.Single(x => x.Id == detail.LoaiVeId);
-            type.DangGiu = Math.Max(0, type.DangGiu - detail.SoLuong);
+            var loaiVe = danhSachLoaiVe.Single(loaiVeDb => loaiVeDb.LoaiVeId == chiTietDonVe.LoaiVeId);
+            QuanLyTonVe.GiaiPhongVeDangGiu(loaiVe, chiTietDonVe.SoLuong);
         }
     }
 }

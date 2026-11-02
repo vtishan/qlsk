@@ -19,121 +19,121 @@ public static class LocalUserSeeder
     private static readonly string[] GivenNames =
         ["Minh Anh", "Thanh Bình", "Ngọc Chi", "Quốc Dũng", "Thu Hà", "Gia Huy", "Khánh Linh", "Bảo Ngọc", "Đức Phúc", "Phương Thảo"];
 
-    public static async Task<UserSeedResult> SeedAsync(ApplicationDbContext db, IPasswordHasher<TaiKhoan> hasher,
-        string password, DateTime? utcNow = null)
+    public static async Task<UserSeedResult> TaoDuLieuNguoiDungMauAsync(ApplicationDbContext nguCanhDuLieu, IPasswordHasher<TaiKhoan> boBamMatKhau,
+        string matKhauNhapLieu, DateTime? thoiDiemUtcChiDinh = null)
     {
-        if (string.IsNullOrWhiteSpace(password) || password.Length < 12)
+        if (string.IsNullOrWhiteSpace(matKhauNhapLieu) || matKhauNhapLieu.Length < 12)
             throw new InvalidOperationException("The sample user password must contain at least 12 characters.");
-        var now = utcNow ?? DateTime.UtcNow;
-        await using var transaction = db.Database.IsRelational()
-            ? await db.Database.BeginTransactionAsync(IsolationLevel.Serializable)
+        var thoiDiemHienTai = thoiDiemUtcChiDinh ?? DateTime.UtcNow;
+        await using var giaoDichCoSoDuLieu = nguCanhDuLieu.Database.IsRelational()
+            ? await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable)
             : null;
 
-        var emails = Enumerable.Range(1, UserCount).Select(EmailFor).ToArray();
-        var existing = (await db.TaiKhoans.AsNoTracking().Where(x => emails.Contains(x.Email))
-            .Select(x => x.Email).ToListAsync()).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var missing = Enumerable.Range(1, UserCount).Where(number => !existing.Contains(EmailFor(number))).ToArray();
-        if (missing.Length == 0) return new UserSeedResult(0, 0, 0, 0, UserCount);
-        if (!await db.VaiTros.AnyAsync(x => x.Id == 1))
+        var danhSachEmailEmailTaiKhoan = Enumerable.Range(1, UserCount).Select(TaoEmailNguoiDungMau).ToArray();
+        var duLieuDaTonTai = (await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking().Where(taiKhoanDb => danhSachEmailEmailTaiKhoan.Contains(taiKhoanDb.Email))
+            .Select(taiKhoanDb => taiKhoanDb.Email).ToListAsync()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var duLieuConThieu = Enumerable.Range(1, UserCount).Where(soThuTuBanGhi => !duLieuDaTonTai.Contains(TaoEmailNguoiDungMau(soThuTuBanGhi))).ToArray();
+        if (duLieuConThieu.Length == 0) return new UserSeedResult(0, 0, 0, 0, UserCount);
+        if (!await nguCanhDuLieu.DanhSachVaiTro.AnyAsync(vaiTroDb => vaiTroDb.VaiTroId == 1))
             throw new InvalidOperationException("Run the schema migrations before populating sample users.");
 
         // Use existing events only, and keep all inventory changes in the same transaction as the orders.
-        var ticketTypes = await db.LoaiVes.Include(x => x.SuKien)
-            .Where(x => x.SuKien.TrangThai == TrangThaiSuKien.DaDuyet &&
-                x.SuKien.BatDau > now.AddMinutes(15) && x.Gia >= 2 && x.Gia == decimal.Truncate(x.Gia) &&
-                x.MoBan <= now.AddMinutes(-30) && x.DongBan > now.AddMinutes(15))
-            .OrderBy(x => x.Id).ToListAsync();
-        if (ticketTypes.Count == 0)
+        var danhSachLoaiVeKiemThu = await nguCanhDuLieu.DanhSachLoaiVe.Include(loaiVeDb => loaiVeDb.SuKien)
+            .Where(loaiVeDb => loaiVeDb.SuKien.TrangThai == TrangThaiSuKien.DaDuyet &&
+                loaiVeDb.SuKien.ThoiGianBatDau > thoiDiemHienTai.AddMinutes(15) && loaiVeDb.GiaVe >= 2 && loaiVeDb.GiaVe == decimal.Truncate(loaiVeDb.GiaVe) &&
+                loaiVeDb.ThoiGianMoBan <= thoiDiemHienTai.AddMinutes(-30) && loaiVeDb.ThoiGianDongBan > thoiDiemHienTai.AddMinutes(15))
+            .OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).ToListAsync();
+        if (danhSachLoaiVeKiemThu.Count == 0)
             throw new InvalidOperationException("Sample users need an approved upcoming event with paid tickets already on sale for at least 30 minutes.");
 
         // Plan the entire batch before adding records, so insufficient inventory cannot leave a partial batch.
-        var plannedInventory = ticketTypes.ToDictionary(x => x.Id, x => x.SoLuong - x.DaBan - x.DangGiu);
-        var plans = new List<(int Number, LoaiVe Type, int Quantity, TrangThaiDon State)>();
-        foreach (var number in missing)
+        var tonVeTheoKeHoach = danhSachLoaiVeKiemThu.ToDictionary(loaiVeDb => loaiVeDb.LoaiVeId, loaiVeDb => loaiVeDb.SoLuong - loaiVeDb.SoLuongDaBan - loaiVeDb.SoLuongDangGiu);
+        var keHoachTaoDonVe = new List<(int Number, LoaiVe Type, int Quantity, TrangThaiDon State)>();
+        foreach (var soThuTuBanGhi in duLieuConThieu)
         {
-            var index = number - 1;
-            var quantity = 1 + index % 3;
-            var type = Enumerable.Range(0, ticketTypes.Count).Select(offset => ticketTypes[(index + offset) % ticketTypes.Count])
-                .FirstOrDefault(x => plannedInventory[x.Id] >= quantity)
+            var chiSoBanGhi = soThuTuBanGhi - 1;
+            var soLuongVeDat = 1 + chiSoBanGhi % 3;
+            var loaiVeDangXuLy = Enumerable.Range(0, danhSachLoaiVeKiemThu.Count).Select(doLechNgay => danhSachLoaiVeKiemThu[(chiSoBanGhi + doLechNgay) % danhSachLoaiVeKiemThu.Count])
+                .FirstOrDefault(loaiVeDb => tonVeTheoKeHoach[loaiVeDb.LoaiVeId] >= soLuongVeDat)
                 ?? throw new InvalidOperationException("There are not enough available tickets for the sample user orders.");
-            var state = StateFor(index);
-            if (state is TrangThaiDon.ChoThanhToan or TrangThaiDon.ThanhCong or TrangThaiDon.YeuCauHoanTien)
-                plannedInventory[type.Id] -= quantity;
-            plans.Add((number, type, quantity, state));
+            var trangThaiDonVe = LayTrangThaiDonMau(chiSoBanGhi);
+            if (trangThaiDonVe is TrangThaiDon.ChoThanhToan or TrangThaiDon.ThanhCong or TrangThaiDon.YeuCauHoanTien)
+                tonVeTheoKeHoach[loaiVeDangXuLy.LoaiVeId] -= soLuongVeDat;
+            keHoachTaoDonVe.Add((soThuTuBanGhi, loaiVeDangXuLy, soLuongVeDat, trangThaiDonVe));
         }
 
         var addedTickets = 0;
-        foreach (var (number, type, quantity, state) in plans)
+        foreach (var (soThuTuBanGhi, loaiVeDangXuLy, soLuongVeDat, trangThaiDonVe) in keHoachTaoDonVe)
         {
-            var index = number - 1;
-            var user = new TaiKhoan
+            var chiSoBanGhi = soThuTuBanGhi - 1;
+            var taiKhoanNguoiDung = new TaiKhoan
             {
-                HoTen = $"{Surnames[index / GivenNames.Length]} {GivenNames[index % GivenNames.Length]}",
-                Email = EmailFor(number), VaiTroId = 1, HoatDong = number % 11 != 0,
-                NgayTao = now.AddDays(-60 - number).AddMinutes(-number)
+                HoTen = $"{Surnames[chiSoBanGhi / GivenNames.Length]} {GivenNames[chiSoBanGhi % GivenNames.Length]}",
+                Email = TaoEmailNguoiDungMau(soThuTuBanGhi), VaiTroId = 1, HoatDong = soThuTuBanGhi % 11 != 0,
+                NgayTao = thoiDiemHienTai.AddDays(-60 - soThuTuBanGhi).AddMinutes(-soThuTuBanGhi)
             };
-            user.MatKhau = hasher.HashPassword(user, password);
-            var saleMinutes = (int)Math.Min(14 * 24 * 60, (now - type.MoBan).TotalMinutes);
-            var created = state == TrangThaiDon.ChoThanhToan
-                ? now.AddMinutes(-1 - index % 5)
-                : now.AddMinutes(-30 - index * 17 % Math.Max(1, saleMinutes - 29));
-            var total = type.Gia * quantity;
-            var order = new DonVe
+            taiKhoanNguoiDung.MatKhauBam = boBamMatKhau.HashPassword(taiKhoanNguoiDung, matKhauNhapLieu);
+            var soPhutMoBan = (int)Math.Min(14 * 24 * 60, (thoiDiemHienTai - loaiVeDangXuLy.ThoiGianMoBan).TotalMinutes);
+            var thoiDiemTaoDon = trangThaiDonVe == TrangThaiDon.ChoThanhToan
+                ? thoiDiemHienTai.AddMinutes(-1 - chiSoBanGhi % 5)
+                : thoiDiemHienTai.AddMinutes(-30 - chiSoBanGhi * 17 % Math.Max(1, soPhutMoBan - 29));
+            var tongTienDonVe = loaiVeDangXuLy.GiaVe * soLuongVeDat;
+            var donVeDangXuLy = new DonVe
             {
-                TaiKhoan = user, SuKienId = type.SuKienId, SoLuong = quantity, TongTien = total,
-                TrangThai = state, NgayTao = created, HetHan = created.AddMinutes(15)
+                TaiKhoan = taiKhoanNguoiDung, SuKienId = loaiVeDangXuLy.SuKienId, SoLuong = soLuongVeDat, TongTien = tongTienDonVe,
+                TrangThai = trangThaiDonVe, NgayTao = thoiDiemTaoDon, ThoiGianHetHan = thoiDiemTaoDon.AddMinutes(15)
             };
-            order.ChiTiets.Add(new ChiTietDonVe
+            donVeDangXuLy.ChiTietDonVe.Add(new ChiTietDonVe
             {
-                LoaiVe = type, SoLuong = quantity, DonGia = type.Gia, ThanhTien = total
+                LoaiVe = loaiVeDangXuLy, SoLuong = soLuongVeDat, DonGia = loaiVeDangXuLy.GiaVe, ThanhTien = tongTienDonVe
             });
 
-            var paid = state is TrangThaiDon.ThanhCong or TrangThaiDon.YeuCauHoanTien or TrangThaiDon.DaHoanTien;
-            var payment = new ThanhToan
+            var daThanhToan = trangThaiDonVe is TrangThaiDon.ThanhCong or TrangThaiDon.YeuCauHoanTien or TrangThaiDon.DaHoanTien;
+            var thanhToanKiemThu = new ThanhToan
             {
-                SoTien = total, NgayTao = created.AddSeconds(10),
-                TrangThai = paid ? TrangThaiThanhToan.ThanhCong : state == TrangThaiDon.ChoThanhToan
+                SoTien = tongTienDonVe, NgayTao = thoiDiemTaoDon.AddSeconds(10),
+                TrangThai = daThanhToan ? TrangThaiThanhToan.ThanhCong : trangThaiDonVe == TrangThaiDon.ChoThanhToan
                     ? TrangThaiThanhToan.DangXuLy : TrangThaiThanhToan.ThatBai,
-                NgayThanhToan = paid ? created.AddMinutes(1) : null,
-                MaLienKet = $"SAMPLE-U{number:000}-LINK",
-                MaGiaoDich = paid ? $"SAMPLE-U{number:000}-PAY" : null,
-                SoTienHoan = state == TrangThaiDon.DaHoanTien ? total
-                    : state == TrangThaiDon.YeuCauHoanTien ? decimal.Truncate(total / 2) : 0,
-                MaHoanTien = state is TrangThaiDon.DaHoanTien or TrangThaiDon.YeuCauHoanTien
-                    ? $"SAMPLE-U{number:000}-REFUND" : null
+                NgayThanhToan = daThanhToan ? thoiDiemTaoDon.AddMinutes(1) : null,
+                MaLienKet = $"SAMPLE-U{soThuTuBanGhi:000}-LINK",
+                MaGiaoDich = daThanhToan ? $"SAMPLE-U{soThuTuBanGhi:000}-PAY" : null,
+                SoTienHoan = trangThaiDonVe == TrangThaiDon.DaHoanTien ? tongTienDonVe
+                    : trangThaiDonVe == TrangThaiDon.YeuCauHoanTien ? decimal.Truncate(tongTienDonVe / 2) : 0,
+                MaHoanTien = trangThaiDonVe is TrangThaiDon.DaHoanTien or TrangThaiDon.YeuCauHoanTien
+                    ? $"SAMPLE-U{soThuTuBanGhi:000}-REFUND" : null
             };
-            order.ThanhToans.Add(payment);
-            if (state == TrangThaiDon.ChoThanhToan) type.DangGiu += quantity;
-            if (paid)
+            donVeDangXuLy.DanhSachThanhToan.Add(thanhToanKiemThu);
+            if (trangThaiDonVe == TrangThaiDon.ChoThanhToan) loaiVeDangXuLy.SoLuongDangGiu += soLuongVeDat;
+            if (daThanhToan)
             {
-                if (state != TrangThaiDon.DaHoanTien) type.DaBan += quantity;
-                for (var ticket = 1; ticket <= quantity; ticket++)
+                if (trangThaiDonVe != TrangThaiDon.DaHoanTien) loaiVeDangXuLy.SoLuongDaBan += soLuongVeDat;
+                for (var veKiemThu = 1; veKiemThu <= soLuongVeDat; veKiemThu++)
                 {
-                    order.Ves.Add(new Ve
+                    donVeDangXuLy.DanhSachVe.Add(new Ve
                     {
-                        LoaiVe = type, MaVe = $"SAMPLE-U{number:000}-T{ticket:00}",
-                        MaQR = $"SAMPLE-QR-U{number:000}-T{ticket:00}", NgayTao = payment.NgayThanhToan!.Value,
-                        TrangThai = state == TrangThaiDon.DaHoanTien ? TrangThaiVe.DaHoanTien : TrangThaiVe.ChuaSuDung
+                        LoaiVe = loaiVeDangXuLy, MaVe = $"SAMPLE-U{soThuTuBanGhi:000}-T{veKiemThu:00}",
+                        NoiDungMaQr = $"SAMPLE-QR-U{soThuTuBanGhi:000}-T{veKiemThu:00}", NgayTao = thanhToanKiemThu.NgayThanhToan!.Value,
+                        TrangThai = trangThaiDonVe == TrangThaiDon.DaHoanTien ? TrangThaiVe.DaHoanTien : TrangThaiVe.ChuaSuDung
                     });
                     addedTickets++;
                 }
             }
-            db.DonVes.Add(order);
+            nguCanhDuLieu.DanhSachDonVe.Add(donVeDangXuLy);
         }
 
-        await db.SaveChangesAsync();
-        if (transaction is not null) await transaction.CommitAsync();
-        return new UserSeedResult(missing.Length, missing.Length, missing.Length, addedTickets, existing.Count);
+        await nguCanhDuLieu.SaveChangesAsync();
+        if (giaoDichCoSoDuLieu is not null) await giaoDichCoSoDuLieu.CommitAsync();
+        return new UserSeedResult(duLieuConThieu.Length, duLieuConThieu.Length, duLieuConThieu.Length, addedTickets, duLieuDaTonTai.Count);
     }
 
-    public static string EmailFor(int number) => $"nguoidung{number:000}@{EmailDomain}";
+    public static string TaoEmailNguoiDungMau(int soThuTuBanGhi) => $"nguoidung{soThuTuBanGhi:000}@{EmailDomain}";
 
-    private static TrangThaiDon StateFor(int index) => (index % 10) switch
+    private static TrangThaiDon LayTrangThaiDonMau(int chiSoBanGhi) => (chiSoBanGhi % 10) switch
     {
         < 5 => TrangThaiDon.ThanhCong,
         5 or 6 => TrangThaiDon.ChoThanhToan,
         7 => TrangThaiDon.DaHuy,
         8 => TrangThaiDon.HetHan,
-        _ => index / 10 % 2 == 0 ? TrangThaiDon.YeuCauHoanTien : TrangThaiDon.DaHoanTien
+        _ => chiSoBanGhi / 10 % 2 == 0 ? TrangThaiDon.YeuCauHoanTien : TrangThaiDon.DaHoanTien
     };
 }

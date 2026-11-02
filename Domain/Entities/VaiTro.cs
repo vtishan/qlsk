@@ -1,8 +1,19 @@
 namespace QLSK.Domain.Entities;
+
 public class VaiTro
 {
-    public int Id { get; set; }
-    public string Ten { get; set; } = "";
-    public string MoTa { get; set; } = "";
-    public ICollection<TaiKhoan> TaiKhoans { get; set; } = [];
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    [System.ComponentModel.DataAnnotations.Schema.Column("Id")]
+    public int VaiTroId { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("ten")]
+    [System.ComponentModel.DataAnnotations.Schema.Column("Ten")]
+    public string TenVaiTro { get; set; } = "";
+
+    [System.Text.Json.Serialization.JsonPropertyName("moTa")]
+    [System.ComponentModel.DataAnnotations.Schema.Column("MoTa")]
+    public string MoTaVaiTro { get; set; } = "";
+
+    [System.Text.Json.Serialization.JsonPropertyName("taiKhoans")]
+    public ICollection<TaiKhoan> DanhSachTaiKhoan { get; set; } = [];
 }

@@ -3,36 +3,36 @@ using QLSK.Common.Models;
 
 namespace QLSK.Common.Exceptions;
 
-public class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExceptionMiddleware> logger)
+public class ApiExceptionMiddleware(RequestDelegate xuLyMiddlewareTiepTheo, ILogger<ApiExceptionMiddleware> boGhiLog)
 {
-    public async Task Invoke(HttpContext context)
+    public async Task Invoke(HttpContext nguCanhHttp)
     {
         try
         {
-            await next(context);
+            await xuLyMiddlewareTiepTheo(nguCanhHttp);
         }
-        catch (ApiException ex)
+        catch (ApiException ngoaiLe)
         {
-            context.Response.StatusCode = ex.Status;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail(ex.Code, ex.Message));
+            nguCanhHttp.Response.StatusCode = ngoaiLe.MaTrangThaiHttp;
+            await nguCanhHttp.Response.WriteAsJsonAsync(ApiResponse.TaoPhanHoiThatBai(ngoaiLe.MaLoi, ngoaiLe.Message));
         }
-        catch (DbUpdateConcurrencyException ex)
+        catch (DbUpdateConcurrencyException ngoaiLe)
         {
-            logger.LogWarning(ex, "Concurrency conflict");
-            context.Response.StatusCode = StatusCodes.Status409Conflict;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("CONCURRENCY_CONFLICT", "Dữ liệu đã thay đổi. Vui lòng tải lại và thử lại."));
+            boGhiLog.LogWarning(ngoaiLe, "Concurrency conflict");
+            nguCanhHttp.Response.StatusCode = StatusCodes.Status409Conflict;
+            await nguCanhHttp.Response.WriteAsJsonAsync(ApiResponse.TaoPhanHoiThatBai("CONCURRENCY_CONFLICT", "Dữ liệu đã thay đổi. Vui lòng tải lại và thử lại."));
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException ngoaiLe)
         {
-            logger.LogWarning(ex, "Database conflict");
-            context.Response.StatusCode = StatusCodes.Status409Conflict;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("DATABASE_CONFLICT", "Dữ liệu bị xung đột hoặc vi phạm ràng buộc."));
+            boGhiLog.LogWarning(ngoaiLe, "Database conflict");
+            nguCanhHttp.Response.StatusCode = StatusCodes.Status409Conflict;
+            await nguCanhHttp.Response.WriteAsJsonAsync(ApiResponse.TaoPhanHoiThatBai("DATABASE_CONFLICT", "Dữ liệu bị xung đột hoặc vi phạm ràng buộc."));
         }
-        catch (Exception ex)
+        catch (Exception ngoaiLe)
         {
-            logger.LogError(ex, "Unhandled error");
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(ApiResponse.Fail("SYSTEM_ERROR", "Có lỗi hệ thống xảy ra."));
+            boGhiLog.LogError(ngoaiLe, "Unhandled error");
+            nguCanhHttp.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await nguCanhHttp.Response.WriteAsJsonAsync(ApiResponse.TaoPhanHoiThatBai("SYSTEM_ERROR", "Có lỗi hệ thống xảy ra."));
         }
     }
 }

@@ -6,53 +6,53 @@ namespace QLSK.Data.Configurations;
 
 public class LoaiVeConfig : IEntityTypeConfiguration<LoaiVe>
 {
-    public void Configure(EntityTypeBuilder<LoaiVe> e)
+    public void Configure(EntityTypeBuilder<LoaiVe> cauHinhLoaiVe)
     {
-        e.ToTable("LoaiVe", t =>
+        cauHinhLoaiVe.ToTable("LoaiVe", bangLoaiVe =>
         {
-            t.HasCheckConstraint(
+            bangLoaiVe.HasCheckConstraint(
                 "CK_LoaiVe_Gia",
                 "[Gia] >= 0"
             );
 
-            t.HasCheckConstraint(
+            bangLoaiVe.HasCheckConstraint(
                 "CK_LoaiVe_SoLuong",
                 "[SoLuong] > 0"
             );
 
-            t.HasCheckConstraint(
+            bangLoaiVe.HasCheckConstraint(
                 "CK_LoaiVe_ThoiGian",
                 "[DongBan] > [MoBan]"
             );
 
-            t.HasCheckConstraint(
+            bangLoaiVe.HasCheckConstraint(
                 "CK_LoaiVe_Ton",
                 "[DaBan] >= 0 AND [DangGiu] >= 0 AND [DaBan] + [DangGiu] <= [SoLuong]"
             );
         });
 
-        e.HasKey(x => x.Id);
+        cauHinhLoaiVe.HasKey(loaiVeDb => loaiVeDb.LoaiVeId);
 
-        e.Property(x => x.Ten)
+        cauHinhLoaiVe.Property(loaiVeDb => loaiVeDb.TenLoaiVe)
             .HasMaxLength(120)
             .IsRequired();
 
-        e.Property(x => x.Gia)
+        cauHinhLoaiVe.Property(loaiVeDb => loaiVeDb.GiaVe)
             .HasPrecision(18, 2);
 
-        e.Property(x => x.RowVersion)
+        cauHinhLoaiVe.Property(loaiVeDb => loaiVeDb.PhienBanDong)
             .IsRowVersion();
 
-        e.HasIndex(x => new
+        cauHinhLoaiVe.HasIndex(loaiVeDb => new
         {
-            x.SuKienId,
-            x.Ten
+            loaiVeDb.SuKienId,
+            Ten = loaiVeDb.TenLoaiVe
         })
         .IsUnique();
 
-        e.HasOne(x => x.SuKien)
-            .WithMany(x => x.LoaiVes)
-            .HasForeignKey(x => x.SuKienId)
+        cauHinhLoaiVe.HasOne(loaiVeDb => loaiVeDb.SuKien)
+            .WithMany(suKienDb => suKienDb.DanhSachLoaiVe)
+            .HasForeignKey(loaiVeDb => loaiVeDb.SuKienId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

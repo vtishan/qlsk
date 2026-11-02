@@ -7,84 +7,88 @@ using QLSK.Domain.Entities;
 
 using TaiKhoanEntity = QLSK.Domain.Entities.TaiKhoan;
 namespace QLSK.Features.TaiKhoan;
-public class TaiKhoanService(ApplicationDbContext db, IPasswordHasher<TaiKhoanEntity> hasher, JwtService jwt)
+public class TaiKhoanService(ApplicationDbContext nguCanhDuLieu, IPasswordHasher<TaiKhoanEntity> boBamMatKhau, JwtService dichVuTokenDangNhap)
 {
-    static TaiKhoanDto Map(TaiKhoanEntity x) => new(x.Id, x.HoTen, x.Email, x.VaiTro.Ten, x.HoatDong, x.NgayTao);
+    static TaiKhoanDto ChuyenSangTaiKhoanDto(TaiKhoanEntity taiKhoan) => new(taiKhoan.TaiKhoanId, taiKhoan.HoTen, taiKhoan.Email, taiKhoan.VaiTro.TenVaiTro, taiKhoan.HoatDong, taiKhoan.NgayTao);
 
-    public async Task<TaiKhoanDto> DangKy(DangKyDto dto)
+    public async Task<TaiKhoanDto> DangKyTaiKhoan(DangKyDto duLieuDangKy)
     {
-        var email = dto.Email.Trim().ToLowerInvariant();
-        if (await db.TaiKhoans.AnyAsync(x => x.Email == email))
+        var emailTaiKhoan = duLieuDangKy.Email.Trim().ToLowerInvariant();
+        if (await nguCanhDuLieu.DanhSachTaiKhoan.AnyAsync(taiKhoanDb => taiKhoanDb.Email == emailTaiKhoan))
             throw new ApiException(409, "EMAIL_EXISTS", "Email đã tồn tại.");
 
-        var user = new TaiKhoanEntity { HoTen = dto.HoTen.Trim(), Email = email, VaiTroId = 1, HoatDong = true };
-        user.MatKhau = hasher.HashPassword(user, dto.MatKhau);
-        db.TaiKhoans.Add(user);
-        await db.SaveChangesAsync();
-        await db.Entry(user).Reference(x => x.VaiTro).LoadAsync();
-        return Map(user);
+        var taiKhoan = new TaiKhoanEntity { HoTen = duLieuDangKy.HoTen.Trim(), Email = emailTaiKhoan, VaiTroId = 1, HoatDong = true };
+        taiKhoan.MatKhauBam = boBamMatKhau.HashPassword(taiKhoan, duLieuDangKy.MatKhau);
+        nguCanhDuLieu.DanhSachTaiKhoan.Add(taiKhoan);
+        await nguCanhDuLieu.SaveChangesAsync();
+        await nguCanhDuLieu.Entry(taiKhoan).Reference(taiKhoanDb => taiKhoanDb.VaiTro).LoadAsync();
+        return ChuyenSangTaiKhoanDto(taiKhoan);
     }
 
-    public async Task<DangNhapResult> DangNhap(DangNhapDto dto)
+    public async Task<DangNhapResult> DangNhapTaiKhoan(DangNhapDto duLieuDangNhap)
     {
-        var email = dto.Email.Trim().ToLowerInvariant();
-        var user = await db.TaiKhoans.Include(x => x.VaiTro).SingleOrDefaultAsync(x => x.Email == email)
+        var emailTaiKhoan = duLieuDangNhap.Email.Trim().ToLowerInvariant();
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.Include(taiKhoanDb => taiKhoanDb.VaiTro).SingleOrDefaultAsync(taiKhoanDb => taiKhoanDb.Email == emailTaiKhoan)
             ?? throw new ApiException(401, "LOGIN_FAILED", "Email hoặc mật khẩu không đúng.");
-        if (!user.HoatDong) throw new ApiException(403, "ACCOUNT_LOCKED", "Tài khoản đã bị khóa.");
-        var ok = hasher.VerifyHashedPassword(user, user.MatKhau, dto.MatKhau);
-        if (ok == PasswordVerificationResult.Failed)
+        if (!taiKhoan.HoatDong) throw new ApiException(403, "ACCOUNT_LOCKED", "Tài khoản đã bị khóa.");
+        var ketQuaXacMinhMatKhau = boBamMatKhau.VerifyHashedPassword(taiKhoan, taiKhoan.MatKhauBam, duLieuDangNhap.MatKhau);
+        if (ketQuaXacMinhMatKhau == PasswordVerificationResult.Failed)
             throw new ApiException(401, "LOGIN_FAILED", "Email hoặc mật khẩu không đúng.");
-        return new DangNhapResult(jwt.Tao(user), Map(user));
+        return new DangNhapResult(dichVuTokenDangNhap.TaoTokenDangNhap(taiKhoan), ChuyenSangTaiKhoanDto(taiKhoan));
     }
 
-    public async Task DoiMatKhau(int id, DoiMatKhauDto dto)
+    public async Task DoiMatKhauTaiKhoan(int taiKhoanId, DoiMatKhauDto duLieuDoiMatKhau)
     {
-        var user = await db.TaiKhoans.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        if (hasher.VerifyHashedPassword(user, user.MatKhau, dto.MatKhauCu) == PasswordVerificationResult.Failed)
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.FindAsync(taiKhoanId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
+        if (boBamMatKhau.VerifyHashedPassword(taiKhoan, taiKhoan.MatKhauBam, duLieuDoiMatKhau.MatKhauCu) == PasswordVerificationResult.Failed)
             throw new ApiException(400, "PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
-        user.MatKhau = hasher.HashPassword(user, dto.MatKhauMoi);
-        await db.SaveChangesAsync();
+        taiKhoan.MatKhauBam = boBamMatKhau.HashPassword(taiKhoan, duLieuDoiMatKhau.MatKhauMoi);
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 
-    public async Task<TaiKhoanDto> Lay(int id)
+    public async Task<TaiKhoanDto> LayTaiKhoanTheoId(int taiKhoanId)
     {
-        var user = await db.TaiKhoans.AsNoTracking().Include(x => x.VaiTro).SingleOrDefaultAsync(x => x.Id == id)
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking().Include(taiKhoanDb => taiKhoanDb.VaiTro).SingleOrDefaultAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        return Map(user);
+        return ChuyenSangTaiKhoanDto(taiKhoan);
     }
 
-    public async Task<TaiKhoanDto> Sua(int id, SuaTaiKhoanDto dto)
+    public async Task<TaiKhoanDto> CapNhatHoTenTaiKhoan(int taiKhoanId, SuaTaiKhoanDto duLieuSuaTaiKhoan)
     {
-        var user = await db.TaiKhoans.Include(x => x.VaiTro).SingleOrDefaultAsync(x => x.Id == id)
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.Include(taiKhoanDb => taiKhoanDb.VaiTro).SingleOrDefaultAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        user.HoTen = dto.HoTen.Trim();
-        await db.SaveChangesAsync();
-        return Map(user);
+        taiKhoan.HoTen = duLieuSuaTaiKhoan.HoTen.Trim();
+        await nguCanhDuLieu.SaveChangesAsync();
+        return ChuyenSangTaiKhoanDto(taiKhoan);
     }
 
-    public async Task<List<TaiKhoanDto>> DanhSach(string? q, int? vaiTroId, bool? hoatDong, int page = 1, int size = 20)
+    public async Task<List<TaiKhoanDto>> LayDanhSachTaiKhoan(string? tuKhoa, int? vaiTroId, bool? hoatDong, int soTrang = 1, int kichThuocTrang = 20)
     {
-        page = Math.Max(page, 1); size = Math.Clamp(size, 1, 100);
-        var query = db.TaiKhoans.AsNoTracking().Include(x => x.VaiTro).AsQueryable();
-        if (!string.IsNullOrWhiteSpace(q)) query = query.Where(x => x.HoTen.Contains(q) || x.Email.Contains(q));
-        if (vaiTroId.HasValue) query = query.Where(x => x.VaiTroId == vaiTroId);
-        if (hoatDong.HasValue) query = query.Where(x => x.HoatDong == hoatDong);
-        return await query.OrderByDescending(x => x.Id).Skip((page - 1) * size).Take(size)
-            .Select(x => new TaiKhoanDto(x.Id, x.HoTen, x.Email, x.VaiTro.Ten, x.HoatDong, x.NgayTao)).ToListAsync();
+        soTrang = Math.Max(soTrang, 1); kichThuocTrang = Math.Clamp(kichThuocTrang, 1, 100);
+        var truyVanTaiKhoan = nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking().Include(taiKhoanDb => taiKhoanDb.VaiTro).AsQueryable();
+        if (!string.IsNullOrWhiteSpace(tuKhoa)) truyVanTaiKhoan = truyVanTaiKhoan.Where(taiKhoanDb => taiKhoanDb.HoTen.Contains(tuKhoa) || taiKhoanDb.Email.Contains(tuKhoa));
+        if (vaiTroId.HasValue) truyVanTaiKhoan = truyVanTaiKhoan.Where(taiKhoanDb => taiKhoanDb.VaiTroId == vaiTroId);
+        if (hoatDong.HasValue) truyVanTaiKhoan = truyVanTaiKhoan.Where(taiKhoanDb => taiKhoanDb.HoatDong == hoatDong);
+        return await truyVanTaiKhoan.OrderByDescending(taiKhoanDb => taiKhoanDb.TaiKhoanId).Skip((soTrang - 1) * kichThuocTrang).Take(kichThuocTrang)
+            .Select(taiKhoanDb => new TaiKhoanDto(taiKhoanDb.TaiKhoanId, taiKhoanDb.HoTen, taiKhoanDb.Email, taiKhoanDb.VaiTro.TenVaiTro, taiKhoanDb.HoatDong, taiKhoanDb.NgayTao)).ToListAsync();
     }
 
-    public async Task Khoa(int id, bool khoa)
+    public Task KhoaTaiKhoan(int taiKhoanId) => CapNhatTrangThaiTaiKhoan(taiKhoanId, hoatDong: false);
+
+    public Task MoKhoaTaiKhoan(int taiKhoanId) => CapNhatTrangThaiTaiKhoan(taiKhoanId, hoatDong: true);
+
+    private async Task CapNhatTrangThaiTaiKhoan(int taiKhoanId, bool hoatDong)
     {
-        var user = await db.TaiKhoans.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        user.HoatDong = !khoa;
-        await db.SaveChangesAsync();
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.FindAsync(taiKhoanId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
+        taiKhoan.HoatDong = hoatDong;
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 
-    public async Task DoiVaiTro(int id, int vaiTroId)
+    public async Task DoiVaiTroTaiKhoan(int taiKhoanId, int vaiTroId)
     {
-        if (!await db.VaiTros.AnyAsync(x => x.Id == vaiTroId)) throw new ApiException(400, "VALIDATION_ERROR", "Vai trò không hợp lệ.");
-        var user = await db.TaiKhoans.FindAsync(id) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        user.VaiTroId = vaiTroId;
-        await db.SaveChangesAsync();
+        if (!await nguCanhDuLieu.DanhSachVaiTro.AnyAsync(vaiTroDb => vaiTroDb.VaiTroId == vaiTroId)) throw new ApiException(400, "VALIDATION_ERROR", "Vai trò không hợp lệ.");
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.FindAsync(taiKhoanId) ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
+        taiKhoan.VaiTroId = vaiTroId;
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 }

@@ -49,7 +49,7 @@ Project được tổ chức theo kiến trúc:
 - RowVersion.
 - Seed role.
 - Migration `InitialCreate`.
-- File `schema.sql`.
+- Cấu hình Fluent API và EF Core Migrations quản lý cấu trúc cơ sở dữ liệu.
 
 ### Phase 2 - Tài khoản và xác thực
 
@@ -241,7 +241,7 @@ Ctrl + C
 
 ## 5. Khởi tạo database
 
-Project sử dụng SQL Server.
+Project sử dụng SQL Server qua Entity Framework Core. Cấu trúc cơ sở dữ liệu được khai báo trong `Domain/Entities`, `Data/Configurations` và quản lý phiên bản bằng `Migrations`.
 
 Trước lần chạy đầu tiên cần cấu hình connection string, sau đó chạy:
 
@@ -298,15 +298,14 @@ dotnet test tests/QLSK.Tests/QLSK.Tests.csproj
 
 ## 7. Migration
 
-Nếu cần tạo lại migration từ Entity Model:
+Khi thay đổi entity hoặc cấu hình Fluent API, tạo migration mới:
 
 ```bash
-dotnet ef migrations remove
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add TenThayDoi
 dotnet ef database update
 ```
 
-> Không nên xóa hoặc tạo lại migration trên database production nếu chưa kiểm tra ảnh hưởng dữ liệu.
+Giữ nguyên lịch sử migration đã áp dụng. Các migration dùng API `MigrationBuilder` của EF Core để tạo bảng, ràng buộc, index và dữ liệu vai trò.
 
 ---
 

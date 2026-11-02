@@ -13,7 +13,7 @@ public class LocalEventDataTests
 {
     [Fact]
     public void Local_population_rejects_the_business_database()
-        => Assert.Throws<InvalidOperationException>(() => LocalSqlGuard.Validate(
+        => Assert.Throws<InvalidOperationException>(() => LocalSqlGuard.KiemTraKetNoiSqlLocal(
             "Server=.\\SQL2022EXP;Database=QLSK;Integrated Security=True", requireTestDatabase: true));
 
     private const string LegacyDescription = "Đây là sự kiện mẫu phục vụ trải nghiệm hệ thống QLSK.";
@@ -25,208 +25,208 @@ public class LocalEventDataTests
     [InlineData("Server=localhost;Database=TEMPDB;Integrated Security=True")]
     [InlineData("Server=localhost;Integrated Security=True")]
     [InlineData("Server=localhost;Database=QLSK;AttachDbFilename=C:\\test.mdf;Integrated Security=True")]
-    public void Local_data_tool_rejects_remote_system_or_attached_databases(string connection)
-        => Assert.Throws<InvalidOperationException>(() => LocalSqlGuard.Validate(connection));
+    public void Local_data_tool_rejects_remote_system_or_attached_databases(string chuoiKetNoiSql)
+        => Assert.Throws<InvalidOperationException>(() => LocalSqlGuard.KiemTraKetNoiSqlLocal(chuoiKetNoiSql));
 
     [Theory]
     [InlineData("Server=.\\SQL2022EXP;Database=QLSK_Local;Integrated Security=True")]
     [InlineData("Server=tcp:127.0.0.1,1433;Database=QLSK_Local;Integrated Security=True")]
-    public void Local_data_tool_accepts_explicit_local_application_databases(string connection)
-        => LocalSqlGuard.Validate(connection);
+    public void Local_data_tool_accepts_explicit_local_application_databases(string chuoiKetNoiSql)
+        => LocalSqlGuard.KiemTraKetNoiSqlLocal(chuoiKetNoiSql);
 
     [Fact]
     public async Task Application_startup_has_no_business_data_or_local_data_dependency()
     {
-        using var factory = new ApiFactory();
-        using var client = factory.CreateClient();
+        using var mayChuKiemThu = new ApiFactory();
+        using var clientYeuCauHttp = mayChuKiemThu.CreateClient();
 
-        await factory.WithDb(async db =>
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            Assert.Equal(4, await db.VaiTros.CountAsync());
-            Assert.Empty(await db.TaiKhoans.ToListAsync());
-            Assert.Empty(await db.BanToChucs.ToListAsync());
-            Assert.Empty(await db.DiaDiems.ToListAsync());
-            Assert.Empty(await db.SuKiens.ToListAsync());
-            Assert.Empty(await db.LoaiVes.ToListAsync());
+            Assert.Equal(4, await nguCanhDuLieu.DanhSachVaiTro.CountAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachTaiKhoan.ToListAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachBanToChuc.ToListAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachDiaDiem.ToListAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachSuKien.ToListAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachLoaiVe.ToListAsync());
         });
 
-        var application = typeof(Program).Assembly;
-        Assert.NotEqual(application, typeof(LocalEventSeeder).Assembly);
-        Assert.DoesNotContain(application.GetReferencedAssemblies(), x => x.Name == "QLSK.LocalData");
-        Assert.DoesNotContain(application.GetTypes(), x => x.Namespace == "QLSK.Data.Seed");
-        foreach (var path in new[] { "/Data/Seed/demo-events.json", "/tests/QLSK.LocalData/catalog/events.json" })
+        var thuMucUngDung = typeof(Program).Assembly;
+        Assert.NotEqual(thuMucUngDung, typeof(LocalEventSeeder).Assembly);
+        Assert.DoesNotContain(thuMucUngDung.GetReferencedAssemblies(), tenAssembly => tenAssembly.Name == "QLSK.LocalData");
+        Assert.DoesNotContain(thuMucUngDung.GetTypes(), kieuDuLieu => kieuDuLieu.Namespace == "QLSK.Data.Seed");
+        foreach (var duongDanTep in new[] { "/Data/Seed/demo-events.json", "/tests/QLSK.LocalData/catalog/events.json" })
         {
-            using var response = await client.GetAsync(path);
-            Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
+            using var phanHoiYeuCauHttp = await clientYeuCauHttp.GetAsync(duongDanTep);
+            Assert.Equal(System.Net.HttpStatusCode.NotFound, phanHoiYeuCauHttp.StatusCode);
         }
     }
 
     [Fact]
     public async Task Explicit_local_population_is_bookable_and_repeated_runs_preserve_edits()
     {
-        using var factory = new ApiFactory();
-        var root = factory.Services.GetRequiredService<IHostEnvironment>().ContentRootPath;
-        var now = new DateTime(2026, 10, 31, 12, 0, 0, DateTimeKind.Utc);
-        var hasher = new PasswordHasher<TaiKhoan>();
+        using var mayChuKiemThu = new ApiFactory();
+        var thuMucDuAn = mayChuKiemThu.Services.GetRequiredService<IHostEnvironment>().ContentRootPath;
+        var thoiDiemHienTai = new DateTime(2026, 10, 31, 12, 0, 0, DateTimeKind.Utc);
+        var boBamMatKhau = new PasswordHasher<TaiKhoan>();
 
-        await factory.WithDb(async db =>
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            Assert.Equal(100, await LocalEventSeeder.SeedAsync(db, hasher, root, "LocalTest@123456", now));
-            db.ChangeTracker.Clear();
+            Assert.Equal(100, await LocalEventSeeder.TaoDuLieuSuKienMauAsync(nguCanhDuLieu, boBamMatKhau, thuMucDuAn, "LocalTest@123456", thoiDiemHienTai));
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            var events = await db.SuKiens.Include(x => x.LoaiVes)
-                .Include(x => x.DatDiaDiem).ThenInclude(x => x!.DiaDiem)
-                .OrderBy(x => x.Id).ToListAsync();
-            Assert.Equal(100, events.Count);
-            Assert.All(events, item => Assert.DoesNotContain(LegacyDescription, item.MoTa));
-            Assert.Equal(100, events.Select(x => x.HinhAnh).Distinct().Count());
-            Assert.Equal(10, await db.LoaiSuKiens.CountAsync());
-            Assert.Equal(5, await db.BanToChucs.CountAsync());
-            Assert.Equal(10, await db.DiaDiems.CountAsync());
-            Assert.Equal(200, await db.LoaiVes.CountAsync());
-            Assert.Equal(100, await db.DatDiaDiems.CountAsync());
+            var danhSachSuKienHienCo = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.DanhSachLoaiVe)
+                .Include(suKienDb => suKienDb.DatDiaDiem).ThenInclude(datDiaDiemDb => datDiaDiemDb!.DiaDiem)
+                .OrderBy(suKienDb => suKienDb.SuKienId).ToListAsync();
+            Assert.Equal(100, danhSachSuKienHienCo.Count);
+            Assert.All(danhSachSuKienHienCo, suKienDangXuLy => Assert.DoesNotContain(LegacyDescription, suKienDangXuLy.MoTaSuKien));
+            Assert.Equal(100, danhSachSuKienHienCo.Select(suKienDb => suKienDb.HinhAnh).Distinct().Count());
+            Assert.Equal(10, await nguCanhDuLieu.DanhSachLoaiSuKien.CountAsync());
+            Assert.Equal(5, await nguCanhDuLieu.DanhSachBanToChuc.CountAsync());
+            Assert.Equal(10, await nguCanhDuLieu.DanhSachDiaDiem.CountAsync());
+            Assert.Equal(200, await nguCanhDuLieu.DanhSachLoaiVe.CountAsync());
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachDatDiaDiem.CountAsync());
 
-            foreach (var item in events)
+            foreach (var suKienDangXuLy in danhSachSuKienHienCo)
             {
-                Assert.Equal(TrangThaiSuKien.DaDuyet, item.TrangThai);
-                Assert.True(item.BatDau > now);
-                Assert.True(item.KetThuc > item.BatDau);
-                Assert.NotNull(item.HinhAnh);
-                Assert.StartsWith("/assets/images/events/event-", item.HinhAnh);
-                Assert.EndsWith(".jpg", item.HinhAnh);
-                var imagePath = Path.Combine(root, "wwwroot", item.HinhAnh.TrimStart('/'));
-                Assert.True(File.Exists(imagePath), $"Missing local image {item.HinhAnh}");
-                using (var image = File.OpenRead(imagePath))
+                Assert.Equal(TrangThaiSuKien.DaDuyet, suKienDangXuLy.TrangThai);
+                Assert.True(suKienDangXuLy.ThoiGianBatDau > thoiDiemHienTai);
+                Assert.True(suKienDangXuLy.ThoiGianKetThuc > suKienDangXuLy.ThoiGianBatDau);
+                Assert.NotNull(suKienDangXuLy.HinhAnh);
+                Assert.StartsWith("/assets/images/events/event-", suKienDangXuLy.HinhAnh);
+                Assert.EndsWith(".jpg", suKienDangXuLy.HinhAnh);
+                var duongDanTepAnh = Path.Combine(thuMucDuAn, "wwwroot", suKienDangXuLy.HinhAnh.TrimStart('/'));
+                Assert.True(File.Exists(duongDanTepAnh), $"Missing local image {suKienDangXuLy.HinhAnh}");
+                using (var duongDanHinhAnh = File.OpenRead(duongDanTepAnh))
                 {
-                    Assert.Equal(0xff, image.ReadByte());
-                    Assert.Equal(0xd8, image.ReadByte());
+                    Assert.Equal(0xff, duongDanHinhAnh.ReadByte());
+                    Assert.Equal(0xd8, duongDanHinhAnh.ReadByte());
                 }
 
-                var booking = Assert.IsType<DatDiaDiem>(item.DatDiaDiem);
-                Assert.Equal(TrangThaiDatCho.DaXacNhan, booking.TrangThai);
-                Assert.Equal(item.BatDau, booking.BatDau);
-                Assert.Equal(item.KetThuc, booking.KetThuc);
-                Assert.True(booking.DiaDiem.SucChua >= item.SoNguoi);
-                Assert.InRange(booking.TienCoc, 0, booking.TongTien);
-                Assert.Equal(item.SoNguoi, item.LoaiVes.Sum(x => x.SoLuong));
-                Assert.All(item.LoaiVes, ticket =>
+                var phieuDatDiaDiem = Assert.IsType<DatDiaDiem>(suKienDangXuLy.DatDiaDiem);
+                Assert.Equal(TrangThaiDatCho.DaXacNhan, phieuDatDiaDiem.TrangThai);
+                Assert.Equal(suKienDangXuLy.ThoiGianBatDau, phieuDatDiaDiem.ThoiGianBatDau);
+                Assert.Equal(suKienDangXuLy.ThoiGianKetThuc, phieuDatDiaDiem.ThoiGianKetThuc);
+                Assert.True(phieuDatDiaDiem.DiaDiem.SucChua >= suKienDangXuLy.SoNguoi);
+                Assert.InRange(phieuDatDiaDiem.TienCoc, 0, phieuDatDiaDiem.TongTien);
+                Assert.Equal(suKienDangXuLy.SoNguoi, suKienDangXuLy.DanhSachLoaiVe.Sum(loaiVeDb => loaiVeDb.SoLuong));
+                Assert.All(suKienDangXuLy.DanhSachLoaiVe, veKiemThu =>
                 {
-                    Assert.True(ticket.Gia >= 0);
-                    Assert.True(ticket.SoLuong > 0);
-                    Assert.Equal(0, ticket.DaBan);
-                    Assert.Equal(0, ticket.DangGiu);
-                    Assert.True(ticket.MoBan <= now && ticket.DongBan > now);
-                    Assert.True(ticket.DongBan <= item.BatDau);
+                    Assert.True(veKiemThu.GiaVe >= 0);
+                    Assert.True(veKiemThu.SoLuong > 0);
+                    Assert.Equal(0, veKiemThu.SoLuongDaBan);
+                    Assert.Equal(0, veKiemThu.SoLuongDangGiu);
+                    Assert.True(veKiemThu.ThoiGianMoBan <= thoiDiemHienTai && veKiemThu.ThoiGianDongBan > thoiDiemHienTai);
+                    Assert.True(veKiemThu.ThoiGianDongBan <= suKienDangXuLy.ThoiGianBatDau);
                 });
             }
 
-            foreach (var venueGroup in events.GroupBy(x => x.DatDiaDiem!.DiaDiemId))
+            foreach (var nhomDiaDiem in danhSachSuKienHienCo.GroupBy(suKienDb => suKienDb.DatDiaDiem!.DiaDiemId))
             {
-                var bookings = venueGroup.Select(x => x.DatDiaDiem!).OrderBy(x => x.BatDau).ToArray();
-                for (var i = 1; i < bookings.Length; i++)
-                    Assert.True(bookings[i - 1].KetThuc <= bookings[i].BatDau);
+                var danhSachPhieuDatDiaDiem = nhomDiaDiem.Select(suKienDb => suKienDb.DatDiaDiem!).OrderBy(datDiaDiemDb => datDiaDiemDb.ThoiGianBatDau).ToArray();
+                for (var chiSo = 1; chiSo < danhSachPhieuDatDiaDiem.Length; chiSo++)
+                    Assert.True(danhSachPhieuDatDiaDiem[chiSo - 1].ThoiGianKetThuc <= danhSachPhieuDatDiaDiem[chiSo].ThoiGianBatDau);
             }
 
-            var edited = events[0];
-            var originalStart = edited.BatDau;
-            edited.Ten = "Tên sự kiện do người dùng chỉnh sửa";
-            edited.MoTa = "Nội dung đã chỉnh sửa phải được giữ lại.";
-            edited.LoaiVes.First().Gia = 123_000;
-            await db.SaveChangesAsync();
-            db.ChangeTracker.Clear();
+            var suKienDuocSua = danhSachSuKienHienCo[0];
+            var thoiGianBatDauTruocSua = suKienDuocSua.ThoiGianBatDau;
+            suKienDuocSua.TenSuKien = "Tên sự kiện do người dùng chỉnh sửa";
+            suKienDuocSua.MoTaSuKien = "Nội dung đã chỉnh sửa phải được giữ lại.";
+            suKienDuocSua.DanhSachLoaiVe.First().GiaVe = 123_000;
+            await nguCanhDuLieu.SaveChangesAsync();
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            Assert.Equal(0, await LocalEventSeeder.SeedAsync(db, hasher, root, "NewPassword@123", now.AddDays(1)));
-            db.ChangeTracker.Clear();
-            var saved = await db.SuKiens.Include(x => x.LoaiVes).SingleAsync(x => x.Id == edited.Id);
-            Assert.Equal(edited.Ten, saved.Ten);
-            Assert.Equal(edited.MoTa, saved.MoTa);
-            Assert.Equal(originalStart, saved.BatDau);
-            Assert.Contains(saved.LoaiVes, x => x.Gia == 123_000);
-            Assert.Equal(100, await db.SuKiens.CountAsync());
-            Assert.Equal(200, await db.LoaiVes.CountAsync());
-            Assert.Equal(100, await db.DatDiaDiems.CountAsync());
-            Assert.Equal(5, await db.BanToChucs.CountAsync());
-            Assert.Equal(10, await db.DiaDiems.CountAsync());
+            Assert.Equal(0, await LocalEventSeeder.TaoDuLieuSuKienMauAsync(nguCanhDuLieu, boBamMatKhau, thuMucDuAn, "NewPassword@123", thoiDiemHienTai.AddDays(1)));
+            nguCanhDuLieu.ChangeTracker.Clear();
+            var suKienDaLuu = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.DanhSachLoaiVe).SingleAsync(suKienDb => suKienDb.SuKienId == suKienDuocSua.SuKienId);
+            Assert.Equal(suKienDuocSua.TenSuKien, suKienDaLuu.TenSuKien);
+            Assert.Equal(suKienDuocSua.MoTaSuKien, suKienDaLuu.MoTaSuKien);
+            Assert.Equal(thoiGianBatDauTruocSua, suKienDaLuu.ThoiGianBatDau);
+            Assert.Contains(suKienDaLuu.DanhSachLoaiVe, loaiVeDb => loaiVeDb.GiaVe == 123_000);
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachSuKien.CountAsync());
+            Assert.Equal(200, await nguCanhDuLieu.DanhSachLoaiVe.CountAsync());
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachDatDiaDiem.CountAsync());
+            Assert.Equal(5, await nguCanhDuLieu.DanhSachBanToChuc.CountAsync());
+            Assert.Equal(10, await nguCanhDuLieu.DanhSachDiaDiem.CountAsync());
         });
     }
 
     [Fact]
     public async Task Normalizing_existing_data_preserves_identity_relations_edits_and_passwords()
     {
-        using var factory = new ApiFactory();
-        var root = factory.Services.GetRequiredService<IHostEnvironment>().ContentRootPath;
-        var now = new DateTime(2026, 10, 31, 12, 0, 0, DateTimeKind.Utc);
-        await factory.WithDb(async db =>
+        using var mayChuKiemThu = new ApiFactory();
+        var thuMucDuAn = mayChuKiemThu.Services.GetRequiredService<IHostEnvironment>().ContentRootPath;
+        var thoiDiemHienTai = new DateTime(2026, 10, 31, 12, 0, 0, DateTimeKind.Utc);
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            await LocalEventSeeder.SeedAsync(db, new PasswordHasher<TaiKhoan>(), root, "LocalTest@123456", now);
-            var account = await db.TaiKhoans.Include(x => x.BanToChuc)
-                .SingleAsync(x => x.Email == "organizer01@qlsk.local");
-            var organizer = account.BanToChuc!;
-            var venue = await db.DiaDiems.SingleAsync(x => x.Ten == "Trung tâm sự kiện Bến Sông");
-            var events = await db.SuKiens.Include(x => x.LoaiVes).Include(x => x.DatDiaDiem)
-                .Where(x => x.BanToChucId == organizer.Id).OrderBy(x => x.Id).ToListAsync();
-            var first = events[0];
-            var edited = events[1];
-            account.Email = "demo.btc01@qlsk.local";
-            account.HoTen = "Ban tổ chức mẫu 01";
-            organizer.Ten = "SựKiện Hub Demo 01";
-            organizer.MoTa = "Ban tổ chức mẫu phục vụ trải nghiệm hệ thống.";
-            venue.Ten = "Không gian sự kiện Demo 01 - TP. Hồ Chí Minh";
-            venue.DiaChi = "Khu trải nghiệm mẫu 01, TP. Hồ Chí Minh (địa điểm giả lập)";
-            first.MoTa = "Nội dung đã được biên tập riêng. " + LegacyDescription;
-            edited.Ten = "Tên chương trình đã được khách sửa";
-            edited.MoTa = "Nội dung đã chỉnh sửa cần được giữ nguyên.";
-            edited.LoaiVes.First().Gia = 123_000;
-            await db.SaveChangesAsync();
-            var accountId = account.Id;
-            var organizerId = organizer.Id;
-            var venueId = venue.Id;
-            var firstId = first.Id;
-            var editedId = edited.Id;
-            var passwordHash = account.MatKhau;
-            var firstStart = first.BatDau;
-            var image = first.HinhAnh;
-            var bookingId = first.DatDiaDiem!.Id;
-            var editedTitle = edited.Ten;
-            var editedDescription = edited.MoTa;
-            db.ChangeTracker.Clear();
+            await LocalEventSeeder.TaoDuLieuSuKienMauAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), thuMucDuAn, "LocalTest@123456", thoiDiemHienTai);
+            var taiKhoanCanXuLy = await nguCanhDuLieu.DanhSachTaiKhoan.Include(taiKhoanDb => taiKhoanDb.BanToChuc)
+                .SingleAsync(taiKhoanDb => taiKhoanDb.Email == "organizer01@qlsk.local");
+            var banToChucHienCo = taiKhoanCanXuLy.BanToChuc!;
+            var diaDiemSuKien = await nguCanhDuLieu.DanhSachDiaDiem.SingleAsync(diaDiemDb => diaDiemDb.TenDiaDiem == "Trung tâm sự kiện Bến Sông");
+            var danhSachSuKienHienCo = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.DanhSachLoaiVe).Include(suKienDb => suKienDb.DatDiaDiem)
+                .Where(suKienDb => suKienDb.BanToChucId == banToChucHienCo.BanToChucId).OrderBy(suKienDb => suKienDb.SuKienId).ToListAsync();
+            var suKienDauTien = danhSachSuKienHienCo[0];
+            var suKienDuocSua = danhSachSuKienHienCo[1];
+            taiKhoanCanXuLy.Email = "demo.btc01@qlsk.local";
+            taiKhoanCanXuLy.HoTen = "Ban tổ chức mẫu 01";
+            banToChucHienCo.TenBanToChuc = "SựKiện Hub Demo 01";
+            banToChucHienCo.MoTaBanToChuc = "Ban tổ chức mẫu phục vụ trải nghiệm hệ thống.";
+            diaDiemSuKien.TenDiaDiem = "Không gian sự kiện Demo 01 - TP. Hồ Chí Minh";
+            diaDiemSuKien.DiaChi = "Khu trải nghiệm mẫu 01, TP. Hồ Chí Minh (địa điểm giả lập)";
+            suKienDauTien.MoTaSuKien = "Nội dung đã được biên tập riêng. " + LegacyDescription;
+            suKienDuocSua.TenSuKien = "Tên chương trình đã được khách sửa";
+            suKienDuocSua.MoTaSuKien = "Nội dung đã chỉnh sửa cần được giữ nguyên.";
+            suKienDuocSua.DanhSachLoaiVe.First().GiaVe = 123_000;
+            await nguCanhDuLieu.SaveChangesAsync();
+            var taiKhoanId = taiKhoanCanXuLy.TaiKhoanId;
+            var banToChucId = banToChucHienCo.BanToChucId;
+            var diaDiemId = diaDiemSuKien.DiaDiemId;
+            var banGhiDauTienId = suKienDauTien.SuKienId;
+            var suKienDuocSuaId = suKienDuocSua.SuKienId;
+            var matKhauDaBam = taiKhoanCanXuLy.MatKhauBam;
+            var thoiDiemBatDauDauTien = suKienDauTien.ThoiGianBatDau;
+            var duongDanHinhAnh = suKienDauTien.HinhAnh;
+            var datDiaDiemId = suKienDauTien.DatDiaDiem!.DatDiaDiemId;
+            var tenSuKienSauSua = suKienDuocSua.TenSuKien;
+            var moTaSuKienSauSua = suKienDuocSua.MoTaSuKien;
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            var preview = await LocalEventSeeder.NormalizeExistingAsync(db, dryRun: true);
-            Assert.True(preview.Accounts > 0 && preview.Organizers > 0 && preview.Venues > 0 && preview.Events > 0);
-            db.ChangeTracker.Clear();
-            Assert.Equal("demo.btc01@qlsk.local", (await db.TaiKhoans.SingleAsync(x => x.Id == accountId)).Email);
-            Assert.Contains(LegacyDescription, (await db.SuKiens.SingleAsync(x => x.Id == firstId)).MoTa);
-            db.ChangeTracker.Clear();
+        var ketQuaXemTruocChuanHoa = await LocalEventSeeder.ChuanHoaDuLieuMauHienCoAsync(nguCanhDuLieu, chiXemTruocThayDoi: true);
+            Assert.True(ketQuaXemTruocChuanHoa.SoTaiKhoanDaChuanHoa > 0 && ketQuaXemTruocChuanHoa.SoBanToChucDaChuanHoa > 0 && ketQuaXemTruocChuanHoa.SoDiaDiemDaChuanHoa > 0 && ketQuaXemTruocChuanHoa.SoSuKienDaChuanHoa > 0);
+            nguCanhDuLieu.ChangeTracker.Clear();
+            Assert.Equal("demo.btc01@qlsk.local", (await nguCanhDuLieu.DanhSachTaiKhoan.SingleAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)).Email);
+            Assert.Contains(LegacyDescription, (await nguCanhDuLieu.DanhSachSuKien.SingleAsync(suKienDb => suKienDb.SuKienId == banGhiDauTienId)).MoTaSuKien);
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            await LocalEventSeeder.NormalizeExistingAsync(db);
-            db.ChangeTracker.Clear();
-            var savedAccount = await db.TaiKhoans.SingleAsync(x => x.Id == accountId);
-            var savedOrganizer = await db.BanToChucs.SingleAsync(x => x.Id == organizerId);
-            var savedVenue = await db.DiaDiems.SingleAsync(x => x.Id == venueId);
-            var saved = await db.SuKiens.Include(x => x.DatDiaDiem).SingleAsync(x => x.Id == firstId);
-            var savedEdited = await db.SuKiens.Include(x => x.LoaiVes).SingleAsync(x => x.Id == editedId);
-            Assert.Equal("organizer01@qlsk.local", savedAccount.Email);
-            Assert.Equal(passwordHash, savedAccount.MatKhau);
-            Assert.Equal("Kết Nối Văn Hóa", savedOrganizer.Ten);
-            Assert.Equal(accountId, savedOrganizer.TaiKhoanId);
-            Assert.Equal("Trung tâm sự kiện Bến Sông", savedVenue.Ten);
-            Assert.Equal("Khu trung tâm, TP. Hồ Chí Minh", savedVenue.DiaChi);
-            Assert.Equal(600, savedVenue.SucChua);
-            Assert.Equal(2_000_000, savedVenue.GiaThue);
-            Assert.Equal("Nội dung đã được biên tập riêng.", saved.MoTa);
-            Assert.Equal(firstStart, saved.BatDau);
-            Assert.Equal(image, saved.HinhAnh);
-            Assert.Equal(organizerId, saved.BanToChucId);
-            Assert.Equal(bookingId, saved.DatDiaDiem!.Id);
-            Assert.Equal(venueId, saved.DatDiaDiem.DiaDiemId);
-            Assert.Equal(editedTitle, savedEdited.Ten);
-            Assert.Equal(editedDescription, savedEdited.MoTa);
-            Assert.Contains(savedEdited.LoaiVes, x => x.Gia == 123_000);
-            Assert.Equal(100, await db.SuKiens.CountAsync());
-            Assert.Equal(200, await db.LoaiVes.CountAsync());
-            Assert.Equal(100, await db.DatDiaDiems.CountAsync());
-            var again = await LocalEventSeeder.NormalizeExistingAsync(db);
-            Assert.Equal(0, again.Accounts + again.Organizers + again.Venues + again.Events);
+            await LocalEventSeeder.ChuanHoaDuLieuMauHienCoAsync(nguCanhDuLieu);
+            nguCanhDuLieu.ChangeTracker.Clear();
+            var taiKhoanDaLuuKiemThu = await nguCanhDuLieu.DanhSachTaiKhoan.SingleAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId);
+            var banToChucDaLuuKiemThu = await nguCanhDuLieu.DanhSachBanToChuc.SingleAsync(banToChucDb => banToChucDb.BanToChucId == banToChucId);
+            var diaDiemDaLuuKiemThu = await nguCanhDuLieu.DanhSachDiaDiem.SingleAsync(diaDiemDb => diaDiemDb.DiaDiemId == diaDiemId);
+            var suKienDaLuu = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.DatDiaDiem).SingleAsync(suKienDb => suKienDb.SuKienId == banGhiDauTienId);
+            var suKienDaSuaKiemThu = await nguCanhDuLieu.DanhSachSuKien.Include(suKienDb => suKienDb.DanhSachLoaiVe).SingleAsync(suKienDb => suKienDb.SuKienId == suKienDuocSuaId);
+            Assert.Equal("organizer01@qlsk.local", taiKhoanDaLuuKiemThu.Email);
+            Assert.Equal(matKhauDaBam, taiKhoanDaLuuKiemThu.MatKhauBam);
+            Assert.Equal("Kết Nối Văn Hóa", banToChucDaLuuKiemThu.TenBanToChuc);
+            Assert.Equal(taiKhoanId, banToChucDaLuuKiemThu.TaiKhoanId);
+            Assert.Equal("Trung tâm sự kiện Bến Sông", diaDiemDaLuuKiemThu.TenDiaDiem);
+            Assert.Equal("Khu trung tâm, TP. Hồ Chí Minh", diaDiemDaLuuKiemThu.DiaChi);
+            Assert.Equal(600, diaDiemDaLuuKiemThu.SucChua);
+            Assert.Equal(2_000_000, diaDiemDaLuuKiemThu.GiaThue);
+            Assert.Equal("Nội dung đã được biên tập riêng.", suKienDaLuu.MoTaSuKien);
+            Assert.Equal(thoiDiemBatDauDauTien, suKienDaLuu.ThoiGianBatDau);
+            Assert.Equal(duongDanHinhAnh, suKienDaLuu.HinhAnh);
+            Assert.Equal(banToChucId, suKienDaLuu.BanToChucId);
+            Assert.Equal(datDiaDiemId, suKienDaLuu.DatDiaDiem!.DatDiaDiemId);
+            Assert.Equal(diaDiemId, suKienDaLuu.DatDiaDiem.DiaDiemId);
+            Assert.Equal(tenSuKienSauSua, suKienDaSuaKiemThu.TenSuKien);
+            Assert.Equal(moTaSuKienSauSua, suKienDaSuaKiemThu.MoTaSuKien);
+            Assert.Contains(suKienDaSuaKiemThu.DanhSachLoaiVe, loaiVeDb => loaiVeDb.GiaVe == 123_000);
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachSuKien.CountAsync());
+            Assert.Equal(200, await nguCanhDuLieu.DanhSachLoaiVe.CountAsync());
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachDatDiaDiem.CountAsync());
+            var ketQuaThucHienLai = await LocalEventSeeder.ChuanHoaDuLieuMauHienCoAsync(nguCanhDuLieu);
+            Assert.Equal(0, ketQuaThucHienLai.SoTaiKhoanDaChuanHoa + ketQuaThucHienLai.SoBanToChucDaChuanHoa + ketQuaThucHienLai.SoDiaDiemDaChuanHoa + ketQuaThucHienLai.SoSuKienDaChuanHoa);
         });
     }
 

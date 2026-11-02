@@ -41,3 +41,7 @@ __pycache__/
 *.py[cod]
 .DS_Store
 Thumbs.db
+
+# Local project documents
+/docs/
+/nhiem_vu.txt

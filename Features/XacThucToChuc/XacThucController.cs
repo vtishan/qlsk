@@ -4,16 +4,16 @@ using QLSK.Common.Auth;
 using QLSK.Common.Models;
 namespace QLSK.Features.XacThucToChuc;
 [ApiController, Route("api/organizer-verifications"), Authorize]
-public class XacThucController(XacThucService service) : ControllerBase
+public class XacThucController(XacThucService dichVuXacThuc) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Gui(GuiYeuCauDto dto) => Ok(ApiResponse.Ok(await service.Gui(User.LayId(), dto)));
+    public async Task<IActionResult> GuiYeuCauXacThucToChuc(GuiYeuCauDto duLieuGuiYeuCau) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.GuiYeuCauXacThucToChuc(User.LayTaiKhoanId(), duLieuGuiYeuCau)));
     [HttpGet("me")]
-    public async Task<IActionResult> Me() => Ok(ApiResponse.Ok(await service.CuaToi(User.LayId())));
+    public async Task<IActionResult> LayYeuCauDangXuLyCuaToi() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.LayYeuCauDangXuLyCuaTaiKhoan(User.LayTaiKhoanId())));
     [HttpGet, Authorize(Roles = "QuanLySuKien,QuanTriVien")]
-    public async Task<IActionResult> DanhSach() => Ok(ApiResponse.Ok(await service.DanhSach()));
+    public async Task<IActionResult> LayDanhSachYeuCauDangXuLy() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.LayDanhSachYeuCauDangXuLy()));
     [HttpPost("{id:int}/approve"), Authorize(Roles = "QuanLySuKien,QuanTriVien")]
-    public async Task<IActionResult> Duyet(int id) { await service.Duyet(User.LayId(), id); return Ok(ApiResponse.Ok(new { message = "Đã duyệt yêu cầu." })); }
+    public async Task<IActionResult> DuyetYeuCauXacThuc([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int yeuCauXacThucId) { await dichVuXacThuc.DuyetYeuCauXacThuc(User.LayTaiKhoanId(), yeuCauXacThucId); return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã duyệt yêu cầu." })); }
     [HttpPost("{id:int}/reject"), Authorize(Roles = "QuanLySuKien,QuanTriVien")]
-    public async Task<IActionResult> TuChoi(int id, TuChoiYeuCauDto dto) { await service.TuChoi(User.LayId(), id, dto.LyDo); return Ok(ApiResponse.Ok(new { message = "Đã từ chối yêu cầu." })); }
+    public async Task<IActionResult> TuChoiYeuCauXacThuc([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int yeuCauXacThucId, TuChoiYeuCauDto duLieuTuChoiYeuCau) { await dichVuXacThuc.TuChoiYeuCauXacThuc(User.LayTaiKhoanId(), yeuCauXacThucId, duLieuTuChoiYeuCau.LyDo); return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã từ chối yêu cầu." })); }
 }

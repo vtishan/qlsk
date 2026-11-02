@@ -6,42 +6,42 @@ namespace QLSK.Data.Configurations;
 
 public class DiaDiemConfig : IEntityTypeConfiguration<DiaDiem>
 {
-    public void Configure(EntityTypeBuilder<DiaDiem> e)
+    public void Configure(EntityTypeBuilder<DiaDiem> cauHinhDiaDiem)
     {
-        e.ToTable("DiaDiem", t =>
+        cauHinhDiaDiem.ToTable("DiaDiem", bangDiaDiem =>
         {
-            t.HasCheckConstraint(
+            bangDiaDiem.HasCheckConstraint(
                 "CK_DiaDiem_SucChua",
                 "[SucChua] > 0"
             );
 
-            t.HasCheckConstraint(
+            bangDiaDiem.HasCheckConstraint(
                 "CK_DiaDiem_GiaThue",
                 "[GiaThue] >= 0"
             );
         });
 
-        e.HasKey(x => x.Id);
+        cauHinhDiaDiem.HasKey(diaDiemDb => diaDiemDb.DiaDiemId);
 
-        e.Property(x => x.Ten)
+        cauHinhDiaDiem.Property(diaDiemDb => diaDiemDb.TenDiaDiem)
             .HasMaxLength(200)
             .IsRequired();
 
-        e.Property(x => x.DiaChi)
+        cauHinhDiaDiem.Property(diaDiemDb => diaDiemDb.DiaChi)
             .HasMaxLength(300)
             .IsRequired();
 
-        e.Property(x => x.GiaThue)
+        cauHinhDiaDiem.Property(diaDiemDb => diaDiemDb.GiaThue)
             .HasPrecision(18, 2);
-        e.Property(x => x.HinhAnh).HasMaxLength(500);
+        cauHinhDiaDiem.Property(diaDiemDb => diaDiemDb.HinhAnh).HasMaxLength(500);
 
-        e.Property(x => x.RowVersion)
+        cauHinhDiaDiem.Property(diaDiemDb => diaDiemDb.PhienBanDong)
             .IsRowVersion();
 
-        e.HasIndex(x => new
+        cauHinhDiaDiem.HasIndex(diaDiemDb => new
         {
-            x.Ten,
-            x.DiaChi
+            Ten = diaDiemDb.TenDiaDiem,
+            diaDiemDb.DiaChi
         })
         .IsUnique();
     }

@@ -9,70 +9,70 @@ namespace QLSK.LocalData;
 
 internal static class LocalDataProgram
 {
-    private static async Task<int> Main(string[] args)
+    private static async Task<int> Main(string[] thamSoDongLenh)
     {
         try
         {
-            if (args.Length == 0 || args.Contains("--help"))
+            if (thamSoDongLenh.Length == 0 || thamSoDongLenh.Contains("--help"))
             {
                 Console.WriteLine("Local data maintenance; never run as part of backend startup.");
                 Console.WriteLine("--normalize-existing [--dry-run] [--root PROJECT_DIRECTORY]");
                 Console.WriteLine("--populate [--root PROJECT_DIRECTORY] (new account password: LOCALDATA_PASSWORD environment variable)");
                 Console.WriteLine("--populate-users [--root PROJECT_DIRECTORY] (100 sample users and related orders on the configured local database)");
-                return args.Length == 0 ? 1 : 0;
+                return thamSoDongLenh.Length == 0 ? 1 : 0;
             }
-            var normalize = args.Contains("--normalize-existing");
-            var populate = args.Contains("--populate");
-            var populateUsers = args.Contains("--populate-users");
-            var dryRun = args.Contains("--dry-run");
-            if (new[] { normalize, populate, populateUsers }.Count(value => value) != 1 || (!normalize && dryRun))
+            var canChuanHoaDuLieuMau = thamSoDongLenh.Contains("--normalize-existing");
+            var canTaoDuLieuMau = thamSoDongLenh.Contains("--populate");
+            var canTaoNguoiDungMau = thamSoDongLenh.Contains("--populate-users");
+            var chiXemTruocThayDoi = thamSoDongLenh.Contains("--dry-run");
+            if (new[] { canChuanHoaDuLieuMau, canTaoDuLieuMau, canTaoNguoiDungMau }.Count(giaTriCanXuLy => giaTriCanXuLy) != 1 || (!canChuanHoaDuLieuMau && chiXemTruocThayDoi))
                 throw new ArgumentException("Choose exactly one operation; --dry-run is available for normalization only.");
-            string? rootArgument = null;
-            for (var i = 0; i < args.Length; i++)
+            string? thuMucDuAnChiDinh = null;
+            for (var chiSo = 0; chiSo < thamSoDongLenh.Length; chiSo++)
             {
-                if (args[i] == "--root")
+                if (thamSoDongLenh[chiSo] == "--root")
                 {
-                    if (++i >= args.Length) throw new ArgumentException("--root requires the project directory.");
-                    rootArgument = args[i];
+                    if (++chiSo >= thamSoDongLenh.Length) throw new ArgumentException("--root requires the project directory.");
+                    thuMucDuAnChiDinh = thamSoDongLenh[chiSo];
                 }
-                else if (args[i] is not ("--normalize-existing" or "--populate" or "--populate-users" or "--dry-run"))
+                else if (thamSoDongLenh[chiSo] is not ("--normalize-existing" or "--populate" or "--populate-users" or "--dry-run"))
                     throw new ArgumentException("Unknown command argument. Use --help.");
             }
-            var root = ResolveRoot(rootArgument);
-            var configBuilder = new ConfigurationBuilder().SetBasePath(root)
+            var thuMucDuAn = XacDinhThuMucDuAn(thuMucDuAnChiDinh);
+            var boDungCauHinh = new ConfigurationBuilder().SetBasePath(thuMucDuAn)
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddJsonFile("appsettings.Development.json", optional: false)
                 .AddJsonFile("appsettings.Local.json", optional: true);
-            if (populateUsers) configBuilder.AddUserSecrets(typeof(ApplicationDbContext).Assembly, optional: true);
-            var config = configBuilder.AddEnvironmentVariables().Build();
-            var connectionString = config.GetConnectionString("Default") ?? "";
-            LocalSqlGuard.Validate(connectionString, requireTestDatabase: populate);
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
-            await using var db = new ApplicationDbContext(options);
-            if (normalize)
+            if (canTaoNguoiDungMau) boDungCauHinh.AddUserSecrets(typeof(ApplicationDbContext).Assembly, optional: true);
+            var cauHinhUngDung = boDungCauHinh.AddEnvironmentVariables().Build();
+            var chuoiKetNoiCoSoDuLieu = cauHinhUngDung.GetConnectionString("Default") ?? "";
+            LocalSqlGuard.KiemTraKetNoiSqlLocal(chuoiKetNoiCoSoDuLieu, requireTestDatabase: canTaoDuLieuMau);
+            var tuyChonCoSoDuLieu = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(chuoiKetNoiCoSoDuLieu).Options;
+            await using var nguCanhDuLieu = new ApplicationDbContext(tuyChonCoSoDuLieu);
+            if (canChuanHoaDuLieuMau)
             {
-                var result = await LocalEventSeeder.NormalizeExistingAsync(db, dryRun);
-                Console.WriteLine(JsonSerializer.Serialize(new { operation = "normalize-existing", dryRun, result }));
+                var ketQuaThucHien = await LocalEventSeeder.ChuanHoaDuLieuMauHienCoAsync(nguCanhDuLieu, chiXemTruocThayDoi);
+                Console.WriteLine(JsonSerializer.Serialize(new { operation = "normalize-existing", dryRun = chiXemTruocThayDoi, result = ketQuaThucHien }));
             }
-            else if (populateUsers)
+            else if (canTaoNguoiDungMau)
             {
-                var password = config["LOCALDATA_PASSWORD"] ?? config["LocalData:UserPassword"] ?? "";
-                var result = await LocalUserSeeder.SeedAsync(db, new PasswordHasher<TaiKhoan>(), password);
-                Console.WriteLine(JsonSerializer.Serialize(new { operation = "populate-users", result }));
+                var matKhauNhapLieu = cauHinhUngDung["LOCALDATA_PASSWORD"] ?? cauHinhUngDung["LocalData:UserPassword"] ?? "";
+                var ketQuaThucHien = await LocalUserSeeder.TaoDuLieuNguoiDungMauAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), matKhauNhapLieu);
+                Console.WriteLine(JsonSerializer.Serialize(new { operation = "populate-users", result = ketQuaThucHien }));
             }
             else
             {
-                var password = Environment.GetEnvironmentVariable("LOCALDATA_PASSWORD") ?? "";
-                if (string.IsNullOrWhiteSpace(password))
+                var matKhauNhapLieu = Environment.GetEnvironmentVariable("LOCALDATA_PASSWORD") ?? "";
+                if (string.IsNullOrWhiteSpace(matKhauNhapLieu))
                     throw new ArgumentException("Set LOCALDATA_PASSWORD for newly created organizer accounts.");
-                var added = await LocalEventSeeder.SeedAsync(db, new PasswordHasher<TaiKhoan>(), root, password);
-                Console.WriteLine(JsonSerializer.Serialize(new { operation = "populate", addedEvents = added }));
+                var soBanGhiDaThem = await LocalEventSeeder.TaoDuLieuSuKienMauAsync(nguCanhDuLieu, new PasswordHasher<TaiKhoan>(), thuMucDuAn, matKhauNhapLieu);
+                Console.WriteLine(JsonSerializer.Serialize(new { operation = "populate", addedEvents = soBanGhiDaThem }));
             }
             return 0;
         }
-        catch (ArgumentException error) { Console.Error.WriteLine(error.Message); return 2; }
-        catch (InvalidOperationException error) when (!error.Message.Contains("connection", StringComparison.OrdinalIgnoreCase))
-        { Console.Error.WriteLine(error.Message); return 2; }
+        catch (ArgumentException loiXuLy) { Console.Error.WriteLine(loiXuLy.Message); return 2; }
+        catch (InvalidOperationException loiXuLy) when (!loiXuLy.Message.Contains("connection", StringComparison.OrdinalIgnoreCase))
+        { Console.Error.WriteLine(loiXuLy.Message); return 2; }
         catch
         {
             Console.Error.WriteLine("Unable to complete the local database operation. Check the local configuration and migration state.");
@@ -80,17 +80,17 @@ internal static class LocalDataProgram
         }
     }
 
-    private static string ResolveRoot(string? value)
+    private static string XacDinhThuMucDuAn(string? giaTriCanXuLy)
     {
-        if (value is not null)
+        if (giaTriCanXuLy is not null)
         {
-            var root = Path.GetFullPath(value);
-            if (!File.Exists(Path.Combine(root, "QLSK.csproj"))) throw new ArgumentException("--root must identify the QLSK project directory.");
-            return root;
+            var thuMucDuAn = Path.GetFullPath(giaTriCanXuLy);
+            if (!File.Exists(Path.Combine(thuMucDuAn, "QLSK.csproj"))) throw new ArgumentException("--root must identify the QLSK project directory.");
+            return thuMucDuAn;
         }
-        foreach (var start in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
-            for (var current = new DirectoryInfo(start); current is not null; current = current.Parent)
-                if (File.Exists(Path.Combine(current.FullName, "QLSK.csproj"))) return current.FullName;
+        foreach (var thoiDiemBatDau in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+            for (var giaTriHienTai = new DirectoryInfo(thoiDiemBatDau); giaTriHienTai is not null; giaTriHienTai = giaTriHienTai.Parent)
+                if (File.Exists(Path.Combine(giaTriHienTai.FullName, "QLSK.csproj"))) return giaTriHienTai.FullName;
         throw new ArgumentException("Unable to find the project directory. Pass --root explicitly.");
     }
 }

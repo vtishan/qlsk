@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using QLSK.Common.Exceptions;
+using QLSK.Common.Inventory;
 using QLSK.Data;
 using QLSK.Domain.Entities;
 using QLSK.Domain.Enums;
@@ -12,224 +13,239 @@ using VeEntity = QLSK.Domain.Entities.Ve;
 
 namespace QLSK.Features.ThanhToan;
 
-public class ThanhToanService(ApplicationDbContext db, PayOsService payos)
+public class ThanhToanService(ApplicationDbContext nguCanhDuLieu, PayOsService dichVuThanhToanPayOs)
 {
-    public async Task<object> Tao(int userId, int donId)
+    public async Task<object> BatDauThanhToanDonVe(int taiKhoanId, int donVeId)
     {
-        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        var order = await db.DonVes
-            .Include(x => x.ChiTiets)
-            .Include(x => x.ThanhToans)
-            .Include(x => x.Ves)
-            .SingleOrDefaultAsync(x => x.Id == donId && x.TaiKhoanId == userId)
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var donVe = await nguCanhDuLieu.DanhSachDonVe
+            .Include(donVeDb => donVeDb.ChiTietDonVe)
+            .Include(donVeDb => donVeDb.DanhSachThanhToan)
+            .Include(donVeDb => donVeDb.DanhSachVe)
+            .SingleOrDefaultAsync(donVeDb => donVeDb.DonVeId == donVeId && donVeDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy đơn vé.");
-        if (order.TrangThai != TrangThaiDon.ChoThanhToan)
+        if (donVe.TrangThai != TrangThaiDon.ChoThanhToan)
             throw new ApiException(409, "ORDER_INVALID_STATE", "Đơn không ở trạng thái chờ thanh toán.");
-        if (order.HetHan <= DateTime.UtcNow)
+        if (donVe.ThoiGianHetHan <= DateTime.UtcNow)
             throw new ApiException(409, "ORDER_EXPIRED", "Đơn đã hết hạn.");
 
-        if (order.TongTien == 0)
+        if (donVe.TongTien == 0)
         {
-            await PhatVe(order);
-            order.TrangThai = TrangThaiDon.ThanhCong;
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
-            return new
-            {
-                paymentId = (int?)null,
-                soTien = 0m,
-                checkoutUrl = (string?)null,
-                trangThai = TrangThaiThanhToan.ThanhCong
-            };
+            var ketQuaThanhToanMienPhi = await HoanTatDonVeMienPhi(donVe);
+            await giaoDich.CommitAsync();
+            return ketQuaThanhToanMienPhi;
         }
 
-        foreach (var pending in order.ThanhToans.Where(x => x.TrangThai == TrangThaiThanhToan.DangXuLy))
-            pending.TrangThai = TrangThaiThanhToan.ThatBai;
-        await db.SaveChangesAsync();
+        var thanhToan = await TaoGiaoDichThanhToanTraPhi(donVe);
+        await giaoDich.CommitAsync();
+        return await TaoLienKetChoGiaoDich(donVe, thanhToan);
+    }
 
-        var payment = new ThanhToanEntity { DonVeId = order.Id, SoTien = order.TongTien };
-        db.ThanhToans.Add(payment);
-        await db.SaveChangesAsync();
-        await tx.CommitAsync();
+    private async Task<object> HoanTatDonVeMienPhi(OrderEntity donVe)
+    {
+        await PhatVeChoDon(donVe);
+        donVe.TrangThai = TrangThaiDon.ThanhCong;
+        await nguCanhDuLieu.SaveChangesAsync();
+        return new
+        {
+            paymentId = (int?)null,
+            soTien = 0m,
+            checkoutUrl = (string?)null,
+            trangThai = TrangThaiThanhToan.ThanhCong
+        };
+    }
 
+    private async Task<ThanhToanEntity> TaoGiaoDichThanhToanTraPhi(OrderEntity donVe)
+    {
+        foreach (var thanhToanDangXuLy in donVe.DanhSachThanhToan.Where(thanhToanDb => thanhToanDb.TrangThai == TrangThaiThanhToan.DangXuLy))
+            thanhToanDangXuLy.TrangThai = TrangThaiThanhToan.ThatBai;
+        await nguCanhDuLieu.SaveChangesAsync();
+
+        var thanhToan = new ThanhToanEntity { DonVeId = donVe.DonVeId, SoTien = donVe.TongTien };
+        nguCanhDuLieu.DanhSachThanhToan.Add(thanhToan);
+        await nguCanhDuLieu.SaveChangesAsync();
+        return thanhToan;
+    }
+
+    private async Task<object> TaoLienKetChoGiaoDich(OrderEntity donVe, ThanhToanEntity thanhToan)
+    {
         try
         {
-            var link = await payos.Tao(order.Id, order.TongTien, $"DON {order.Id}", order.HetHan);
-            payment.MaLienKet = link.PaymentLinkId;
-            await db.SaveChangesAsync();
-            return new { payment.Id, payment.SoTien, checkoutUrl = link.CheckoutUrl, payment.TrangThai };
+            var lienKetThanhToan = await dichVuThanhToanPayOs.TaoLienKetThanhToan(donVe.DonVeId, donVe.TongTien, $"DON {donVe.DonVeId}", donVe.ThoiGianHetHan);
+            thanhToan.MaLienKet = lienKetThanhToan.MaLienKetThanhToan;
+            await nguCanhDuLieu.SaveChangesAsync();
+            return new { Id = thanhToan.ThanhToanId, thanhToan.SoTien, checkoutUrl = lienKetThanhToan.UrlThanhToan, thanhToan.TrangThai };
         }
         catch
         {
-            payment.TrangThai = TrangThaiThanhToan.ThatBai;
-            await db.SaveChangesAsync();
+            thanhToan.TrangThai = TrangThaiThanhToan.ThatBai;
+            await nguCanhDuLieu.SaveChangesAsync();
             throw;
         }
     }
 
-    public async Task XuLyWebhook(PayOsWebhook webhook)
+    public async Task XuLyWebhookThanhToan(PayOsWebhook webhook)
     {
-        var data = payos.Verify(webhook);
-        if (!webhook.Success || webhook.Code != "00" || data.Code != "00")
+        var duLieuWebhook = dichVuThanhToanPayOs.XacThucVaDocWebhook(webhook);
+        if (!webhook.ThanhCong || webhook.MaKetQua != "00" || duLieuWebhook.MaKetQua != "00")
             throw new ApiException(400, "PAYMENT_INVALID", "Webhook không phải giao dịch thành công.");
-        if (string.IsNullOrWhiteSpace(data.Reference))
+        if (string.IsNullOrWhiteSpace(duLieuWebhook.MaThamChieu))
             throw new ApiException(400, "PAYMENT_INVALID", "Webhook thiếu mã giao dịch.");
 
-        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        if (await db.ThanhToans.AnyAsync(x => x.MaGiaoDich == data.Reference))
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        if (await nguCanhDuLieu.DanhSachThanhToan.AnyAsync(thanhToanDb => thanhToanDb.MaGiaoDich == duLieuWebhook.MaThamChieu))
         {
-            await tx.CommitAsync();
+            await giaoDich.CommitAsync();
             return;
         }
 
-        var orderId = checked((int)data.OrderCode);
-        var order = await db.DonVes
-            .Include(x => x.ChiTiets)
-            .Include(x => x.ThanhToans)
-            .Include(x => x.Ves)
-            .SingleOrDefaultAsync(x => x.Id == orderId)
+        var donVeId = checked((int)duLieuWebhook.MaDonVe);
+        var donVe = await nguCanhDuLieu.DanhSachDonVe
+            .Include(donVeDb => donVeDb.ChiTietDonVe)
+            .Include(donVeDb => donVeDb.DanhSachThanhToan)
+            .Include(donVeDb => donVeDb.DanhSachVe)
+            .SingleOrDefaultAsync(donVeDb => donVeDb.DonVeId == donVeId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy đơn từ webhook.");
-        var payment = TimThanhToan(order, data.PaymentLinkId);
-        if (payment == null)
+        var thanhToan = TimThanhToanChoWebhook(donVe, duLieuWebhook.MaLienKetThanhToan);
+        if (thanhToan == null)
         {
-            payment = new ThanhToanEntity
+            thanhToan = new ThanhToanEntity
             {
-                DonVeId = order.Id,
-                SoTien = order.TongTien,
-                MaGiaoDich = data.Reference,
-                MaLienKet = data.PaymentLinkId,
+                DonVeId = donVe.DonVeId,
+                SoTien = donVe.TongTien,
+                MaGiaoDich = duLieuWebhook.MaThamChieu,
+                MaLienKet = duLieuWebhook.MaLienKetThanhToan,
                 TrangThai = TrangThaiThanhToan.NghiVan
             };
-            db.ThanhToans.Add(payment);
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
+            nguCanhDuLieu.DanhSachThanhToan.Add(thanhToan);
+            await nguCanhDuLieu.SaveChangesAsync();
+            await giaoDich.CommitAsync();
             return;
         }
 
-        payment.MaGiaoDich = data.Reference;
-        payment.MaLienKet = data.PaymentLinkId;
-        if (data.Amount != order.TongTien)
+        thanhToan.MaGiaoDich = duLieuWebhook.MaThamChieu;
+        thanhToan.MaLienKet = duLieuWebhook.MaLienKetThanhToan;
+        if (duLieuWebhook.SoTienGiaoDich != donVe.TongTien)
         {
-            payment.TrangThai = TrangThaiThanhToan.NghiVan;
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
+            thanhToan.TrangThai = TrangThaiThanhToan.NghiVan;
+            await nguCanhDuLieu.SaveChangesAsync();
+            await giaoDich.CommitAsync();
             throw new ApiException(409, "PAYMENT_INVALID", "Số tiền webhook không khớp đơn hàng.");
         }
-        if (order.TrangThai != TrangThaiDon.ChoThanhToan || order.HetHan <= DateTime.UtcNow)
+        if (donVe.TrangThai != TrangThaiDon.ChoThanhToan || donVe.ThoiGianHetHan <= DateTime.UtcNow)
         {
-            payment.TrangThai = TrangThaiThanhToan.NghiVan;
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
+            thanhToan.TrangThai = TrangThaiThanhToan.NghiVan;
+            await nguCanhDuLieu.SaveChangesAsync();
+            await giaoDich.CommitAsync();
             return;
         }
 
-        if (!await CoThePhatVe(order))
+        if (!await CoThePhatVe(donVe))
         {
-            payment.TrangThai = TrangThaiThanhToan.NghiVan;
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
+            thanhToan.TrangThai = TrangThaiThanhToan.NghiVan;
+            await nguCanhDuLieu.SaveChangesAsync();
+            await giaoDich.CommitAsync();
             return;
         }
 
-        await PhatVe(order, false);
-        foreach (var other in order.ThanhToans.Where(x => x.Id != payment.Id && x.TrangThai == TrangThaiThanhToan.DangXuLy))
-            other.TrangThai = TrangThaiThanhToan.ThatBai;
-        order.TrangThai = TrangThaiDon.ThanhCong;
-        payment.TrangThai = TrangThaiThanhToan.ThanhCong;
-        payment.NgayThanhToan = DateTime.UtcNow;
-        await db.SaveChangesAsync();
-        await tx.CommitAsync();
+        await PhatVeChoDon(donVe, kiemTraTonVe: false);
+        foreach (var thanhToanKhac in donVe.DanhSachThanhToan.Where(thanhToanDb => thanhToanDb.ThanhToanId != thanhToan.ThanhToanId && thanhToanDb.TrangThai == TrangThaiThanhToan.DangXuLy))
+            thanhToanKhac.TrangThai = TrangThaiThanhToan.ThatBai;
+        donVe.TrangThai = TrangThaiDon.ThanhCong;
+        thanhToan.TrangThai = TrangThaiThanhToan.ThanhCong;
+        thanhToan.NgayThanhToan = DateTime.UtcNow;
+        await nguCanhDuLieu.SaveChangesAsync();
+        await giaoDich.CommitAsync();
     }
 
-    public async Task HoanTien(int id, decimal soTien, string maHoanTien)
+    public async Task GhiNhanHoanTien(int thanhToanId, decimal soTienHoan, string maHoanTien)
     {
-        await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        var payment = await db.ThanhToans
-            .Include(x => x.DonVe)
-            .ThenInclude(x => x.Ves)
-            .ThenInclude(x => x.LoaiVe)
-            .SingleOrDefaultAsync(x => x.Id == id)
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var thanhToan = await nguCanhDuLieu.DanhSachThanhToan
+            .Include(thanhToanDb => thanhToanDb.DonVe)
+            .ThenInclude(donVeDb => donVeDb.DanhSachVe)
+            .ThenInclude(veDaPhatHanhDb => veDaPhatHanhDb.LoaiVe)
+            .SingleOrDefaultAsync(thanhToanDb => thanhToanDb.ThanhToanId == thanhToanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy thanh toán.");
-        if (payment.TrangThai != TrangThaiThanhToan.ThanhCong)
+        if (thanhToan.TrangThai != TrangThaiThanhToan.ThanhCong)
             throw new ApiException(409, "PAYMENT_INVALID", "Thanh toán chưa thành công.");
-        if (soTien <= 0 || soTien != decimal.Truncate(soTien) || payment.SoTienHoan + soTien > payment.SoTien)
+        if (soTienHoan <= 0 || soTienHoan != decimal.Truncate(soTienHoan) || thanhToan.SoTienHoan + soTienHoan > thanhToan.SoTien)
             throw new ApiException(409, "REFUND_EXCEEDS_PAYMENT", "Số tiền hoàn phải là số VND nguyên và không vượt số tiền đã thanh toán.");
 
-        var hoanToanPhan = payment.SoTienHoan + soTien == payment.SoTien;
-        if (hoanToanPhan && payment.DonVe.Ves.Any(x => x.TrangThai == TrangThaiVe.DaCheckIn))
+        var hoanToanPhan = thanhToan.SoTienHoan + soTienHoan == thanhToan.SoTien;
+        if (hoanToanPhan && thanhToan.DonVe.DanhSachVe.Any(veDaPhatHanhDb => veDaPhatHanhDb.TrangThai == TrangThaiVe.DaCheckIn))
             throw new ApiException(409, "REFUND_CHECKED_IN_TICKET", "Không thể hoàn toàn phần khi đơn có vé đã check-in.");
 
-        payment.SoTienHoan += soTien;
-        payment.MaHoanTien = maHoanTien.Trim();
+        thanhToan.SoTienHoan += soTienHoan;
+        thanhToan.MaHoanTien = maHoanTien.Trim();
         if (hoanToanPhan)
         {
-            payment.DonVe.TrangThai = TrangThaiDon.DaHoanTien;
-            var tickets = payment.DonVe.Ves.Where(x => x.TrangThai == TrangThaiVe.ChuaSuDung).ToList();
-            foreach (var group in tickets.GroupBy(x => x.LoaiVe))
-                group.Key.DaBan = Math.Max(0, group.Key.DaBan - group.Count());
-            foreach (var ticket in tickets)
-                ticket.TrangThai = TrangThaiVe.DaHoanTien;
+            thanhToan.DonVe.TrangThai = TrangThaiDon.DaHoanTien;
+            var danhSachVeHoanTien = thanhToan.DonVe.DanhSachVe.Where(veDaPhatHanhDb => veDaPhatHanhDb.TrangThai == TrangThaiVe.ChuaSuDung).ToList();
+            foreach (var nhomTheoLoaiVe in danhSachVeHoanTien.GroupBy(veDaPhatHanhDb => veDaPhatHanhDb.LoaiVe))
+                QuanLyTonVe.TraLaiSoLuongVeDaBan(nhomTheoLoaiVe.Key, nhomTheoLoaiVe.Count());
+            foreach (var veDaPhatHanh in danhSachVeHoanTien)
+                veDaPhatHanh.TrangThai = TrangThaiVe.DaHoanTien;
         }
         else
         {
-            payment.DonVe.TrangThai = TrangThaiDon.YeuCauHoanTien;
+            thanhToan.DonVe.TrangThai = TrangThaiDon.YeuCauHoanTien;
         }
 
-        await db.SaveChangesAsync();
-        await tx.CommitAsync();
+        await nguCanhDuLieu.SaveChangesAsync();
+        await giaoDich.CommitAsync();
     }
 
-    private static ThanhToanEntity? TimThanhToan(OrderEntity order, string? paymentLinkId)
+    private static ThanhToanEntity? TimThanhToanChoWebhook(OrderEntity donVe, string? maLienKetThanhToan)
     {
-        if (!string.IsNullOrWhiteSpace(paymentLinkId))
+        if (!string.IsNullOrWhiteSpace(maLienKetThanhToan))
         {
-            var exact = order.ThanhToans.SingleOrDefault(x => x.MaLienKet == paymentLinkId);
-            if (exact != null) return exact;
+            var thanhToanTheoLienKet = donVe.DanhSachThanhToan.SingleOrDefault(thanhToanDb => thanhToanDb.MaLienKet == maLienKetThanhToan);
+            if (thanhToanTheoLienKet != null) return thanhToanTheoLienKet;
         }
 
-        var khongCoLienKet = order.ThanhToans
-            .Where(x => x.TrangThai == TrangThaiThanhToan.DangXuLy && string.IsNullOrWhiteSpace(x.MaLienKet))
+        var thanhToanChuaCoLienKet = donVe.DanhSachThanhToan
+            .Where(thanhToanDb => thanhToanDb.TrangThai == TrangThaiThanhToan.DangXuLy && string.IsNullOrWhiteSpace(thanhToanDb.MaLienKet))
             .ToList();
-        return khongCoLienKet.Count == 1 ? khongCoLienKet[0] : null;
+        return thanhToanChuaCoLienKet.Count == 1 ? thanhToanChuaCoLienKet[0] : null;
     }
 
-    private async Task<bool> CoThePhatVe(OrderEntity order)
+    private async Task<bool> CoThePhatVe(OrderEntity donVe)
     {
-        var ids = order.ChiTiets.Select(x => x.LoaiVeId).Distinct().OrderBy(x => x).ToList();
-        var types = await db.LoaiVes.Where(x => ids.Contains(x.Id)).OrderBy(x => x.Id).ToListAsync();
-        if (types.Count != ids.Count) return false;
-        return order.ChiTiets.All(detail =>
+        var danhSachLoaiVeId = donVe.ChiTietDonVe.Select(chiTietDonVeDb => chiTietDonVeDb.LoaiVeId).Distinct().OrderBy(loaiVeId => loaiVeId).ToList();
+        var danhSachLoaiVe = await nguCanhDuLieu.DanhSachLoaiVe.Where(loaiVeDb => danhSachLoaiVeId.Contains(loaiVeDb.LoaiVeId)).OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).ToListAsync();
+        if (danhSachLoaiVe.Count != danhSachLoaiVeId.Count) return false;
+        return donVe.ChiTietDonVe.All(chiTietDonVeDb =>
         {
-            var type = types.Single(x => x.Id == detail.LoaiVeId);
-            return type.DangGiu >= detail.SoLuong && type.DaBan + detail.SoLuong <= type.SoLuong;
+            var loaiVe = danhSachLoaiVe.Single(loaiVeDb => loaiVeDb.LoaiVeId == chiTietDonVeDb.LoaiVeId);
+            return loaiVe.SoLuongDangGiu >= chiTietDonVeDb.SoLuong && loaiVe.SoLuongDaBan + chiTietDonVeDb.SoLuong <= loaiVe.SoLuong;
         });
     }
 
-    private async Task PhatVe(OrderEntity order, bool validate = true)
+    private async Task PhatVeChoDon(OrderEntity donVe, bool kiemTraTonVe = true)
     {
-        var ids = order.ChiTiets.Select(x => x.LoaiVeId).Distinct().OrderBy(x => x).ToList();
-        var types = await db.LoaiVes.Where(x => ids.Contains(x.Id)).OrderBy(x => x.Id).ToListAsync();
-        if (validate && (types.Count != ids.Count || order.ChiTiets.Any(detail =>
+        var danhSachLoaiVeId = donVe.ChiTietDonVe.Select(chiTietDonVeDb => chiTietDonVeDb.LoaiVeId).Distinct().OrderBy(loaiVeId => loaiVeId).ToList();
+        var danhSachLoaiVe = await nguCanhDuLieu.DanhSachLoaiVe.Where(loaiVeDb => danhSachLoaiVeId.Contains(loaiVeDb.LoaiVeId)).OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).ToListAsync();
+        if (kiemTraTonVe && (danhSachLoaiVe.Count != danhSachLoaiVeId.Count || donVe.ChiTietDonVe.Any(chiTietDonVeDb =>
             {
-                var type = types.SingleOrDefault(x => x.Id == detail.LoaiVeId);
-                return type == null || type.DangGiu < detail.SoLuong || type.DaBan + detail.SoLuong > type.SoLuong;
+                var loaiVe = danhSachLoaiVe.SingleOrDefault(loaiVeDb => loaiVeDb.LoaiVeId == chiTietDonVeDb.LoaiVeId);
+                return loaiVe == null || loaiVe.SoLuongDangGiu < chiTietDonVeDb.SoLuong || loaiVe.SoLuongDaBan + chiTietDonVeDb.SoLuong > loaiVe.SoLuong;
             })))
             throw new ApiException(409, "TICKET_INVENTORY_INVALID", "Tồn vé không còn hợp lệ.");
 
-        foreach (var detail in order.ChiTiets)
+        foreach (var chiTietDonVe in donVe.ChiTietDonVe)
         {
-            var type = types.Single(x => x.Id == detail.LoaiVeId);
-            type.DangGiu -= detail.SoLuong;
-            type.DaBan += detail.SoLuong;
-            for (var i = 0; i < detail.SoLuong; i++)
+            var loaiVe = danhSachLoaiVe.Single(loaiVeDb => loaiVeDb.LoaiVeId == chiTietDonVe.LoaiVeId);
+            QuanLyTonVe.ChuyenVeGiuSangDaBan(loaiVe, chiTietDonVe.SoLuong);
+            for (var chiSoVe = 0; chiSoVe < chiTietDonVe.SoLuong; chiSoVe++)
             {
-                var code = Guid.NewGuid().ToString("N").ToUpperInvariant();
-                db.Ves.Add(new VeEntity
+                var maQrDayDu = Guid.NewGuid().ToString("N").ToUpperInvariant();
+                nguCanhDuLieu.DanhSachVe.Add(new VeEntity
                 {
-                    DonVeId = order.Id,
-                    LoaiVeId = detail.LoaiVeId,
-                    MaVe = code[..12],
-                    MaQR = code
+                    DonVeId = donVe.DonVeId,
+                    LoaiVeId = chiTietDonVe.LoaiVeId,
+                    MaVe = maQrDayDu[..12],
+                    NoiDungMaQr = maQrDayDu
                 });
             }
         }

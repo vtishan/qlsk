@@ -6,13 +6,13 @@ namespace QLSK.Data.Configurations;
 
 public class XuatVeConfig : IEntityTypeConfiguration<XuatVe>
 {
-    public void Configure(EntityTypeBuilder<XuatVe> e)
+    public void Configure(EntityTypeBuilder<XuatVe> cauHinhXuatVe)
     {
-        e.ToTable("XuatVe");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.Kieu).HasMaxLength(30).IsRequired();
-        e.Property(x => x.DiaChi).HasMaxLength(250);
-        e.HasIndex(x => new { x.VeId, x.NgayTao });
-        e.HasOne(x => x.Ve).WithMany(x => x.XuatVes).HasForeignKey(x => x.VeId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhXuatVe.ToTable("XuatVe");
+        cauHinhXuatVe.HasKey(xuatVeDb => xuatVeDb.XuatVeId);
+        cauHinhXuatVe.Property(xuatVeDb => xuatVeDb.HinhThucXuat).HasMaxLength(30).IsRequired();
+        cauHinhXuatVe.Property(xuatVeDb => xuatVeDb.EmailNhan).HasMaxLength(250);
+        cauHinhXuatVe.HasIndex(xuatVeDb => new { xuatVeDb.VeId, xuatVeDb.NgayTao });
+        cauHinhXuatVe.HasOne(xuatVeDb => xuatVeDb.VeDuocXuat).WithMany(veDaPhatHanhDb => veDaPhatHanhDb.LichSuXuatVe).HasForeignKey(xuatVeDb => xuatVeDb.VeId).OnDelete(DeleteBehavior.Restrict);
     }
 }

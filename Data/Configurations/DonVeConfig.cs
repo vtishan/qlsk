@@ -6,49 +6,49 @@ namespace QLSK.Data.Configurations;
 
 public class DonVeConfig : IEntityTypeConfiguration<DonVe>
 {
-    public void Configure(EntityTypeBuilder<DonVe> e)
+    public void Configure(EntityTypeBuilder<DonVe> cauHinhDonVe)
     {
-        e.ToTable("DonVe", t =>
+        cauHinhDonVe.ToTable("DonVe", bangDonVe =>
         {
-            t.HasCheckConstraint(
+            bangDonVe.HasCheckConstraint(
                 "CK_DonVe_SoLuong",
                 "[SoLuong] > 0"
             );
 
-            t.HasCheckConstraint(
+            bangDonVe.HasCheckConstraint(
                 "CK_DonVe_TongTien",
                 "[TongTien] >= 0"
             );
         });
 
-        e.HasKey(x => x.Id);
+        cauHinhDonVe.HasKey(donVeDb => donVeDb.DonVeId);
 
-        e.Property(x => x.TongTien)
+        cauHinhDonVe.Property(donVeDb => donVeDb.TongTien)
             .HasPrecision(18, 2);
 
-        e.Property(x => x.RowVersion)
+        cauHinhDonVe.Property(donVeDb => donVeDb.PhienBanDong)
             .IsRowVersion();
 
-        e.HasIndex(x => new
+        cauHinhDonVe.HasIndex(donVeDb => new
         {
-            x.TaiKhoanId,
-            x.NgayTao
+            donVeDb.TaiKhoanId,
+            donVeDb.NgayTao
         });
 
-        e.HasIndex(x => new
+        cauHinhDonVe.HasIndex(donVeDb => new
         {
-            x.TrangThai,
-            x.HetHan
+            donVeDb.TrangThai,
+            HetHan = donVeDb.ThoiGianHetHan
         });
 
-        e.HasOne(x => x.TaiKhoan)
-            .WithMany(x => x.DonVes)
-            .HasForeignKey(x => x.TaiKhoanId)
+        cauHinhDonVe.HasOne(donVeDb => donVeDb.TaiKhoan)
+            .WithMany(taiKhoanDb => taiKhoanDb.DanhSachDonVe)
+            .HasForeignKey(donVeDb => donVeDb.TaiKhoanId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        e.HasOne(x => x.SuKien)
-            .WithMany(x => x.DonVes)
-            .HasForeignKey(x => x.SuKienId)
+        cauHinhDonVe.HasOne(donVeDb => donVeDb.SuKien)
+            .WithMany(suKienDb => suKienDb.DanhSachDonVe)
+            .HasForeignKey(donVeDb => donVeDb.SuKienId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

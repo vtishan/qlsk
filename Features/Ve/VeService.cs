@@ -5,27 +5,27 @@ using QLSK.Domain.Entities;
 using QLSK.Domain.Enums;
 using VeEntity = QLSK.Domain.Entities.Ve;
 namespace QLSK.Features.Ve;
-public class VeService(ApplicationDbContext db)
+public class VeService(ApplicationDbContext nguCanhDuLieu)
 {
-    public async Task<List<VeEntity>> CuaToi(int userId) => await db.Ves.AsNoTracking().Where(x => x.DonVe.TaiKhoanId == userId).Include(x => x.DonVe).Include(x => x.LoaiVe).ThenInclude(x => x.SuKien).OrderByDescending(x => x.Id).ToListAsync();
-    public async Task<VeEntity> Lay(int userId, int id, bool manager)
+    public async Task<List<VeEntity>> LayVeCuaTaiKhoan(int taiKhoanId) => await nguCanhDuLieu.DanhSachVe.AsNoTracking().Where(veDaPhatHanhDb => veDaPhatHanhDb.DonVe.TaiKhoanId == taiKhoanId).Include(veDaPhatHanhDb => veDaPhatHanhDb.DonVe).Include(veDaPhatHanhDb => veDaPhatHanhDb.LoaiVe).ThenInclude(loaiVeDb => loaiVeDb.SuKien).OrderByDescending(veDaPhatHanhDb => veDaPhatHanhDb.VeId).ToListAsync();
+    public async Task<VeEntity> LayChiTietVe(int taiKhoanId, int veId, bool laNguoiQuanLy)
     {
-        var x = await db.Ves.AsNoTracking().Include(x => x.DonVe).Include(x => x.LoaiVe).ThenInclude(x => x.SuKien).SingleOrDefaultAsync(x => x.Id == id) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
-        if (!manager && x.DonVe.TaiKhoanId != userId) throw new ApiException(403,"FORBIDDEN","Không có quyền."); return x;
+        var veDaPhatHanh = await nguCanhDuLieu.DanhSachVe.AsNoTracking().Include(veDaPhatHanhDb => veDaPhatHanhDb.DonVe).Include(veDaPhatHanhDb => veDaPhatHanhDb.LoaiVe).ThenInclude(loaiVeDb => loaiVeDb.SuKien).SingleOrDefaultAsync(veDaPhatHanhDb => veDaPhatHanhDb.VeId == veId) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
+        if (!laNguoiQuanLy && veDaPhatHanh.DonVe.TaiKhoanId != taiKhoanId) throw new ApiException(403,"FORBIDDEN","Không có quyền."); return veDaPhatHanh;
     }
-    public async Task<VeEntity> Ma(int userId, string code, bool manager)
+    public async Task<VeEntity> LayVeTheoMaVe(int taiKhoanId, string maVe, bool laNguoiQuanLy)
     {
-        var x = await db.Ves.AsNoTracking().Include(x=>x.DonVe).Include(x=>x.LoaiVe).ThenInclude(x=>x.SuKien).SingleOrDefaultAsync(x=>x.MaVe==code) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
-        if(!manager && x.DonVe.TaiKhoanId!=userId) throw new ApiException(403,"FORBIDDEN","Không có quyền."); return x;
+        var veDaPhatHanh = await nguCanhDuLieu.DanhSachVe.AsNoTracking().Include(veDaPhatHanhDb=>veDaPhatHanhDb.DonVe).Include(veDaPhatHanhDb=>veDaPhatHanhDb.LoaiVe).ThenInclude(loaiVeDb=>loaiVeDb.SuKien).SingleOrDefaultAsync(veDaPhatHanhDb=>veDaPhatHanhDb.MaVe==maVe) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
+        if(!laNguoiQuanLy && veDaPhatHanh.DonVe.TaiKhoanId!=taiKhoanId) throw new ApiException(403,"FORBIDDEN","Không có quyền."); return veDaPhatHanh;
     }
-    public async Task<VeEntity> CheckIn(string code)
+    public async Task<VeEntity> CheckInVe(string maVeHoacQr)
     {
-        var x = await db.Ves.Include(x=>x.LoaiVe).ThenInclude(x=>x.SuKien).SingleOrDefaultAsync(x=>x.MaVe==code || x.MaQR==code) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
-        if(x.TrangThai==TrangThaiVe.DaCheckIn) throw new ApiException(409,"TICKET_ALREADY_CHECKED_IN","Vé đã check-in.");
-        if(x.TrangThai!=TrangThaiVe.ChuaSuDung) throw new ApiException(409,"TICKET_INVALID_STATE","Vé không hợp lệ.");
-        var now = DateTime.UtcNow;
-        if(x.LoaiVe.SuKien.TrangThai != TrangThaiSuKien.DangDienRa || now < x.LoaiVe.SuKien.BatDau || now >= x.LoaiVe.SuKien.KetThuc)
+        var veDaPhatHanh = await nguCanhDuLieu.DanhSachVe.Include(veDaPhatHanhDb=>veDaPhatHanhDb.LoaiVe).ThenInclude(loaiVeDb=>loaiVeDb.SuKien).SingleOrDefaultAsync(veDaPhatHanhDb=>veDaPhatHanhDb.MaVe==maVeHoacQr || veDaPhatHanhDb.NoiDungMaQr==maVeHoacQr) ?? throw new ApiException(404,"NOT_FOUND","Không tìm thấy vé.");
+        if(veDaPhatHanh.TrangThai==TrangThaiVe.DaCheckIn) throw new ApiException(409,"TICKET_ALREADY_CHECKED_IN","Vé đã check-in.");
+        if(veDaPhatHanh.TrangThai!=TrangThaiVe.ChuaSuDung) throw new ApiException(409,"TICKET_INVALID_STATE","Vé không hợp lệ.");
+        var thoiDiemHienTai = DateTime.UtcNow;
+        if(veDaPhatHanh.LoaiVe.SuKien.TrangThai != TrangThaiSuKien.DangDienRa || thoiDiemHienTai < veDaPhatHanh.LoaiVe.SuKien.ThoiGianBatDau || thoiDiemHienTai >= veDaPhatHanh.LoaiVe.SuKien.ThoiGianKetThuc)
             throw new ApiException(409,"EVENT_NOT_IN_PROGRESS","Sự kiện chưa diễn ra hoặc đã kết thúc.");
-        x.TrangThai=TrangThaiVe.DaCheckIn; x.NgayCheckIn=now; await db.SaveChangesAsync(); return x;
+        veDaPhatHanh.TrangThai=TrangThaiVe.DaCheckIn; veDaPhatHanh.NgayCheckIn=thoiDiemHienTai; await nguCanhDuLieu.SaveChangesAsync(); return veDaPhatHanh;
     }
 }

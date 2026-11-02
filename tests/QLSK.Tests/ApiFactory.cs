@@ -23,100 +23,100 @@ namespace QLSK.Tests;
 public sealed class ApiFactory : WebApplicationFactory<Program>
 {
     public const string JwtKey = "QLSK_TEST_ONLY_KEY_NOT_FOR_DEPLOYMENT_32_BYTES";
-    private readonly string databaseName = $"QLSK_Test_{Guid.NewGuid():N}";
-    private IHost? initializedHost;
-    private string ConnectionString => $"Server=.\\SQL2022EXP;Database={databaseName};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True";
+    private readonly string tenCoSoDuLieuKiemThu = $"QLSK_Test_{Guid.NewGuid():N}";
+    private IHost? hostKiemThuDaKhoiTao;
+    private string ConnectionString => $"Server=.\\SQL2022EXP;Database={tenCoSoDuLieuKiemThu};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True";
 
-    protected override IHost CreateHost(IHostBuilder builder)
+    protected override IHost CreateHost(IHostBuilder boDungHost)
     {
-        var host = base.CreateHost(builder);
+        var hostKiemThu = base.CreateHost(boDungHost);
         try
         {
             // Database setup belongs to the test host, never application startup.
-            using var scope = host.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            RequireOwnedDatabase(db);
-            db.Database.Migrate();
-            initializedHost = host;
-            return host;
+            using var phamViDichVu = hostKiemThu.Services.CreateScope();
+            var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            KiemTraCoSoDuLieuThuocPhienKiemThu(nguCanhDuLieu);
+            nguCanhDuLieu.Database.Migrate();
+            hostKiemThuDaKhoiTao = hostKiemThu;
+            return hostKiemThu;
         }
         catch
         {
-            host.Dispose();
+            hostKiemThu.Dispose();
             throw;
         }
     }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder boDungWebHost)
     {
-        builder.UseEnvironment("Testing");
-        builder.UseSetting("ConnectionStrings:Default", ConnectionString);
-        builder.UseSetting("Jwt:Issuer", "QLSK");
-        builder.UseSetting("Jwt:Audience", "QLSK.Client");
-        builder.UseSetting("Jwt:Key", JwtKey);
-        builder.UseSetting("PayOS:ClientId", "test-client-id");
-        builder.UseSetting("PayOS:ApiKey", "test-api-key");
-        builder.UseSetting("PayOS:ChecksumKey", "test-checksum-key");
-        builder.UseSetting("Email:Host", "");
+        boDungWebHost.UseEnvironment("Testing");
+        boDungWebHost.UseSetting("ConnectionStrings:Default", ConnectionString);
+        boDungWebHost.UseSetting("Jwt:Issuer", "QLSK");
+        boDungWebHost.UseSetting("Jwt:Audience", "QLSK.Client");
+        boDungWebHost.UseSetting("Jwt:Key", JwtKey);
+        boDungWebHost.UseSetting("PayOS:ClientId", "test-client-id");
+        boDungWebHost.UseSetting("PayOS:ApiKey", "test-api-key");
+        boDungWebHost.UseSetting("PayOS:ChecksumKey", "test-checksum-key");
+        boDungWebHost.UseSetting("Email:Host", "");
 
-        builder.ConfigureServices(services =>
+        boDungWebHost.ConfigureServices(danhSachDichVu =>
         {
-            services.RemoveAll<IHostedService>();
-            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
-            services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
-            services.RemoveAll<EmailService>();
-            services.AddScoped<EmailService, TestEmailService>();
-            services.AddHttpClient<PayOsService>(client =>
-                client.BaseAddress = new Uri("https://api-merchant.payos.vn/"))
+            danhSachDichVu.RemoveAll<IHostedService>();
+            danhSachDichVu.RemoveAll<DbContextOptions<ApplicationDbContext>>();
+            danhSachDichVu.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
+            danhSachDichVu.RemoveAll<EmailService>();
+            danhSachDichVu.AddScoped<EmailService, TestEmailService>();
+            danhSachDichVu.AddHttpClient<PayOsService>(clientYeuCauHttp =>
+                clientYeuCauHttp.BaseAddress = new Uri("https://api-merchant.payos.vn/"))
                 .ConfigurePrimaryHttpMessageHandler(() => new TestPayOsHandler());
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(ConnectionString));
+            danhSachDichVu.AddDbContext<ApplicationDbContext>(tuyChonCoSoDuLieu =>
+                tuyChonCoSoDuLieu.UseSqlServer(ConnectionString));
         });
     }
 
-    public HttpClient CreateAuthenticatedClient(int userId, string role, string? passwordHashOverride = null)
+    public HttpClient CreateAuthenticatedClient(int taiKhoanId, string tenVaiTro, string? matKhauBamThayThe = null)
     {
-        var passwordHash = passwordHashOverride;
-        if (passwordHash is null)
+        var matKhauDaBam = matKhauBamThayThe;
+        if (matKhauDaBam is null)
         {
-            using var scope = Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            passwordHash = db.TaiKhoans.AsNoTracking()
-                .Where(x => x.Id == userId)
-                .Select(x => x.MatKhau)
+            using var phamViDichVu = Services.CreateScope();
+            var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            matKhauDaBam = nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking()
+                .Where(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
+                .Select(taiKhoanDb => taiKhoanDb.MatKhauBam)
                 .Single();
         }
-        var client = CreateClient();
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", CreateToken(userId, role, passwordHash));
-        return client;
+        var clientYeuCauHttp = CreateClient();
+        clientYeuCauHttp.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TaoTokenTaiKhoanKiemThu(taiKhoanId, tenVaiTro, matKhauDaBam));
+        return clientYeuCauHttp;
     }
 
-    public async Task WithDb(Func<ApplicationDbContext, Task> action)
+    public async Task ThucThiVoiCoSoDuLieuKiemThu(Func<ApplicationDbContext, Task> thaoTacCanThucThi)
     {
-        using var scope = Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        await action(db);
+        using var phamViDichVu = Services.CreateScope();
+        var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await thaoTacCanThucThi(nguCanhDuLieu);
     }
 
-    public async Task<T> WithDb<T>(Func<ApplicationDbContext, Task<T>> action)
+    public async Task<TKetQua> ThucThiVoiCoSoDuLieuKiemThu<TKetQua>(Func<ApplicationDbContext, Task<TKetQua>> thaoTacCanThucThi)
     {
-        using var scope = Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        return await action(db);
+        using var phamViDichVu = Services.CreateScope();
+        var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        return await thaoTacCanThucThi(nguCanhDuLieu);
     }
 
-    protected override void Dispose(bool disposing)
+    protected override void Dispose(bool dangGiaiPhongTaiNguyen)
     {
-        if (disposing && initializedHost is not null)
+        if (dangGiaiPhongTaiNguyen && hostKiemThuDaKhoiTao is not null)
         {
             try
             {
-                using var scope = initializedHost.Services.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                RequireOwnedDatabase(db);
-                db.Database.EnsureDeleted();
+                using var phamViDichVu = hostKiemThuDaKhoiTao.Services.CreateScope();
+                var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                KiemTraCoSoDuLieuThuocPhienKiemThu(nguCanhDuLieu);
+                nguCanhDuLieu.Database.EnsureDeleted();
             }
             catch
             {
@@ -124,49 +124,49 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             }
         }
 
-        base.Dispose(disposing);
+        base.Dispose(dangGiaiPhongTaiNguyen);
     }
 
-    private void RequireOwnedDatabase(ApplicationDbContext db)
+    private void KiemTraCoSoDuLieuThuocPhienKiemThu(ApplicationDbContext nguCanhDuLieu)
     {
-        var connection = new SqlConnectionStringBuilder(db.Database.GetConnectionString()
+        var boPhanTichChuoiKetNoi = new SqlConnectionStringBuilder(nguCanhDuLieu.Database.GetConnectionString()
             ?? throw new InvalidOperationException("An isolated SQL Server test connection is required."));
-        if (connection.InitialCatalog != databaseName || connection.DataSource != ".\\SQL2022EXP")
+        if (boPhanTichChuoiKetNoi.InitialCatalog != tenCoSoDuLieuKiemThu || boPhanTichChuoiKetNoi.DataSource != ".\\SQL2022EXP")
             throw new InvalidOperationException("Test database setup and cleanup require this factory's isolated local database.");
     }
 
-    private static string CreateToken(int userId, string role, string passwordHash)
+    private static string TaoTokenTaiKhoanKiemThu(int taiKhoanId, string tenVaiTro, string matKhauDaBam)
     {
-        var claims = new[]
+        var cacClaimTaiKhoan = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-            new Claim(ClaimTypes.Name, $"Test {role}"),
-            new Claim(ClaimTypes.Email, $"test-{userId}@local.test"),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(JwtService.PasswordFingerprintClaim, JwtService.PasswordFingerprint(passwordHash))
+            new Claim(ClaimTypes.NameIdentifier, taiKhoanId.ToString()),
+            new Claim(ClaimTypes.Name, $"Test {tenVaiTro}"),
+            new Claim(ClaimTypes.Email, $"test-{taiKhoanId}@local.test"),
+            new Claim(ClaimTypes.Role, tenVaiTro),
+            new Claim(JwtService.PasswordFingerprintClaim, JwtService.TaoDauVanTayMatKhau(matKhauDaBam))
         };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
-        var token = new JwtSecurityToken(
+        var khoaKyDangNhap = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
+        var tokenDangNhap = new JwtSecurityToken(
             "QLSK",
             "QLSK.Client",
-            claims,
+            cacClaimTaiKhoan,
             expires: DateTime.UtcNow.AddHours(1),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            signingCredentials: new SigningCredentials(khoaKyDangNhap, SecurityAlgorithms.HmacSha256));
+        return new JwtSecurityTokenHandler().WriteToken(tokenDangNhap);
     }
 }
 
 // Gateway responses exist only in this test assembly. Unexpected calls are rejected.
 public sealed class TestPayOsHandler : HttpMessageHandler
 {
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage yeuCauHttp, CancellationToken tokenHuyThaoTac)
     {
-        if (request.Method != HttpMethod.Post || request.RequestUri?.Host != "api-merchant.payos.vn" ||
-            request.RequestUri.AbsolutePath != "/v2/payment-requests" || request.Content is null)
+        if (yeuCauHttp.Method != HttpMethod.Post || yeuCauHttp.RequestUri?.Host != "api-merchant.payos.vn" ||
+            yeuCauHttp.RequestUri.AbsolutePath != "/v2/payment-requests" || yeuCauHttp.Content is null)
             throw new InvalidOperationException("Unexpected payment gateway request in isolated API tests.");
 
-        using var body = JsonDocument.Parse(await request.Content.ReadAsStringAsync(cancellationToken));
-        var orderCode = body.RootElement.GetProperty("orderCode").GetInt64();
+        using var taiLieuJsonPhanHoi = JsonDocument.Parse(await yeuCauHttp.Content.ReadAsStringAsync(tokenHuyThaoTac));
+        var maDonVe = taiLieuJsonPhanHoi.RootElement.GetProperty("orderCode").GetInt64();
         return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
         {
             Content = JsonContent.Create(new
@@ -174,8 +174,8 @@ public sealed class TestPayOsHandler : HttpMessageHandler
                 code = "00",
                 data = new
                 {
-                    checkoutUrl = $"https://checkout.test/pay/{orderCode}",
-                    paymentLinkId = $"test-payment-{orderCode}"
+                    checkoutUrl = $"https://checkout.test/pay/{maDonVe}",
+                    paymentLinkId = $"test-payment-{maDonVe}"
                 }
             })
         };
@@ -184,9 +184,9 @@ public sealed class TestPayOsHandler : HttpMessageHandler
 
 public sealed class TestEmailService() : EmailService(Options.Create(new EmailOptions()))
 {
-    public override Task Gui(
-        string to,
-        string subject,
-        string body,
-        byte[]? attachment = null) => Task.CompletedTask;
+    public override Task GuiEmailVe(
+        string emailNhan,
+        string tieuDe,
+        string noiDung,
+        byte[]? tepPdfVe = null) => Task.CompletedTask;
 }

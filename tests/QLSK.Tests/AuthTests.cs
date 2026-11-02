@@ -9,12 +9,12 @@ using Xunit;
 
 namespace QLSK.Tests;
 
-public class AuthTests(ApiFactory factory) : IClassFixture<ApiFactory>
+public class AuthTests(ApiFactory mayChuKiemThu) : IClassFixture<ApiFactory>
 {
     [Fact(DisplayName = "POST /api/auth/register")]
     public async Task Post_api_auth_register()
     {
-        var response = await factory.CreateClient().PostAsJsonAsync(
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().PostAsJsonAsync(
             "/api/auth/register",
             new DangKyDto
             {
@@ -23,40 +23,40 @@ public class AuthTests(ApiFactory factory) : IClassFixture<ApiFactory>
                 MatKhau = "Abc@123456"
             });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
     }
 
     [Fact(DisplayName = "POST /api/auth/login")]
     public async Task Post_api_auth_login()
     {
-        var email = $"login-{Guid.NewGuid():N}@test.local";
-        await SeedLoginAccount(email, "Abc@123456");
+        var emailTaiKhoan = $"login-{Guid.NewGuid():N}@test.local";
+        await SeedLoginAccount(emailTaiKhoan, "Abc@123456");
 
-        var response = await factory.CreateClient().PostAsJsonAsync(
+        var phanHoiYeuCauHttp = await mayChuKiemThu.CreateClient().PostAsJsonAsync(
             "/api/auth/login",
             new DangNhapDto
             {
-                Email = email,
+                Email = emailTaiKhoan,
                 MatKhau = "Abc@123456"
             });
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, phanHoiYeuCauHttp.StatusCode);
     }
 
-    private async Task SeedLoginAccount(string email, string password)
+    private async Task SeedLoginAccount(string emailTaiKhoan, string matKhauNhapLieu)
     {
-        using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<TaiKhoan>>();
-        var account = new TaiKhoan
+        using var phamViDichVu = mayChuKiemThu.Services.CreateScope();
+        var nguCanhDuLieu = phamViDichVu.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var boBamMatKhau = phamViDichVu.ServiceProvider.GetRequiredService<IPasswordHasher<TaiKhoan>>();
+        var taiKhoanCanXuLy = new TaiKhoan
         {
             HoTen = "Test login",
-            Email = email,
+            Email = emailTaiKhoan,
             VaiTroId = 1,
             HoatDong = true
         };
-        account.MatKhau = hasher.HashPassword(account, password);
-        db.TaiKhoans.Add(account);
-        await db.SaveChangesAsync();
+        taiKhoanCanXuLy.MatKhauBam = boBamMatKhau.HashPassword(taiKhoanCanXuLy, matKhauNhapLieu);
+        nguCanhDuLieu.DanhSachTaiKhoan.Add(taiKhoanCanXuLy);
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 }

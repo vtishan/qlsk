@@ -26,41 +26,41 @@ internal static class SetupConsole
         }
     }
 
-    public static string ReadRequired(string label)
+    public static string ReadRequiredInput(string nhanNhapLieu)
     {
-        Console.Write($"{label}: ");
-        var value = Console.ReadLine()?.Trim();
-        if (string.IsNullOrWhiteSpace(value))
-            throw new SetupValidationException($"Chưa nhập {label.ToLowerInvariant()}.");
-        return value;
+        Console.Write($"{nhanNhapLieu}: ");
+        var giaTriCanXuLy = Console.ReadLine()?.Trim();
+        if (string.IsNullOrWhiteSpace(giaTriCanXuLy))
+            throw new SetupValidationException($"Chưa nhập {nhanNhapLieu.ToLowerInvariant()}.");
+        return giaTriCanXuLy;
     }
 
     public static string ReadNewPassword()
     {
         Console.WriteLine("Mật khẩu: ít nhất 12 ký tự, gồm ít nhất 3 nhóm chữ hoa, chữ thường, số, ký tự đặc biệt.");
-        var password = ReadPassword("Mật khẩu mới");
-        if (password != ReadPassword("Nhập lại mật khẩu"))
+        var matKhauNhapLieu = ReadPassword("Mật khẩu mới");
+        if (matKhauNhapLieu != ReadPassword("Nhập lại mật khẩu"))
             throw new SetupValidationException("Hai mật khẩu không khớp. Chưa thay đổi tài khoản.");
-        return password;
+        return matKhauNhapLieu;
     }
 
-    private static string ReadPassword(string label)
+    private static string ReadPassword(string nhanNhapLieu)
     {
-        Console.Write($"{label}: ");
-        var value = new StringBuilder();
+        Console.Write($"{nhanNhapLieu}: ");
+        var boGhepMatKhau = new StringBuilder();
         while (true)
         {
-            var key = Console.ReadKey(intercept: true);
-            if (key.Key == ConsoleKey.Enter)
+            var phimVuaNhap = Console.ReadKey(intercept: true);
+            if (phimVuaNhap.Key == ConsoleKey.Enter)
             {
                 Console.WriteLine();
-                return value.ToString();
+                return boGhepMatKhau.ToString();
             }
-            if (key.Key == ConsoleKey.Backspace)
+            if (phimVuaNhap.Key == ConsoleKey.Backspace)
             {
-                if (value.Length > 0) value.Length--;
+                if (boGhepMatKhau.Length > 0) boGhepMatKhau.Length--;
             }
-            else if (!char.IsControl(key.KeyChar)) value.Append(key.KeyChar);
+            else if (!char.IsControl(phimVuaNhap.KeyChar)) boGhepMatKhau.Append(phimVuaNhap.KeyChar);
         }
     }
 }

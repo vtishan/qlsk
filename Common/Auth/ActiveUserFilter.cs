@@ -5,26 +5,26 @@ using QLSK.Common.Models;
 using QLSK.Data;
 
 namespace QLSK.Common.Auth;
-public class ActiveUserFilter(ApplicationDbContext db) : IAsyncAuthorizationFilter
+public class ActiveUserFilter(ApplicationDbContext nguCanhDuLieu) : IAsyncAuthorizationFilter
 {
-    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext nguCanhPhanQuyen)
     {
-        if (context.HttpContext.User.Identity?.IsAuthenticated != true) return;
-        var id = context.HttpContext.User.LayId();
-        var account = await db.TaiKhoans.AsNoTracking()
-            .Where(x => x.Id == id)
-            .Select(x => new { x.HoatDong, VaiTro = x.VaiTro.Ten, x.MatKhau })
+        if (nguCanhPhanQuyen.HttpContext.User.Identity?.IsAuthenticated != true) return;
+        var taiKhoanId = nguCanhPhanQuyen.HttpContext.User.LayTaiKhoanId();
+        var thongTinXacThucTaiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking()
+            .Where(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
+            .Select(taiKhoanDb => new { taiKhoanDb.HoatDong, VaiTro = taiKhoanDb.VaiTro.TenVaiTro, MatKhau = taiKhoanDb.MatKhauBam })
             .SingleOrDefaultAsync();
-        if (account is not { HoatDong: true })
+        if (thongTinXacThucTaiKhoan is not { HoatDong: true })
         {
-            context.Result = new ObjectResult(ApiResponse.Fail("ACCOUNT_LOCKED", "Tài khoản đã bị khóa.")) { StatusCode = 403 };
+            nguCanhPhanQuyen.Result = new ObjectResult(ApiResponse.TaoPhanHoiThatBai("ACCOUNT_LOCKED", "Tài khoản đã bị khóa.")) { StatusCode = 403 };
             return;
         }
 
-        var tokenRole = context.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        var tokenPassword = context.HttpContext.User.FindFirst(JwtService.PasswordFingerprintClaim)?.Value;
-        if (!string.Equals(tokenRole, account.VaiTro, StringComparison.Ordinal) ||
-            !string.Equals(tokenPassword, JwtService.PasswordFingerprint(account.MatKhau), StringComparison.Ordinal))
-            context.Result = new ObjectResult(ApiResponse.Fail("TOKEN_STALE", "Thông tin đăng nhập đã thay đổi. Vui lòng đăng nhập lại.")) { StatusCode = 401 };
+        var vaiTroTrongToken = nguCanhPhanQuyen.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var dauVanTayMatKhauTrongToken = nguCanhPhanQuyen.HttpContext.User.FindFirst(JwtService.PasswordFingerprintClaim)?.Value;
+        if (!string.Equals(vaiTroTrongToken, thongTinXacThucTaiKhoan.VaiTro, StringComparison.Ordinal) ||
+            !string.Equals(dauVanTayMatKhauTrongToken, JwtService.TaoDauVanTayMatKhau(thongTinXacThucTaiKhoan.MatKhau), StringComparison.Ordinal))
+            nguCanhPhanQuyen.Result = new ObjectResult(ApiResponse.TaoPhanHoiThatBai("TOKEN_STALE", "Thông tin đăng nhập đã thay đổi. Vui lòng đăng nhập lại.")) { StatusCode = 401 };
     }
 }

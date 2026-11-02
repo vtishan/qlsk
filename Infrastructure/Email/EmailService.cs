@@ -5,17 +5,17 @@ using QLSK.Common.Exceptions;
 
 namespace QLSK.Infrastructure.Email;
 
-public class EmailService(IOptions<EmailOptions> options)
+public class EmailService(IOptions<EmailOptions> tuyChonEmail)
 {
-    private readonly EmailOptions cfg = options.Value;
+    private readonly EmailOptions cauHinh = tuyChonEmail.Value;
 
-    public virtual async Task Gui(
-        string to,
-        string subject,
-        string body,
-        byte[]? attachment = null)
+    public virtual async Task GuiEmailVe(
+        string emailNhan,
+        string tieuDe,
+        string noiDung,
+        byte[]? tepPdfVe = null)
     {
-        if (string.IsNullOrWhiteSpace(cfg.Host))
+        if (string.IsNullOrWhiteSpace(cauHinh.MayChuSmtp))
         {
             throw new ApiException(
                 503,
@@ -24,35 +24,35 @@ public class EmailService(IOptions<EmailOptions> options)
             );
         }
 
-        using var mail = new MailMessage(
-            cfg.From,
-            to,
-            subject,
-            body
+        using var thuEmail = new MailMessage(
+            cauHinh.EmailGui,
+            emailNhan,
+            tieuDe,
+            noiDung
         );
 
-        if (attachment != null)
+        if (tepPdfVe != null)
         {
-            var stream = new MemoryStream(attachment);
+            var luongPdf = new MemoryStream(tepPdfVe);
 
-            mail.Attachments.Add(
+            thuEmail.Attachments.Add(
                 new Attachment(
-                    stream,
+                    luongPdf,
                     "ve.pdf",
                     "application/pdf"
                 )
             );
         }
 
-        using var smtp = new SmtpClient(cfg.Host, cfg.Port)
+        using var clientGuiEmailSmtp = new SmtpClient(cauHinh.MayChuSmtp, cauHinh.CongSmtp)
         {
-            EnableSsl = cfg.EnableSsl,
+            EnableSsl = cauHinh.BatMaHoaSsl,
             Credentials = new NetworkCredential(
-                cfg.User,
-                cfg.Password
+                cauHinh.TenDangNhapSmtp,
+                cauHinh.MatKhauSmtp
             )
         };
 
-        await smtp.SendMailAsync(mail);
+        await clientGuiEmailSmtp.SendMailAsync(thuEmail);
     }
 }

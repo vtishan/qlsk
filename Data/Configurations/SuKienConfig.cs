@@ -6,50 +6,50 @@ namespace QLSK.Data.Configurations;
 
 public class SuKienConfig : IEntityTypeConfiguration<SuKien>
 {
-    public void Configure(EntityTypeBuilder<SuKien> e)
+    public void Configure(EntityTypeBuilder<SuKien> cauHinhSuKien)
     {
-        e.ToTable("SuKien", t =>
+        cauHinhSuKien.ToTable("SuKien", bangSuKien =>
         {
-            t.HasCheckConstraint(
+            bangSuKien.HasCheckConstraint(
                 "CK_SuKien_ThoiGian",
                 "[KetThuc] > [BatDau]"
             );
 
-            t.HasCheckConstraint(
+            bangSuKien.HasCheckConstraint(
                 "CK_SuKien_SoNguoi",
                 "[SoNguoi] > 0"
             );
         });
 
-        e.HasKey(x => x.Id);
+        cauHinhSuKien.HasKey(suKienDb => suKienDb.SuKienId);
 
-        e.Property(x => x.Ten)
+        cauHinhSuKien.Property(suKienDb => suKienDb.TenSuKien)
             .HasMaxLength(200)
             .IsRequired();
 
-        e.Property(x => x.MoTa)
+        cauHinhSuKien.Property(suKienDb => suKienDb.MoTaSuKien)
             .HasMaxLength(4000);
 
-        e.Property(x => x.HinhAnh)
+        cauHinhSuKien.Property(suKienDb => suKienDb.HinhAnh)
             .HasMaxLength(500);
 
-        e.Property(x => x.RowVersion)
+        cauHinhSuKien.Property(suKienDb => suKienDb.PhienBanDong)
             .IsRowVersion();
 
-        e.HasIndex(x => new
+        cauHinhSuKien.HasIndex(suKienDb => new
         {
-            x.TrangThai,
-            x.BatDau
+            suKienDb.TrangThai,
+            BatDau = suKienDb.ThoiGianBatDau
         });
 
-        e.HasOne(x => x.BanToChuc)
-            .WithMany(x => x.SuKiens)
-            .HasForeignKey(x => x.BanToChucId)
+        cauHinhSuKien.HasOne(suKienDb => suKienDb.BanToChuc)
+            .WithMany(banToChucDb => banToChucDb.DanhSachSuKien)
+            .HasForeignKey(suKienDb => suKienDb.BanToChucId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        e.HasOne(x => x.LoaiSuKien)
-            .WithMany(x => x.SuKiens)
-            .HasForeignKey(x => x.LoaiSuKienId)
+        cauHinhSuKien.HasOne(suKienDb => suKienDb.LoaiSuKien)
+            .WithMany(loaiSuKienDb => loaiSuKienDb.DanhSachSuKien)
+            .HasForeignKey(suKienDb => suKienDb.LoaiSuKienId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

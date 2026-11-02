@@ -7,55 +7,55 @@ namespace QLSK.Infrastructure.File;
 
 public class VePdfService
 {
-    public byte[] Tao(Ve ve, byte[] qr)
+    public byte[] TaoPdfVe(Ve veDaPhatHanh, byte[] anhQrPng)
     {
-        return Document.Create(doc =>
+        return Document.Create(taiLieuPdf =>
         {
-            doc.Page(page =>
+            taiLieuPdf.Page(trangPdf =>
             {
-                page.Size(PageSizes.A5);
-                page.Margin(30);
+                trangPdf.Size(PageSizes.A5);
+                trangPdf.Margin(30);
 
-                TaoTieuDe(page);
-                TaoNoiDung(page, ve, qr);
-                TaoChanTrang(page);
+                TaoTieuDePdfVe(trangPdf);
+                TaoNoiDungPdfVe(trangPdf, veDaPhatHanh, anhQrPng);
+                TaoChanTrangPdfVe(trangPdf);
             });
         }).GeneratePdf();
     }
 
-    private void TaoTieuDe(PageDescriptor page)
+    private void TaoTieuDePdfVe(PageDescriptor trangPdf)
     {
-        page.Header()
+        trangPdf.Header()
             .Text("VÉ SỰ KIỆN")
             .FontSize(22)
             .Bold();
     }
 
-    private void TaoNoiDung(
-        PageDescriptor page,
-        Ve ve,
-        byte[] qr)
+    private void TaoNoiDungPdfVe(
+        PageDescriptor trangPdf,
+        Ve veDaPhatHanh,
+        byte[] anhQrPng)
     {
-        var suKien = ve.LoaiVe.SuKien;
+        var suKien = veDaPhatHanh.LoaiVe.SuKien;
 
-        page.Content().Column(c =>
+        trangPdf.Content().Column(cotNoiDung =>
         {
-            c.Spacing(8);
+            cotNoiDung.Spacing(8);
 
-            c.Item().Text($"Sự kiện: {suKien.Ten}");
-            c.Item().Text($"Loại vé: {ve.LoaiVe.Ten}");
-            c.Item().Text($"Mã vé: {ve.MaVe}");
-            c.Item().Text($"Thời gian: {suKien.BatDau:dd/MM/yyyy HH:mm}");
+            cotNoiDung.Item().Text($"Sự kiện: {suKien.TenSuKien}");
+            cotNoiDung.Item().Text($"Loại vé: {veDaPhatHanh.LoaiVe.TenLoaiVe}");
+            cotNoiDung.Item().Text($"Mã vé: {veDaPhatHanh.MaVe}");
+            cotNoiDung.Item().Text($"Thời gian: {suKien.ThoiGianBatDau:dd/MM/yyyy HH:mm}");
 
-            c.Item()
+            cotNoiDung.Item()
                 .Width(180)
-                .Image(qr);
+                .Image(anhQrPng);
         });
     }
 
-    private void TaoChanTrang(PageDescriptor page)
+    private void TaoChanTrangPdfVe(PageDescriptor trangPdf)
     {
-        page.Footer()
+        trangPdf.Footer()
             .AlignCenter()
             .Text("Xuất từ hệ thống QLSK");
     }

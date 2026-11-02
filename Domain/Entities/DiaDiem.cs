@@ -1,13 +1,32 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 namespace QLSK.Domain.Entities;
+
 public class DiaDiem
 {
-    public int Id { get; set; }
-    public string Ten { get; set; } = "";
+    [JsonPropertyName("id")]
+    [Column("Id")]
+    public int DiaDiemId { get; set; }
+
+    [JsonPropertyName("ten")]
+    [Column("Ten")]
+    public string TenDiaDiem { get; set; } = "";
+
     public string DiaChi { get; set; } = "";
+
     public string? HinhAnh { get; set; }
+
     public int SucChua { get; set; }
+
     public decimal GiaThue { get; set; }
+
     public bool HoatDong { get; set; } = true;
-    public byte[] RowVersion { get; set; } = [];
-    public ICollection<DatDiaDiem> DatCho { get; set; } = [];
+
+    [JsonPropertyName("rowVersion")]
+    [Column("RowVersion")]
+    public byte[] PhienBanDong { get; set; } = [];
+
+    [JsonPropertyName("datCho")]
+    public ICollection<DatDiaDiem> DanhSachDatDiaDiem { get; set; } = [];
 }

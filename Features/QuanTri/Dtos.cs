@@ -11,8 +11,8 @@ public class QuanTriSuKienDto : TaoSuKienDto
 public class QuanTriToChucDto
 {
     [Range(1, int.MaxValue)] public int TaiKhoanId { get; set; }
-    [Required, MaxLength(200)] public string Ten { get; set; } = "";
-    [MaxLength(1000)] public string MoTa { get; set; } = "";
+    [System.Text.Json.Serialization.JsonPropertyName("ten")] [Required, MaxLength(200)] public string TenBanToChuc { get; set; } = "";
+    [System.Text.Json.Serialization.JsonPropertyName("moTa")] [MaxLength(1000)] public string MoTaBanToChuc { get; set; } = "";
 }
 
 public class QuanTriTaiKhoanDto

@@ -6,15 +6,15 @@ namespace QLSK.Data.Configurations;
 
 public class TaiKhoanConfig : IEntityTypeConfiguration<TaiKhoan>
 {
-    public void Configure(EntityTypeBuilder<TaiKhoan> e)
+    public void Configure(EntityTypeBuilder<TaiKhoan> cauHinhTaiKhoan)
     {
-        e.ToTable("TaiKhoan");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.HoTen).HasMaxLength(120).IsRequired();
-        e.Property(x => x.Email).HasMaxLength(200).IsRequired();
-        e.Property(x => x.MatKhau).HasMaxLength(500).IsRequired();
-        e.Property(x => x.RowVersion).IsRowVersion();
-        e.HasIndex(x => x.Email).IsUnique();
-        e.HasOne(x => x.VaiTro).WithMany(x => x.TaiKhoans).HasForeignKey(x => x.VaiTroId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhTaiKhoan.ToTable("TaiKhoan");
+        cauHinhTaiKhoan.HasKey(taiKhoanDb => taiKhoanDb.TaiKhoanId);
+        cauHinhTaiKhoan.Property(taiKhoanDb => taiKhoanDb.HoTen).HasMaxLength(120).IsRequired();
+        cauHinhTaiKhoan.Property(taiKhoanDb => taiKhoanDb.Email).HasMaxLength(200).IsRequired();
+        cauHinhTaiKhoan.Property(taiKhoanDb => taiKhoanDb.MatKhauBam).HasMaxLength(500).IsRequired();
+        cauHinhTaiKhoan.Property(taiKhoanDb => taiKhoanDb.PhienBanDong).IsRowVersion();
+        cauHinhTaiKhoan.HasIndex(taiKhoanDb => taiKhoanDb.Email).IsUnique();
+        cauHinhTaiKhoan.HasOne(taiKhoanDb => taiKhoanDb.VaiTro).WithMany(vaiTroDb => vaiTroDb.DanhSachTaiKhoan).HasForeignKey(taiKhoanDb => taiKhoanDb.VaiTroId).OnDelete(DeleteBehavior.Restrict);
     }
 }

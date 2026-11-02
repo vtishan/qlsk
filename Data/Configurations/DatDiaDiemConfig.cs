@@ -6,55 +6,55 @@ namespace QLSK.Data.Configurations;
 
 public class DatDiaDiemConfig : IEntityTypeConfiguration<DatDiaDiem>
 {
-    public void Configure(EntityTypeBuilder<DatDiaDiem> e)
+    public void Configure(EntityTypeBuilder<DatDiaDiem> cauHinhDatDiaDiem)
     {
-        e.ToTable("DatDiaDiem", t =>
+        cauHinhDatDiaDiem.ToTable("DatDiaDiem", bangDatDiaDiem =>
         {
-            t.HasCheckConstraint(
+            bangDatDiaDiem.HasCheckConstraint(
                 "CK_DatDiaDiem_ThoiGian",
                 "[KetThuc] > [BatDau]"
             );
 
-            t.HasCheckConstraint(
+            bangDatDiaDiem.HasCheckConstraint(
                 "CK_DatDiaDiem_TienCoc",
                 "[TienCoc] >= 0 AND [TienCoc] <= [TongTien]"
             );
 
-            t.HasCheckConstraint(
+            bangDatDiaDiem.HasCheckConstraint(
                 "CK_DatDiaDiem_TongTien",
                 "[TongTien] >= 0"
             );
         });
 
-        e.HasKey(x => x.Id);
+        cauHinhDatDiaDiem.HasKey(datDiaDiemDb => datDiaDiemDb.DatDiaDiemId);
 
-        e.Property(x => x.TienCoc)
+        cauHinhDatDiaDiem.Property(datDiaDiemDb => datDiaDiemDb.TienCoc)
             .HasPrecision(18, 2);
 
-        e.Property(x => x.TongTien)
+        cauHinhDatDiaDiem.Property(datDiaDiemDb => datDiaDiemDb.TongTien)
             .HasPrecision(18, 2);
 
-        e.Property(x => x.RowVersion)
+        cauHinhDatDiaDiem.Property(datDiaDiemDb => datDiaDiemDb.PhienBanDong)
             .IsRowVersion();
 
-        e.HasIndex(x => x.SuKienId)
+        cauHinhDatDiaDiem.HasIndex(datDiaDiemDb => datDiaDiemDb.SuKienId)
             .IsUnique();
 
-        e.HasIndex(x => new
+        cauHinhDatDiaDiem.HasIndex(datDiaDiemDb => new
         {
-            x.DiaDiemId,
-            x.BatDau,
-            x.KetThuc
+            datDiaDiemDb.DiaDiemId,
+            BatDau = datDiaDiemDb.ThoiGianBatDau,
+            KetThuc = datDiaDiemDb.ThoiGianKetThuc
         });
 
-        e.HasOne(x => x.DiaDiem)
-            .WithMany(x => x.DatCho)
-            .HasForeignKey(x => x.DiaDiemId)
+        cauHinhDatDiaDiem.HasOne(datDiaDiemDb => datDiaDiemDb.DiaDiem)
+            .WithMany(diaDiemDb => diaDiemDb.DanhSachDatDiaDiem)
+            .HasForeignKey(datDiaDiemDb => datDiaDiemDb.DiaDiemId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        e.HasOne(x => x.SuKien)
-            .WithOne(x => x.DatDiaDiem)
-            .HasForeignKey<DatDiaDiem>(x => x.SuKienId)
+        cauHinhDatDiaDiem.HasOne(datDiaDiemDb => datDiaDiemDb.SuKien)
+            .WithOne(suKienDb => suKienDb.DatDiaDiem)
+            .HasForeignKey<DatDiaDiem>(datDiaDiemDb => datDiaDiemDb.SuKienId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,11 +1,28 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 namespace QLSK.Domain.Entities;
+
 public class BanToChuc
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    [Column("Id")]
+    public int BanToChucId { get; set; }
+
     public int TaiKhoanId { get; set; }
-    public string Ten { get; set; } = "";
-    public string MoTa { get; set; } = "";
+
+    [JsonPropertyName("ten")]
+    [Column("Ten")]
+    public string TenBanToChuc { get; set; } = "";
+
+    [JsonPropertyName("moTa")]
+    [Column("MoTa")]
+    public string MoTaBanToChuc { get; set; } = "";
+
     public DateTime NgayXacThuc { get; set; } = DateTime.UtcNow;
+
     public TaiKhoan TaiKhoan { get; set; } = null!;
-    public ICollection<SuKien> SuKiens { get; set; } = [];
+
+    [JsonPropertyName("suKiens")]
+    public ICollection<SuKien> DanhSachSuKien { get; set; } = [];
 }

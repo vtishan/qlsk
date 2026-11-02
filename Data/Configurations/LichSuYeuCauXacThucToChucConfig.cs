@@ -6,15 +6,15 @@ namespace QLSK.Data.Configurations;
 
 public class LichSuYeuCauXacThucToChucConfig : IEntityTypeConfiguration<LichSuYeuCauXacThucToChuc>
 {
-    public void Configure(EntityTypeBuilder<LichSuYeuCauXacThucToChuc> e)
+    public void Configure(EntityTypeBuilder<LichSuYeuCauXacThucToChuc> cauHinhLichSuYeuCauXacThucToChuc)
     {
-        e.ToTable("LichSuYeuCauXacThucToChuc");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.TenToChuc).HasMaxLength(200).IsRequired();
-        e.Property(x => x.GiayTo).HasMaxLength(500).IsRequired();
-        e.Property(x => x.LyDo).HasMaxLength(500);
-        e.HasIndex(x => new { x.TaiKhoanId, x.NgayXuLy });
-        e.HasOne(x => x.TaiKhoan).WithMany(x => x.LichSuYeuCaus).HasForeignKey(x => x.TaiKhoanId).OnDelete(DeleteBehavior.Restrict);
-        e.HasOne(x => x.NguoiXuLy).WithMany().HasForeignKey(x => x.NguoiXuLyId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhLichSuYeuCauXacThucToChuc.ToTable("LichSuYeuCauXacThucToChuc");
+        cauHinhLichSuYeuCauXacThucToChuc.HasKey(lichSuXacThucDb => lichSuXacThucDb.LichSuYeuCauXacThucToChucId);
+        cauHinhLichSuYeuCauXacThucToChuc.Property(lichSuXacThucDb => lichSuXacThucDb.TenToChuc).HasMaxLength(200).IsRequired();
+        cauHinhLichSuYeuCauXacThucToChuc.Property(lichSuXacThucDb => lichSuXacThucDb.GiayTo).HasMaxLength(500).IsRequired();
+        cauHinhLichSuYeuCauXacThucToChuc.Property(lichSuXacThucDb => lichSuXacThucDb.LyDo).HasMaxLength(500);
+        cauHinhLichSuYeuCauXacThucToChuc.HasIndex(lichSuXacThucDb => new { lichSuXacThucDb.TaiKhoanId, lichSuXacThucDb.NgayXuLy });
+        cauHinhLichSuYeuCauXacThucToChuc.HasOne(lichSuXacThucDb => lichSuXacThucDb.TaiKhoan).WithMany(taiKhoanDb => taiKhoanDb.LichSuYeuCauXacThuc).HasForeignKey(lichSuXacThucDb => lichSuXacThucDb.TaiKhoanId).OnDelete(DeleteBehavior.Restrict);
+        cauHinhLichSuYeuCauXacThucToChuc.HasOne(lichSuXacThucDb => lichSuXacThucDb.NguoiXuLy).WithMany().HasForeignKey(lichSuXacThucDb => lichSuXacThucDb.NguoiXuLyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

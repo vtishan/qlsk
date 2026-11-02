@@ -1,2 +1,8 @@
 namespace QLSK.Domain.Enums;
-public enum TrangThaiYeuCau { ChoDuyet, DaDuyet, TuChoi }
+
+public enum TrangThaiYeuCau
+{
+    ChoDuyet,
+    DaDuyet,
+    TuChoi
+}

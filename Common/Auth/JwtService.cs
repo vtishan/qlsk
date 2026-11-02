@@ -7,28 +7,28 @@ using Microsoft.IdentityModel.Tokens;
 using QLSK.Domain.Entities;
 
 namespace QLSK.Common.Auth;
-public class JwtService(IOptions<JwtOptions> options)
+public class JwtService(IOptions<JwtOptions> tuyChonJwt)
 {
     public const string PasswordFingerprintClaim = "pwd";
-    private readonly JwtOptions cfg = options.Value;
+    private readonly JwtOptions cauHinh = tuyChonJwt.Value;
 
-    public static string PasswordFingerprint(string passwordHash)
-        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(passwordHash)));
+    public static string TaoDauVanTayMatKhau(string matKhauDaBam)
+        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(matKhauDaBam)));
 
-    public string Tao(TaiKhoan user)
+    public string TaoTokenDangNhap(TaiKhoan taiKhoan)
     {
-        var claims = new[]
+        var cacClaimTaiKhoan = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.HoTen),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.VaiTro.Ten),
-            new Claim(PasswordFingerprintClaim, PasswordFingerprint(user.MatKhau))
+            new Claim(ClaimTypes.NameIdentifier, taiKhoan.TaiKhoanId.ToString()),
+            new Claim(ClaimTypes.Name, taiKhoan.HoTen),
+            new Claim(ClaimTypes.Email, taiKhoan.Email),
+            new Claim(ClaimTypes.Role, taiKhoan.VaiTro.TenVaiTro),
+            new Claim(PasswordFingerprintClaim, TaoDauVanTayMatKhau(taiKhoan.MatKhauBam))
         };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cfg.Key));
-        var token = new JwtSecurityToken(cfg.Issuer, cfg.Audience, claims,
-            expires: DateTime.UtcNow.AddMinutes(cfg.ExpireMinutes),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var khoaKyDangNhap = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cauHinh.KhoaKyJwt));
+        var tokenDangNhap = new JwtSecurityToken(cauHinh.Issuer, cauHinh.Audience, cacClaimTaiKhoan,
+            expires: DateTime.UtcNow.AddMinutes(cauHinh.ExpireMinutes),
+            signingCredentials: new SigningCredentials(khoaKyDangNhap, SecurityAlgorithms.HmacSha256));
+        return new JwtSecurityTokenHandler().WriteToken(tokenDangNhap);
     }
 }

@@ -4,10 +4,10 @@ using QLSK.Common.Auth;
 using QLSK.Common.Models;
 namespace QLSK.Features.DonVe;
 [ApiController, Route("api/orders"), Authorize]
-public class DonVeController(DonVeService service) : ControllerBase
+public class DonVeController(DonVeService dichVuDonVe) : ControllerBase
 {
-    [HttpPost] public async Task<IActionResult> Tao(TaoDonDto dto) => Ok(ApiResponse.Ok(await service.Tao(User.LayId(), dto)));
-    [HttpGet("me")] public async Task<IActionResult> Me() => Ok(ApiResponse.Ok(await service.CuaToi(User.LayId())));
-    [HttpGet("{id:int}")] public async Task<IActionResult> Lay(int id) => Ok(ApiResponse.Ok(await service.Lay(User.LayId(), id, User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien"))));
-    [HttpPost("{id:int}/cancel")] public async Task<IActionResult> Huy(int id) { await service.Huy(User.LayId(), id); return Ok(ApiResponse.Ok(new { message = "Đã hủy đơn." })); }
+    [HttpPost] public async Task<IActionResult> TaoDonVaGiuVe(TaoDonDto duLieuTaoDon) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuDonVe.TaoDonVaGiuVe(User.LayTaiKhoanId(), duLieuTaoDon)));
+    [HttpGet("me")] public async Task<IActionResult> LayDonVeCuaToi() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuDonVe.LayDonVeCuaTaiKhoan(User.LayTaiKhoanId())));
+    [HttpGet("{id:int}")] public async Task<IActionResult> LayChiTietDonVe([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int donVeId) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuDonVe.LayChiTietDonVe(User.LayTaiKhoanId(), donVeId, User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien"))));
+    [HttpPost("{id:int}/cancel")] public async Task<IActionResult> HuyDonVe([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int donVeId) { await dichVuDonVe.HuyDonVe(User.LayTaiKhoanId(), donVeId); return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã hủy đơn." })); }
 }

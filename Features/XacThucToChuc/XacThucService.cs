@@ -5,57 +5,57 @@ using QLSK.Domain.Entities;
 using QLSK.Domain.Enums;
 
 namespace QLSK.Features.XacThucToChuc;
-public class XacThucService(ApplicationDbContext db)
+public class XacThucService(ApplicationDbContext nguCanhDuLieu)
 {
-    public async Task<YeuCauXacThucToChuc> Gui(int userId, GuiYeuCauDto dto)
+    public async Task<YeuCauXacThucToChuc> GuiYeuCauXacThucToChuc(int taiKhoanId, GuiYeuCauDto duLieuGuiYeuCau)
     {
-        var user = await db.TaiKhoans.Include(x => x.BanToChuc).SingleOrDefaultAsync(x => x.Id == userId)
+        var taiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.Include(taiKhoanDb => taiKhoanDb.BanToChuc).SingleOrDefaultAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy tài khoản.");
-        if (user.BanToChuc != null) throw new ApiException(409, "ORGANIZER_ALREADY_VERIFIED", "Tài khoản đã là ban tổ chức.");
-        if (await db.YeuCauXacThucToChucs.AnyAsync(x => x.TaiKhoanId == userId))
+        if (taiKhoan.BanToChuc != null) throw new ApiException(409, "ORGANIZER_ALREADY_VERIFIED", "Tài khoản đã là ban tổ chức.");
+        if (await nguCanhDuLieu.YeuCauXacThucToChuc.AnyAsync(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoanId == taiKhoanId))
             throw new ApiException(409, "VERIFICATION_ALREADY_PENDING", "Đã có yêu cầu đang chờ xử lý.");
-        var req = new YeuCauXacThucToChuc { TaiKhoanId = userId, TenToChuc = dto.TenToChuc.Trim(), GiayTo = dto.GiayTo.Trim() };
-        db.YeuCauXacThucToChucs.Add(req);
-        await db.SaveChangesAsync();
-        return req;
+        var yeuCauXacThuc = new YeuCauXacThucToChuc { TaiKhoanId = taiKhoanId, TenToChuc = duLieuGuiYeuCau.TenToChuc.Trim(), GiayTo = duLieuGuiYeuCau.GiayTo.Trim() };
+        nguCanhDuLieu.YeuCauXacThucToChuc.Add(yeuCauXacThuc);
+        await nguCanhDuLieu.SaveChangesAsync();
+        return yeuCauXacThuc;
     }
 
-    public async Task<YeuCauXacThucToChuc?> CuaToi(int userId) => await db.YeuCauXacThucToChucs.AsNoTracking().SingleOrDefaultAsync(x => x.TaiKhoanId == userId);
+    public async Task<YeuCauXacThucToChuc?> LayYeuCauDangXuLyCuaTaiKhoan(int taiKhoanId) => await nguCanhDuLieu.YeuCauXacThucToChuc.AsNoTracking().SingleOrDefaultAsync(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoanId == taiKhoanId);
 
-    public async Task<List<YeuCauXacThucToChuc>> DanhSach() => await db.YeuCauXacThucToChucs.AsNoTracking().Include(x => x.TaiKhoan).OrderBy(x => x.NgayTao).ToListAsync();
+    public async Task<List<YeuCauXacThucToChuc>> LayDanhSachYeuCauDangXuLy() => await nguCanhDuLieu.YeuCauXacThucToChuc.AsNoTracking().Include(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoan).OrderBy(yeuCauXacThucDb => yeuCauXacThucDb.NgayTao).ToListAsync();
 
-    public async Task Duyet(int managerId, int id)
+    public async Task DuyetYeuCauXacThuc(int nguoiDuyetId, int yeuCauXacThucId)
     {
-        await using var tx = await db.Database.BeginTransactionAsync();
-        var req = await db.YeuCauXacThucToChucs.Include(x => x.TaiKhoan).SingleOrDefaultAsync(x => x.Id == id)
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync();
+        var yeuCauXacThuc = await nguCanhDuLieu.YeuCauXacThucToChuc.Include(yeuCauXacThucDb => yeuCauXacThucDb.TaiKhoan).SingleOrDefaultAsync(yeuCauXacThucDb => yeuCauXacThucDb.YeuCauXacThucToChucId == yeuCauXacThucId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy yêu cầu.");
-        if (req.TrangThai != TrangThaiYeuCau.ChoDuyet) throw new ApiException(409, "VERIFICATION_INVALID_STATE", "Yêu cầu không còn ở trạng thái chờ duyệt.");
-        var now = DateTime.UtcNow;
-        db.LichSuYeuCauXacThucToChucs.Add(new LichSuYeuCauXacThucToChuc
+        if (yeuCauXacThuc.TrangThai != TrangThaiYeuCau.ChoDuyet) throw new ApiException(409, "VERIFICATION_INVALID_STATE", "Yêu cầu không còn ở trạng thái chờ duyệt.");
+        var thoiDiemHienTai = DateTime.UtcNow;
+        nguCanhDuLieu.LichSuYeuCauXacThucToChuc.Add(new LichSuYeuCauXacThucToChuc
         {
-            TaiKhoanId = req.TaiKhoanId, TenToChuc = req.TenToChuc, GiayTo = req.GiayTo,
-            TrangThai = TrangThaiYeuCau.DaDuyet, NgayTao = req.NgayTao, NgayXuLy = now, NguoiXuLyId = managerId
+            TaiKhoanId = yeuCauXacThuc.TaiKhoanId, TenToChuc = yeuCauXacThuc.TenToChuc, GiayTo = yeuCauXacThuc.GiayTo,
+            TrangThai = TrangThaiYeuCau.DaDuyet, NgayTao = yeuCauXacThuc.NgayTao, NgayXuLy = thoiDiemHienTai, NguoiXuLyId = nguoiDuyetId
         });
-        db.BanToChucs.Add(new BanToChuc { TaiKhoanId = req.TaiKhoanId, Ten = req.TenToChuc, NgayXacThuc = now });
-        req.TaiKhoan.VaiTroId = 2;
-        db.YeuCauXacThucToChucs.Remove(req);
-        await db.SaveChangesAsync();
-        await tx.CommitAsync();
+        nguCanhDuLieu.DanhSachBanToChuc.Add(new BanToChuc { TaiKhoanId = yeuCauXacThuc.TaiKhoanId, TenBanToChuc = yeuCauXacThuc.TenToChuc, NgayXacThuc = thoiDiemHienTai });
+        yeuCauXacThuc.TaiKhoan.VaiTroId = 2;
+        nguCanhDuLieu.YeuCauXacThucToChuc.Remove(yeuCauXacThuc);
+        await nguCanhDuLieu.SaveChangesAsync();
+        await giaoDich.CommitAsync();
     }
 
-    public async Task TuChoi(int managerId, int id, string lyDo)
+    public async Task TuChoiYeuCauXacThuc(int nguoiDuyetId, int yeuCauXacThucId, string lyDoTuChoi)
     {
-        await using var tx = await db.Database.BeginTransactionAsync();
-        var req = await db.YeuCauXacThucToChucs.SingleOrDefaultAsync(x => x.Id == id)
+        await using var giaoDich = await nguCanhDuLieu.Database.BeginTransactionAsync();
+        var yeuCauXacThuc = await nguCanhDuLieu.YeuCauXacThucToChuc.SingleOrDefaultAsync(yeuCauXacThucDb => yeuCauXacThucDb.YeuCauXacThucToChucId == yeuCauXacThucId)
             ?? throw new ApiException(404, "NOT_FOUND", "Không tìm thấy yêu cầu.");
-        var now = DateTime.UtcNow;
-        db.LichSuYeuCauXacThucToChucs.Add(new LichSuYeuCauXacThucToChuc
+        var thoiDiemHienTai = DateTime.UtcNow;
+        nguCanhDuLieu.LichSuYeuCauXacThucToChuc.Add(new LichSuYeuCauXacThucToChuc
         {
-            TaiKhoanId = req.TaiKhoanId, TenToChuc = req.TenToChuc, GiayTo = req.GiayTo, LyDo = lyDo.Trim(),
-            TrangThai = TrangThaiYeuCau.TuChoi, NgayTao = req.NgayTao, NgayXuLy = now, NguoiXuLyId = managerId
+            TaiKhoanId = yeuCauXacThuc.TaiKhoanId, TenToChuc = yeuCauXacThuc.TenToChuc, GiayTo = yeuCauXacThuc.GiayTo, LyDo = lyDoTuChoi.Trim(),
+            TrangThai = TrangThaiYeuCau.TuChoi, NgayTao = yeuCauXacThuc.NgayTao, NgayXuLy = thoiDiemHienTai, NguoiXuLyId = nguoiDuyetId
         });
-        db.YeuCauXacThucToChucs.Remove(req);
-        await db.SaveChangesAsync();
-        await tx.CommitAsync();
+        nguCanhDuLieu.YeuCauXacThucToChuc.Remove(yeuCauXacThuc);
+        await nguCanhDuLieu.SaveChangesAsync();
+        await giaoDich.CommitAsync();
     }
 }

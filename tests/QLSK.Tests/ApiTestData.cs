@@ -22,180 +22,180 @@ public sealed record TestScenario(
 
 public static class ApiTestData
 {
-    public static async Task<TestScenario> SeedAsync(
-        ApplicationDbContext db,
-        TrangThaiSuKien eventState = TrangThaiSuKien.DaDuyet,
-        TrangThaiDon orderState = TrangThaiDon.ChoThanhToan,
-        TrangThaiThanhToan paymentState = TrangThaiThanhToan.ThanhCong,
-        TrangThaiVe ticketState = TrangThaiVe.ChuaSuDung,
-        TrangThaiDatCho bookingState = TrangThaiDatCho.DaXacNhan)
+    public static async Task<TestScenario> TaoDuLieuKiemThuAsync(
+        ApplicationDbContext nguCanhDuLieu,
+        TrangThaiSuKien trangThaiSuKien = TrangThaiSuKien.DaDuyet,
+        TrangThaiDon trangThaiDonVe = TrangThaiDon.ChoThanhToan,
+        TrangThaiThanhToan trangThaiThanhToan = TrangThaiThanhToan.ThanhCong,
+        TrangThaiVe trangThaiVe = TrangThaiVe.ChuaSuDung,
+        TrangThaiDatCho trangThaiDatDiaDiem = TrangThaiDatCho.DaXacNhan)
     {
-        var suffix = Guid.NewGuid().ToString("N");
-        var user = User(1, $"user-{suffix}@test.local");
-        var organizerUser = User(2, $"organizer-{suffix}@test.local");
-        var manager = User(3, $"manager-{suffix}@test.local");
-        var admin = User(4, $"admin-{suffix}@test.local");
-        db.TaiKhoans.AddRange(user, organizerUser, manager, admin);
+        var hauToDuyNhat = Guid.NewGuid().ToString("N");
+        var taiKhoanNguoiDung = TaoTaiKhoanKiemThu(1, $"user-{hauToDuyNhat}@test.local");
+        var taiKhoanBanToChuc = TaoTaiKhoanKiemThu(2, $"organizer-{hauToDuyNhat}@test.local");
+        var taiKhoanQuanLy = TaoTaiKhoanKiemThu(3, $"manager-{hauToDuyNhat}@test.local");
+        var taiKhoanQuanTri = TaoTaiKhoanKiemThu(4, $"admin-{hauToDuyNhat}@test.local");
+        nguCanhDuLieu.DanhSachTaiKhoan.AddRange(taiKhoanNguoiDung, taiKhoanBanToChuc, taiKhoanQuanLy, taiKhoanQuanTri);
 
-        var organizer = new BanToChuc
+        var banToChucHienCo = new BanToChuc
         {
-            TaiKhoan = organizerUser,
-            Ten = $"Ban tổ chức {suffix}"
+            TaiKhoan = taiKhoanBanToChuc,
+            TenBanToChuc = $"Ban tổ chức {hauToDuyNhat}"
         };
-        var category = new LoaiSuKien
+        var loaiSuKienKiemThu = new LoaiSuKien
         {
-            Ten = $"Loại {suffix}",
-            MoTa = "Dữ liệu integration test",
+            TenLoaiSuKien = $"Loại {hauToDuyNhat}",
+            MoTaLoaiSuKien = "Dữ liệu integration test",
             HoatDong = true
         };
-        db.AddRange(organizer, category);
+        nguCanhDuLieu.AddRange(banToChucHienCo, loaiSuKienKiemThu);
 
-        var start = eventState switch
+        var thoiDiemBatDau = trangThaiSuKien switch
         {
             TrangThaiSuKien.DangDienRa => DateTime.UtcNow.AddMinutes(-30),
             TrangThaiSuKien.DaKetThuc => DateTime.UtcNow.AddDays(-1),
             _ => DateTime.UtcNow.AddDays(10)
         };
-        var @event = new SuKien
+        var suKienKiemThu = new SuKien
         {
-            BanToChuc = organizer,
-            LoaiSuKien = category,
-            Ten = $"Sự kiện {suffix}",
-            MoTa = "Dữ liệu integration test",
-            BatDau = start,
-            KetThuc = start.AddHours(3),
+            BanToChuc = banToChucHienCo,
+            LoaiSuKien = loaiSuKienKiemThu,
+            TenSuKien = $"Sự kiện {hauToDuyNhat}",
+            MoTaSuKien = "Dữ liệu integration test",
+            ThoiGianBatDau = thoiDiemBatDau,
+            ThoiGianKetThuc = thoiDiemBatDau.AddHours(3),
             SoNguoi = 500,
-            TrangThai = eventState
+            TrangThai = trangThaiSuKien
         };
-        var venue = new DiaDiem
+        var diaDiemSuKien = new DiaDiem
         {
-            Ten = $"Địa điểm {suffix}",
-            DiaChi = $"Địa chỉ {suffix}",
+            TenDiaDiem = $"Địa điểm {hauToDuyNhat}",
+            DiaChi = $"Địa chỉ {hauToDuyNhat}",
             SucChua = 1000,
             GiaThue = 1_000_000,
             HoatDong = true
         };
-        db.AddRange(@event, venue);
+        nguCanhDuLieu.AddRange(suKienKiemThu, diaDiemSuKien);
 
-        var ticketType = new LoaiVe
+        var loaiVeKiemThu = new LoaiVe
         {
-            SuKien = @event,
-            Ten = $"Vé {suffix}",
-            Gia = 100_000,
+            SuKien = suKienKiemThu,
+            TenLoaiVe = $"Vé {hauToDuyNhat}",
+            GiaVe = 100_000,
             SoLuong = 100,
-            DaBan = orderState == TrangThaiDon.ThanhCong ? 1 : 0,
-            DangGiu = orderState == TrangThaiDon.ChoThanhToan ? 1 : 0,
-            MoBan = DateTime.UtcNow.AddDays(-1),
-            DongBan = DateTime.UtcNow.AddDays(5)
+            SoLuongDaBan = trangThaiDonVe == TrangThaiDon.ThanhCong ? 1 : 0,
+            SoLuongDangGiu = trangThaiDonVe == TrangThaiDon.ChoThanhToan ? 1 : 0,
+            ThoiGianMoBan = DateTime.UtcNow.AddDays(-1),
+            ThoiGianDongBan = DateTime.UtcNow.AddDays(5)
         };
-        var order = new DonVe
+        var donVeDangXuLy = new DonVe
         {
-            TaiKhoan = user,
-            SuKien = @event,
+            TaiKhoan = taiKhoanNguoiDung,
+            SuKien = suKienKiemThu,
             SoLuong = 1,
             TongTien = 100_000,
-            TrangThai = orderState,
-            HetHan = DateTime.UtcNow.AddMinutes(15)
+            TrangThai = trangThaiDonVe,
+            ThoiGianHetHan = DateTime.UtcNow.AddMinutes(15)
         };
-        order.ChiTiets.Add(new ChiTietDonVe
+        donVeDangXuLy.ChiTietDonVe.Add(new ChiTietDonVe
         {
-            LoaiVe = ticketType,
+            LoaiVe = loaiVeKiemThu,
             SoLuong = 1,
             DonGia = 100_000,
             ThanhTien = 100_000
         });
-        var payment = new ThanhToan
+        var thanhToanKiemThu = new ThanhToan
         {
-            DonVe = order,
+            DonVe = donVeDangXuLy,
             SoTien = 100_000,
-            TrangThai = paymentState,
-            MaGiaoDich = $"PAY-{suffix}",
-            NgayThanhToan = paymentState == TrangThaiThanhToan.ThanhCong ? DateTime.UtcNow : null
+            TrangThai = trangThaiThanhToan,
+            MaGiaoDich = $"PAY-{hauToDuyNhat}",
+            NgayThanhToan = trangThaiThanhToan == TrangThaiThanhToan.ThanhCong ? DateTime.UtcNow : null
         };
-        var ticket = new Ve
+        var veKiemThu = new Ve
         {
-            DonVe = order,
-            LoaiVe = ticketType,
-            MaVe = $"VE-{suffix}",
-            MaQR = $"QR-{suffix}",
-            TrangThai = ticketState
+            DonVe = donVeDangXuLy,
+            LoaiVe = loaiVeKiemThu,
+            MaVe = $"VE-{hauToDuyNhat}",
+            NoiDungMaQr = $"QR-{hauToDuyNhat}",
+            TrangThai = trangThaiVe
         };
-        var booking = new DatDiaDiem
+        var phieuDatDiaDiem = new DatDiaDiem
         {
-            DiaDiem = venue,
-            SuKien = @event,
-            BatDau = start,
-            KetThuc = start.AddHours(3),
+            DiaDiem = diaDiemSuKien,
+            SuKien = suKienKiemThu,
+            ThoiGianBatDau = thoiDiemBatDau,
+            ThoiGianKetThuc = thoiDiemBatDau.AddHours(3),
             TienCoc = 100_000,
-            TongTien = venue.GiaThue,
-            TrangThai = bookingState
+            TongTien = diaDiemSuKien.GiaThue,
+            TrangThai = trangThaiDatDiaDiem
         };
-        db.AddRange(ticketType, order, payment, ticket, booking);
-        await db.SaveChangesAsync();
+        nguCanhDuLieu.AddRange(loaiVeKiemThu, donVeDangXuLy, thanhToanKiemThu, veKiemThu, phieuDatDiaDiem);
+        await nguCanhDuLieu.SaveChangesAsync();
 
         return new TestScenario(
-            user.Id,
-            organizerUser.Id,
-            manager.Id,
-            admin.Id,
-            category.Id,
-            @event.Id,
-            venue.Id,
-            ticketType.Id,
-            order.Id,
-            payment.Id,
-            ticket.Id,
-            booking.Id);
+            taiKhoanNguoiDung.TaiKhoanId,
+            taiKhoanBanToChuc.TaiKhoanId,
+            taiKhoanQuanLy.TaiKhoanId,
+            taiKhoanQuanTri.TaiKhoanId,
+            loaiSuKienKiemThu.LoaiSuKienId,
+            suKienKiemThu.SuKienId,
+            diaDiemSuKien.DiaDiemId,
+            loaiVeKiemThu.LoaiVeId,
+            donVeDangXuLy.DonVeId,
+            thanhToanKiemThu.ThanhToanId,
+            veKiemThu.VeId,
+            phieuDatDiaDiem.DatDiaDiemId);
     }
 
     public static async Task<int> AddUserAsync(
-        ApplicationDbContext db,
-        int roleId,
-        bool active = true)
+        ApplicationDbContext nguCanhDuLieu,
+        int vaiTroId,
+        bool duocKichHoat = true)
     {
-        var user = User(roleId, $"user-{Guid.NewGuid():N}@test.local", active);
-        db.TaiKhoans.Add(user);
-        await db.SaveChangesAsync();
-        return user.Id;
+        var taiKhoanNguoiDung = TaoTaiKhoanKiemThu(vaiTroId, $"user-{Guid.NewGuid():N}@test.local", duocKichHoat);
+        nguCanhDuLieu.DanhSachTaiKhoan.Add(taiKhoanNguoiDung);
+        await nguCanhDuLieu.SaveChangesAsync();
+        return taiKhoanNguoiDung.TaiKhoanId;
     }
 
-    public static async Task<int> AddPendingVerificationAsync(ApplicationDbContext db)
+    public static async Task<int> AddPendingVerificationAsync(ApplicationDbContext nguCanhDuLieu)
     {
-        var user = User(1, $"verification-{Guid.NewGuid():N}@test.local");
-        var request = new YeuCauXacThucToChuc
+        var taiKhoanNguoiDung = TaoTaiKhoanKiemThu(1, $"verification-{Guid.NewGuid():N}@test.local");
+        var yeuCauXacThucToChuc = new YeuCauXacThucToChuc
         {
-            TaiKhoan = user,
+            TaiKhoan = taiKhoanNguoiDung,
             TenToChuc = $"Tổ chức {Guid.NewGuid():N}",
             GiayTo = "https://test.local/document.pdf"
         };
-        db.Add(request);
-        await db.SaveChangesAsync();
-        return request.Id;
+        nguCanhDuLieu.Add(yeuCauXacThucToChuc);
+        await nguCanhDuLieu.SaveChangesAsync();
+        return yeuCauXacThucToChuc.YeuCauXacThucToChucId;
     }
 
-    public static Task<TestScenario> ScenarioAsync(ApiFactory factory,
-        TrangThaiSuKien eventState = TrangThaiSuKien.DaDuyet,
-        TrangThaiDon orderState = TrangThaiDon.ChoThanhToan,
-        TrangThaiThanhToan paymentState = TrangThaiThanhToan.ThanhCong,
-        TrangThaiVe ticketState = TrangThaiVe.ChuaSuDung,
-        TrangThaiDatCho bookingState = TrangThaiDatCho.DaXacNhan)
-        => factory.WithDb(db => SeedAsync(db, eventState, orderState, paymentState, ticketState, bookingState));
+    public static Task<TestScenario> TaoKichBanKiemThuAsync(ApiFactory mayChuKiemThu,
+        TrangThaiSuKien trangThaiSuKien = TrangThaiSuKien.DaDuyet,
+        TrangThaiDon trangThaiDonVe = TrangThaiDon.ChoThanhToan,
+        TrangThaiThanhToan trangThaiThanhToan = TrangThaiThanhToan.ThanhCong,
+        TrangThaiVe trangThaiVe = TrangThaiVe.ChuaSuDung,
+        TrangThaiDatCho trangThaiDatDiaDiem = TrangThaiDatCho.DaXacNhan)
+        => mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(nguCanhDuLieu => TaoDuLieuKiemThuAsync(nguCanhDuLieu, trangThaiSuKien, trangThaiDonVe, trangThaiThanhToan, trangThaiVe, trangThaiDatDiaDiem));
 
-    public static async Task<int> AddPasswordUserAsync(ApplicationDbContext db, IPasswordHasher<TaiKhoan> hasher)
+    public static async Task<int> AddPasswordUserAsync(ApplicationDbContext nguCanhDuLieu, IPasswordHasher<TaiKhoan> boBamMatKhau)
     {
-        var user = User(1, $"password-{Guid.NewGuid():N}@test.local");
-        user.MatKhau = hasher.HashPassword(user, "Old@123456");
-        db.TaiKhoans.Add(user);
-        await db.SaveChangesAsync();
-        return user.Id;
+        var taiKhoanNguoiDung = TaoTaiKhoanKiemThu(1, $"password-{Guid.NewGuid():N}@test.local");
+        taiKhoanNguoiDung.MatKhauBam = boBamMatKhau.HashPassword(taiKhoanNguoiDung, "Old@123456");
+        nguCanhDuLieu.DanhSachTaiKhoan.Add(taiKhoanNguoiDung);
+        await nguCanhDuLieu.SaveChangesAsync();
+        return taiKhoanNguoiDung.TaiKhoanId;
     }
 
-    private static TaiKhoan User(int roleId, string email, bool active = true) => new()
+    private static TaiKhoan TaoTaiKhoanKiemThu(int vaiTroId, string emailTaiKhoan, bool duocKichHoat = true) => new()
     {
-        HoTen = $"Test role {roleId}",
-        Email = email,
-        MatKhau = "not-used-by-token-tests",
-        VaiTroId = roleId,
-        HoatDong = active
+        HoTen = $"Test role {vaiTroId}",
+        Email = emailTaiKhoan,
+        MatKhauBam = "not-used-by-token-tests",
+        VaiTroId = vaiTroId,
+        HoatDong = duocKichHoat
     };
 }

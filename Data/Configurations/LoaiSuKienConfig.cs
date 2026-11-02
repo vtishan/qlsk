@@ -6,12 +6,12 @@ namespace QLSK.Data.Configurations;
 
 public class LoaiSuKienConfig : IEntityTypeConfiguration<LoaiSuKien>
 {
-    public void Configure(EntityTypeBuilder<LoaiSuKien> e)
+    public void Configure(EntityTypeBuilder<LoaiSuKien> cauHinhLoaiSuKien)
     {
-        e.ToTable("LoaiSuKien");
-        e.HasKey(x => x.Id);
-        e.Property(x => x.Ten).HasMaxLength(120).IsRequired();
-        e.Property(x => x.MoTa).HasMaxLength(500);
-        e.HasIndex(x => x.Ten).IsUnique();
+        cauHinhLoaiSuKien.ToTable("LoaiSuKien");
+        cauHinhLoaiSuKien.HasKey(loaiSuKienDb => loaiSuKienDb.LoaiSuKienId);
+        cauHinhLoaiSuKien.Property(loaiSuKienDb => loaiSuKienDb.TenLoaiSuKien).HasMaxLength(120).IsRequired();
+        cauHinhLoaiSuKien.Property(loaiSuKienDb => loaiSuKienDb.MoTaLoaiSuKien).HasMaxLength(500);
+        cauHinhLoaiSuKien.HasIndex(loaiSuKienDb => loaiSuKienDb.TenLoaiSuKien).IsUnique();
     }
 }

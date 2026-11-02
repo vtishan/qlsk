@@ -10,74 +10,74 @@ namespace QLSK.Tests;
 public class LocalUserDataTests
 {
     private const string Password = "LocalUserTest!2026";
-    private static readonly DateTime Now = new(2026, 11, 2, 3, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime ThoiDiemKiemThu = new(2026, 11, 2, 3, 0, 0, DateTimeKind.Utc);
 
     [Fact]
     public async Task Creates_100_unique_users_with_consistent_orders_payments_tickets_and_inventory()
     {
-        using var factory = new ApiFactory();
-        await factory.WithDb(async db =>
+        using var mayChuKiemThu = new ApiFactory();
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            await AddEvent(db);
-            var hasher = new PasswordHasher<TaiKhoan>();
-            var result = await LocalUserSeeder.SeedAsync(db, hasher, Password, Now);
-            Assert.Equal(new UserSeedResult(100, 100, 100, 118, 0), result);
-            db.ChangeTracker.Clear();
+            await TaoSuKienKiemThu(nguCanhDuLieu);
+            var boBamMatKhau = new PasswordHasher<TaiKhoan>();
+            var ketQuaThucHien = await LocalUserSeeder.TaoDuLieuNguoiDungMauAsync(nguCanhDuLieu, boBamMatKhau, Password, ThoiDiemKiemThu);
+            Assert.Equal(new UserSeedResult(100, 100, 100, 118, 0), ketQuaThucHien);
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            var users = await db.TaiKhoans.Where(x => x.VaiTroId == 1).OrderBy(x => x.Email).ToListAsync();
-            Assert.Equal(100, users.Count);
-            Assert.Equal(100, users.Select(x => x.HoTen).Distinct().Count());
-            Assert.Equal(100, users.Select(x => x.Email).Distinct().Count());
-            Assert.Equal(100, users.Select(x => x.MatKhau).Distinct().Count());
-            Assert.Equal(91, users.Count(x => x.HoatDong));
-            Assert.Equal(9, users.Count(x => !x.HoatDong));
-            Assert.All(users, x => Assert.EndsWith("@sample.qlsk.test", x.Email));
-            Assert.NotEqual(PasswordVerificationResult.Failed, hasher.VerifyHashedPassword(users[0], users[0].MatKhau, Password));
-            Assert.Empty(await db.TaiKhoans.Where(x => x.VaiTroId == 4).ToListAsync());
+            var danhSachTaiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.Where(taiKhoanDb => taiKhoanDb.VaiTroId == 1).OrderBy(taiKhoanDb => taiKhoanDb.Email).ToListAsync();
+            Assert.Equal(100, danhSachTaiKhoan.Count);
+            Assert.Equal(100, danhSachTaiKhoan.Select(taiKhoanDb => taiKhoanDb.HoTen).Distinct().Count());
+            Assert.Equal(100, danhSachTaiKhoan.Select(taiKhoanDb => taiKhoanDb.Email).Distinct().Count());
+            Assert.Equal(100, danhSachTaiKhoan.Select(taiKhoanDb => taiKhoanDb.MatKhauBam).Distinct().Count());
+            Assert.Equal(91, danhSachTaiKhoan.Count(taiKhoanDb => taiKhoanDb.HoatDong));
+            Assert.Equal(9, danhSachTaiKhoan.Count(taiKhoanDb => !taiKhoanDb.HoatDong));
+            Assert.All(danhSachTaiKhoan, taiKhoanDb => Assert.EndsWith("@sample.qlsk.test", taiKhoanDb.Email));
+            Assert.NotEqual(PasswordVerificationResult.Failed, boBamMatKhau.VerifyHashedPassword(danhSachTaiKhoan[0], danhSachTaiKhoan[0].MatKhauBam, Password));
+            Assert.Empty(await nguCanhDuLieu.DanhSachTaiKhoan.Where(taiKhoanDb => taiKhoanDb.VaiTroId == 4).ToListAsync());
 
-            var orders = await db.DonVes.Include(x => x.TaiKhoan).Include(x => x.ChiTiets).ThenInclude(x => x.LoaiVe)
-                .Include(x => x.ThanhToans).Include(x => x.Ves).ToListAsync();
-            Assert.Equal(100, orders.Count);
-            Assert.Equal(50, orders.Count(x => x.TrangThai == TrangThaiDon.ThanhCong));
-            Assert.Equal(20, orders.Count(x => x.TrangThai == TrangThaiDon.ChoThanhToan));
-            Assert.Equal(10, orders.Count(x => x.TrangThai == TrangThaiDon.DaHuy));
-            Assert.Equal(10, orders.Count(x => x.TrangThai == TrangThaiDon.HetHan));
-            Assert.Equal(5, orders.Count(x => x.TrangThai == TrangThaiDon.YeuCauHoanTien));
-            Assert.Equal(5, orders.Count(x => x.TrangThai == TrangThaiDon.DaHoanTien));
-            foreach (var order in orders)
+            var danhSachDonVeKiemThu = await nguCanhDuLieu.DanhSachDonVe.Include(donVeDb => donVeDb.TaiKhoan).Include(donVeDb => donVeDb.ChiTietDonVe).ThenInclude(chiTietDonVeDb => chiTietDonVeDb.LoaiVe)
+                .Include(donVeDb => donVeDb.DanhSachThanhToan).Include(donVeDb => donVeDb.DanhSachVe).ToListAsync();
+            Assert.Equal(100, danhSachDonVeKiemThu.Count);
+            Assert.Equal(50, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.ThanhCong));
+            Assert.Equal(20, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.ChoThanhToan));
+            Assert.Equal(10, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.DaHuy));
+            Assert.Equal(10, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.HetHan));
+            Assert.Equal(5, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.YeuCauHoanTien));
+            Assert.Equal(5, danhSachDonVeKiemThu.Count(donVeDb => donVeDb.TrangThai == TrangThaiDon.DaHoanTien));
+            foreach (var donVeDangXuLy in danhSachDonVeKiemThu)
             {
-                var detail = Assert.Single(order.ChiTiets);
-                var payment = Assert.Single(order.ThanhToans);
-                Assert.Equal(order.SoLuong, detail.SoLuong);
-                Assert.Equal(order.TongTien, detail.DonGia * detail.SoLuong);
-                Assert.Equal(order.TongTien, detail.ThanhTien);
-                Assert.Equal(order.TongTien, payment.SoTien);
-                Assert.Equal(order.SuKienId, detail.LoaiVe.SuKienId);
-                Assert.True(order.TaiKhoan.NgayTao <= order.NgayTao && order.NgayTao >= detail.LoaiVe.MoBan);
-                Assert.InRange(payment.SoTienHoan, 0, payment.SoTien);
-                var paid = payment.TrangThai == TrangThaiThanhToan.ThanhCong;
-                Assert.Equal(paid ? order.SoLuong : 0, order.Ves.Count);
-                if (paid) Assert.True(payment.NgayThanhToan < order.HetHan);
-                if (order.TrangThai == TrangThaiDon.ChoThanhToan) Assert.True(order.HetHan > Now);
-                if (order.TrangThai == TrangThaiDon.HetHan) Assert.True(order.HetHan < Now);
-                if (order.TrangThai == TrangThaiDon.DaHoanTien)
+                var chiTietSuKien = Assert.Single(donVeDangXuLy.ChiTietDonVe);
+                var thanhToanKiemThu = Assert.Single(donVeDangXuLy.DanhSachThanhToan);
+                Assert.Equal(donVeDangXuLy.SoLuong, chiTietSuKien.SoLuong);
+                Assert.Equal(donVeDangXuLy.TongTien, chiTietSuKien.DonGia * chiTietSuKien.SoLuong);
+                Assert.Equal(donVeDangXuLy.TongTien, chiTietSuKien.ThanhTien);
+                Assert.Equal(donVeDangXuLy.TongTien, thanhToanKiemThu.SoTien);
+                Assert.Equal(donVeDangXuLy.SuKienId, chiTietSuKien.LoaiVe.SuKienId);
+                Assert.True(donVeDangXuLy.TaiKhoan.NgayTao <= donVeDangXuLy.NgayTao && donVeDangXuLy.NgayTao >= chiTietSuKien.LoaiVe.ThoiGianMoBan);
+                Assert.InRange(thanhToanKiemThu.SoTienHoan, 0, thanhToanKiemThu.SoTien);
+                var daThanhToan = thanhToanKiemThu.TrangThai == TrangThaiThanhToan.ThanhCong;
+                Assert.Equal(daThanhToan ? donVeDangXuLy.SoLuong : 0, donVeDangXuLy.DanhSachVe.Count);
+                if (daThanhToan) Assert.True(thanhToanKiemThu.NgayThanhToan < donVeDangXuLy.ThoiGianHetHan);
+                if (donVeDangXuLy.TrangThai == TrangThaiDon.ChoThanhToan) Assert.True(donVeDangXuLy.ThoiGianHetHan > ThoiDiemKiemThu);
+                if (donVeDangXuLy.TrangThai == TrangThaiDon.HetHan) Assert.True(donVeDangXuLy.ThoiGianHetHan < ThoiDiemKiemThu);
+                if (donVeDangXuLy.TrangThai == TrangThaiDon.DaHoanTien)
                 {
-                    Assert.Equal(order.TongTien, payment.SoTienHoan);
-                    Assert.All(order.Ves, x => Assert.Equal(TrangThaiVe.DaHoanTien, x.TrangThai));
+                    Assert.Equal(donVeDangXuLy.TongTien, thanhToanKiemThu.SoTienHoan);
+                    Assert.All(donVeDangXuLy.DanhSachVe, veDaPhatHanhDb => Assert.Equal(TrangThaiVe.DaHoanTien, veDaPhatHanhDb.TrangThai));
                 }
             }
 
-            var tickets = await db.Ves.ToListAsync();
-            Assert.Equal(118, tickets.Count);
-            Assert.Equal(118, tickets.Select(x => x.MaVe).Distinct().Count());
-            Assert.Equal(118, tickets.Select(x => x.MaQR).Distinct().Count());
-            Assert.All(tickets, x => Assert.Null(x.NgayCheckIn));
-            foreach (var type in await db.LoaiVes.ToListAsync())
+            var danhSachVeKiemThu = await nguCanhDuLieu.DanhSachVe.ToListAsync();
+            Assert.Equal(118, danhSachVeKiemThu.Count);
+            Assert.Equal(118, danhSachVeKiemThu.Select(veDaPhatHanhDb => veDaPhatHanhDb.MaVe).Distinct().Count());
+            Assert.Equal(118, danhSachVeKiemThu.Select(veDaPhatHanhDb => veDaPhatHanhDb.NoiDungMaQr).Distinct().Count());
+            Assert.All(danhSachVeKiemThu, veDaPhatHanhDb => Assert.Null(veDaPhatHanhDb.NgayCheckIn));
+            foreach (var loaiVeDangXuLy in await nguCanhDuLieu.DanhSachLoaiVe.ToListAsync())
             {
-                Assert.Equal(tickets.Count(x => x.LoaiVeId == type.Id && x.TrangThai == TrangThaiVe.ChuaSuDung), type.DaBan);
-                Assert.Equal(orders.Where(x => x.TrangThai == TrangThaiDon.ChoThanhToan)
-                    .SelectMany(x => x.ChiTiets).Where(x => x.LoaiVeId == type.Id).Sum(x => x.SoLuong), type.DangGiu);
-                Assert.InRange(type.DaBan + type.DangGiu, 0, type.SoLuong);
+                Assert.Equal(danhSachVeKiemThu.Count(veDaPhatHanhDb => veDaPhatHanhDb.LoaiVeId == loaiVeDangXuLy.LoaiVeId && veDaPhatHanhDb.TrangThai == TrangThaiVe.ChuaSuDung), loaiVeDangXuLy.SoLuongDaBan);
+                Assert.Equal(danhSachDonVeKiemThu.Where(donVeDb => donVeDb.TrangThai == TrangThaiDon.ChoThanhToan)
+                    .SelectMany(donVeDb => donVeDb.ChiTietDonVe).Where(chiTietDonVeDb => chiTietDonVeDb.LoaiVeId == loaiVeDangXuLy.LoaiVeId).Sum(chiTietDonVeDb => chiTietDonVeDb.SoLuong), loaiVeDangXuLy.SoLuongDangGiu);
+                Assert.InRange(loaiVeDangXuLy.SoLuongDaBan + loaiVeDangXuLy.SoLuongDangGiu, 0, loaiVeDangXuLy.SoLuong);
             }
         });
     }
@@ -85,70 +85,70 @@ public class LocalUserDataTests
     [Fact]
     public async Task Repeated_population_preserves_user_edits_passwords_orders_and_inventory()
     {
-        using var factory = new ApiFactory();
-        await factory.WithDb(async db =>
+        using var mayChuKiemThu = new ApiFactory();
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            await AddEvent(db);
-            var hasher = new PasswordHasher<TaiKhoan>();
-            await LocalUserSeeder.SeedAsync(db, hasher, Password, Now);
-            var user = await db.TaiKhoans.SingleAsync(x => x.Email == LocalUserSeeder.EmailFor(1));
-            user.HoTen = "Tên người dùng đã chỉnh sửa";
-            user.HoatDong = false;
-            user.MatKhau = hasher.HashPassword(user, "ChangedUserPassword!2026");
-            await db.SaveChangesAsync();
-            var hash = user.MatKhau;
-            var inventory = await db.LoaiVes.OrderBy(x => x.Id).Select(x => new { x.Id, x.DaBan, x.DangGiu }).ToListAsync();
-            db.ChangeTracker.Clear();
+            await TaoSuKienKiemThu(nguCanhDuLieu);
+            var boBamMatKhau = new PasswordHasher<TaiKhoan>();
+            await LocalUserSeeder.TaoDuLieuNguoiDungMauAsync(nguCanhDuLieu, boBamMatKhau, Password, ThoiDiemKiemThu);
+            var taiKhoanNguoiDung = await nguCanhDuLieu.DanhSachTaiKhoan.SingleAsync(taiKhoanDb => taiKhoanDb.Email == LocalUserSeeder.TaoEmailNguoiDungMau(1));
+            taiKhoanNguoiDung.HoTen = "Tên người dùng đã chỉnh sửa";
+            taiKhoanNguoiDung.HoatDong = false;
+            taiKhoanNguoiDung.MatKhauBam = boBamMatKhau.HashPassword(taiKhoanNguoiDung, "ChangedUserPassword!2026");
+            await nguCanhDuLieu.SaveChangesAsync();
+            var matKhauBam = taiKhoanNguoiDung.MatKhauBam;
+            var soLuongTonVe = await nguCanhDuLieu.DanhSachLoaiVe.OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).Select(loaiVeDb => new { Id = loaiVeDb.LoaiVeId, DaBan = loaiVeDb.SoLuongDaBan, DangGiu = loaiVeDb.SoLuongDangGiu }).ToListAsync();
+            nguCanhDuLieu.ChangeTracker.Clear();
 
-            var result = await LocalUserSeeder.SeedAsync(db, hasher, "DoNotResetPassword!2026", Now.AddDays(1));
-            Assert.Equal(new UserSeedResult(0, 0, 0, 0, 100), result);
-            user = await db.TaiKhoans.SingleAsync(x => x.Id == user.Id);
-            Assert.Equal("Tên người dùng đã chỉnh sửa", user.HoTen);
-            Assert.False(user.HoatDong);
-            Assert.Equal(hash, user.MatKhau);
-            Assert.Equal(100, await db.DonVes.CountAsync());
-            Assert.Equal(100, await db.ThanhToans.CountAsync());
-            Assert.Equal(118, await db.Ves.CountAsync());
-            Assert.Equal(inventory, await db.LoaiVes.OrderBy(x => x.Id).Select(x => new { x.Id, x.DaBan, x.DangGiu }).ToListAsync());
+            var ketQuaThucHien = await LocalUserSeeder.TaoDuLieuNguoiDungMauAsync(nguCanhDuLieu, boBamMatKhau, "DoNotResetPassword!2026", ThoiDiemKiemThu.AddDays(1));
+            Assert.Equal(new UserSeedResult(0, 0, 0, 0, 100), ketQuaThucHien);
+            taiKhoanNguoiDung = await nguCanhDuLieu.DanhSachTaiKhoan.SingleAsync(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanNguoiDung.TaiKhoanId);
+            Assert.Equal("Tên người dùng đã chỉnh sửa", taiKhoanNguoiDung.HoTen);
+            Assert.False(taiKhoanNguoiDung.HoatDong);
+            Assert.Equal(matKhauBam, taiKhoanNguoiDung.MatKhauBam);
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachDonVe.CountAsync());
+            Assert.Equal(100, await nguCanhDuLieu.DanhSachThanhToan.CountAsync());
+            Assert.Equal(118, await nguCanhDuLieu.DanhSachVe.CountAsync());
+            Assert.Equal(soLuongTonVe, await nguCanhDuLieu.DanhSachLoaiVe.OrderBy(loaiVeDb => loaiVeDb.LoaiVeId).Select(loaiVeDb => new { Id = loaiVeDb.LoaiVeId, DaBan = loaiVeDb.SoLuongDaBan, DangGiu = loaiVeDb.SoLuongDangGiu }).ToListAsync());
         });
     }
 
     [Fact]
     public async Task Insufficient_inventory_does_not_leave_a_partial_batch_or_change_capacity()
     {
-        using var factory = new ApiFactory();
-        await factory.WithDb(async db =>
+        using var mayChuKiemThu = new ApiFactory();
+        await mayChuKiemThu.ThucThiVoiCoSoDuLieuKiemThu(async nguCanhDuLieu =>
         {
-            await AddEvent(db, capacityPerType: 1);
-            db.ChangeTracker.Clear();
-            await Assert.ThrowsAsync<InvalidOperationException>(() => LocalUserSeeder.SeedAsync(db,
-                new PasswordHasher<TaiKhoan>(), Password, Now));
-            Assert.DoesNotContain(db.ChangeTracker.Entries(), x => x.State == EntityState.Added || x.State == EntityState.Modified);
-            Assert.Empty(await db.TaiKhoans.Where(x => x.VaiTroId == 1).ToListAsync());
-            Assert.Empty(await db.DonVes.ToListAsync());
-            Assert.All(await db.LoaiVes.ToListAsync(), x => Assert.Equal(0, x.DaBan + x.DangGiu));
+            await TaoSuKienKiemThu(nguCanhDuLieu, soLuongVeMoiHang: 1);
+            nguCanhDuLieu.ChangeTracker.Clear();
+            await Assert.ThrowsAsync<InvalidOperationException>(() => LocalUserSeeder.TaoDuLieuNguoiDungMauAsync(nguCanhDuLieu,
+                new PasswordHasher<TaiKhoan>(), Password, ThoiDiemKiemThu));
+            Assert.DoesNotContain(nguCanhDuLieu.ChangeTracker.Entries(), banGhiTheoDoi => banGhiTheoDoi.State == EntityState.Added || banGhiTheoDoi.State == EntityState.Modified);
+            Assert.Empty(await nguCanhDuLieu.DanhSachTaiKhoan.Where(taiKhoanDb => taiKhoanDb.VaiTroId == 1).ToListAsync());
+            Assert.Empty(await nguCanhDuLieu.DanhSachDonVe.ToListAsync());
+            Assert.All(await nguCanhDuLieu.DanhSachLoaiVe.ToListAsync(), loaiVeDb => Assert.Equal(0, loaiVeDb.SoLuongDaBan + loaiVeDb.SoLuongDangGiu));
         });
     }
 
-    private static async Task AddEvent(QLSK.Data.ApplicationDbContext db, int capacityPerType = 200)
+    private static async Task TaoSuKienKiemThu(QLSK.Data.ApplicationDbContext nguCanhDuLieu, int soLuongVeMoiHang = 200)
     {
-        var item = new SuKien
+        var suKienDangXuLy = new SuKien
         {
-            Ten = "Sự kiện cho dữ liệu người dùng", MoTa = "Integration test", TrangThai = TrangThaiSuKien.DaDuyet,
-            BatDau = Now.AddDays(7), KetThuc = Now.AddDays(7).AddHours(3), SoNguoi = capacityPerType * 2,
+            TenSuKien = "Sự kiện cho dữ liệu người dùng", MoTaSuKien = "Integration test", TrangThai = TrangThaiSuKien.DaDuyet,
+            ThoiGianBatDau = ThoiDiemKiemThu.AddDays(7), ThoiGianKetThuc = ThoiDiemKiemThu.AddDays(7).AddHours(3), SoNguoi = soLuongVeMoiHang * 2,
             BanToChuc = new BanToChuc
             {
-                Ten = "Đơn vị kiểm thử", TaiKhoan = new TaiKhoan { Email = "owner@sample.test", HoTen = "Chủ sự kiện", VaiTroId = 2 }
+                TenBanToChuc = "Đơn vị kiểm thử", TaiKhoan = new TaiKhoan { Email = "owner@sample.test", HoTen = "Chủ sự kiện", VaiTroId = 2 }
             },
-            LoaiSuKien = new LoaiSuKien { Ten = "Loại kiểm thử" }
+            LoaiSuKien = new LoaiSuKien { TenLoaiSuKien = "Loại kiểm thử" }
         };
-        foreach (var name in new[] { "Tiêu chuẩn", "Đồng hành" })
-            item.LoaiVes.Add(new LoaiVe
+        foreach (var tenDoiTuong in new[] { "Tiêu chuẩn", "Đồng hành" })
+            suKienDangXuLy.DanhSachLoaiVe.Add(new LoaiVe
             {
-                Ten = name, Gia = name == "Tiêu chuẩn" ? 120_000 : 220_000, SoLuong = capacityPerType,
-                MoBan = Now.AddDays(-3), DongBan = item.BatDau
+                TenLoaiVe = tenDoiTuong, GiaVe = tenDoiTuong == "Tiêu chuẩn" ? 120_000 : 220_000, SoLuong = soLuongVeMoiHang,
+                ThoiGianMoBan = ThoiDiemKiemThu.AddDays(-3), ThoiGianDongBan = suKienDangXuLy.ThoiGianBatDau
             });
-        db.SuKiens.Add(item);
-        await db.SaveChangesAsync();
+        nguCanhDuLieu.DanhSachSuKien.Add(suKienDangXuLy);
+        await nguCanhDuLieu.SaveChangesAsync();
     }
 }
