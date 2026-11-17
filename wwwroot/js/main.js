@@ -174,7 +174,7 @@ async function hienDanhSachDuyetToChuc() {
   if (!khungYeuCauXacThuc) return;
   hienKhungDangTai("ds-duyet-tochuc", 3);
   try {
-    var phanHoiYeuCau = await guiYeuCauApi("/api/organizer-verifications");
+    var phanHoiYeuCau = await guiYeuCauDanhSach("/api/organizer-verifications", "ds-duyet-tochuc", hienDanhSachDuyetToChuc);
     var yeuCauChoDuyet = (phanHoiYeuCau.data || []).filter(function (yeuCauXacThuc) {
       return yeuCauXacThuc.TrangThai === 0 || yeuCauXacThuc.TrangThai === "ChoDuyet";
     });

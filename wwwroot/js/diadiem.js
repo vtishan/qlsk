@@ -50,7 +50,7 @@ async function taiDanhSachDiaDiem() {
   try {
     var tuKhoaTimKiem = docGiaTriInput("dd-tukhoa");
     var laQuanTriVien = !!phienDangNhap.token && phienDangNhap.vaiTro === "QuanTriVien";
-    var phanHoiDiaDiem = await guiYeuCauApi(laQuanTriVien ? "/api/venues/all" : "/api/venues");
+    var phanHoiDiaDiem = await guiYeuCauDanhSach(laQuanTriVien ? "/api/venues/all" : "/api/venues", "ds-diadiem", taiDanhSachDiaDiem);
     if (requestNumber !== __lanTaiDiaDiem) return;
     var duLieuDiaDiem = phanHoiDiaDiem.data ?? phanHoiDiaDiem.Data;
     if (!Array.isArray(duLieuDiaDiem)) throw new Error("Chưa thể tải danh sách địa điểm. Vui lòng thử lại.");
@@ -290,7 +290,7 @@ async function taiDatDiaDiem() {
   var cacMocThoiGian = document.getElementById("booking-timeline");
   if (cacMocThoiGian) cacMocThoiGian.innerHTML = "";
   try {
-    var phanHoiDatDiaDiem = await guiYeuCauApi("/api/venue-bookings");
+    var phanHoiDatDiaDiem = await guiYeuCauDanhSach("/api/venue-bookings", "ds-dat", taiDatDiaDiem);
     if (typeof giaoDienQuanLySuKien !== "undefined") {
       giaoDienQuanLySuKien.hienDanhSachDatDiaDiem(phanHoiDatDiaDiem.data || []);
       return;
@@ -362,34 +362,20 @@ async function taiThongKeDatDiaDiem() {
   hienKhungDangTai("tk-dat-tt", 3);
   hienKhungDangTai("tk-dat-dd", 3);
   try {
-    var phanHoiDatDiaDiem = await guiYeuCauApi("/api/venue-bookings");
+    var phanHoiDatDiaDiem = await guiYeuCauDanhSach("/api/venue-bookings/statistics", "tk-dat-dd", taiThongKeDatDiaDiem);
     var khungTheoTrangThai = document.getElementById("tk-dat-tt"),
       khungTheoDiaDiem = document.getElementById("tk-dat-dd");
-    var danhSachDatDiaDiem = phanHoiDatDiaDiem.data || [];
+    var thongKe = phanHoiDatDiaDiem.data || {};
     if (khungTheoTrangThai)
       khungTheoTrangThai.innerHTML = taoHtmlBang(
         [
           ["TrangThai", "Trạng thái"],
           ["SoLuong", "Số lượng"],
         ],
-        demSoLuongTheoNhom(danhSachDatDiaDiem, function (guiPhieuDatDiaDiem) {
-          return (
-            ["ChoXacNhan", "DaXacNhan", "TuChoi", "DaHuy", "HoanThanh"][guiPhieuDatDiaDiem.TrangThai] ||
-            guiPhieuDatDiaDiem.TrangThai
-          );
-        }),
+        Object.values(thongKe.TheoTrangThai || {}),
       );
-    var thongKeTheoDiaDiem = new Map();
-    danhSachDatDiaDiem.forEach(function (guiPhieuDatDiaDiem) {
-      if (!thongKeTheoDiaDiem.has(guiPhieuDatDiaDiem.DiaDiemId))
-        thongKeTheoDiaDiem.set(guiPhieuDatDiaDiem.DiaDiemId, {
-          TenDiaDiem: guiPhieuDatDiaDiem.DiaDiem ? guiPhieuDatDiaDiem.DiaDiem.Ten : String(guiPhieuDatDiaDiem.DiaDiemId),
-          SoLuotDat: 0,
-        });
-      thongKeTheoDiaDiem.get(guiPhieuDatDiaDiem.DiaDiemId).SoLuotDat++;
-    });
     document.querySelectorAll('[data-metric="venues"]').forEach(function (phanTuDom) {
-      phanTuDom.textContent = dinhDangSoTien(thongKeTheoDiaDiem.size);
+      phanTuDom.textContent = dinhDangSoTien(thongKe.TongDiaDiem || 0);
     });
     if (khungTheoDiaDiem)
       khungTheoDiaDiem.innerHTML = taoHtmlBang(
@@ -397,7 +383,7 @@ async function taiThongKeDatDiaDiem() {
           ["TenDiaDiem", "Địa điểm"],
           ["SoLuotDat", "Lượt đặt"],
         ],
-        Array.from(thongKeTheoDiaDiem.values()),
+        thongKe.TheoDiaDiem || [],
       );
   } catch (loiXuLy) {
     ["tk-dat-tt", "tk-dat-dd"].forEach(function (idKhungThongKe) {

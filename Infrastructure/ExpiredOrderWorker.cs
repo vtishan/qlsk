@@ -14,8 +14,9 @@ public class ExpiredOrderWorker(
         {
             try
             {
-                await XuLyDonHetHan();
+                await XuLyDonHetHan(tokenDungWorker);
             }
+            catch (OperationCanceledException) when (tokenDungWorker.IsCancellationRequested) { return; }
             catch (Exception ngoaiLe)
             {
                 boGhiLog.LogError(
@@ -31,14 +32,14 @@ public class ExpiredOrderWorker(
         }
     }
 
-    private async Task XuLyDonHetHan()
+    private async Task XuLyDonHetHan(CancellationToken cancellationToken)
     {
         using var phamViDichVu = boTaoPhamViDichVu.CreateScope();
 
         var dichVuDonVe = phamViDichVu.ServiceProvider
             .GetRequiredService<DonVeService>();
 
-        var soDonHetHan = await dichVuDonVe.XuLyCacDonVeHetHan();
+        var soDonHetHan = await dichVuDonVe.XuLyCacDonVeHetHan(cancellationToken);
 
         if (soDonHetHan > 0)
         {

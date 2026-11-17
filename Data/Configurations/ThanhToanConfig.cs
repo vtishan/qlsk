@@ -15,6 +15,7 @@ public class ThanhToanConfig : IEntityTypeConfiguration<ThanhToan>
         cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.SoTienHoan).HasPrecision(18, 2);
         cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.MaGiaoDich).HasMaxLength(120);
         cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.MaLienKet).HasMaxLength(120);
+        cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.CheckoutUrl).HasMaxLength(1000);
         cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.MaHoanTien).HasMaxLength(120);
         cauHinhThanhToan.Property(thanhToanDb => thanhToanDb.PhienBanDong).IsRowVersion();
         cauHinhThanhToan.HasIndex(thanhToanDb => thanhToanDb.MaGiaoDich).IsUnique().HasFilter("[MaGiaoDich] IS NOT NULL");

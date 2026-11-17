@@ -23,6 +23,7 @@ public class JwtService(IOptions<JwtOptions> tuyChonJwt)
             new Claim(ClaimTypes.Name, taiKhoan.HoTen),
             new Claim(ClaimTypes.Email, taiKhoan.Email),
             new Claim(ClaimTypes.Role, taiKhoan.VaiTro.TenVaiTro),
+            new Claim("ver", taiKhoan.TokenVersion.ToString(System.Globalization.CultureInfo.InvariantCulture)),
             new Claim(PasswordFingerprintClaim, TaoDauVanTayMatKhau(taiKhoan.MatKhauBam))
         };
         var khoaKyDangNhap = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cauHinh.KhoaKyJwt));

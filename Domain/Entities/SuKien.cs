@@ -22,6 +22,12 @@ public class SuKien
 
     public string? HinhAnh { get; set; }
 
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public decimal? GiaThapNhat { get; set; }
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool MetadataComplete { get; set; }
+
     [System.Text.Json.Serialization.JsonPropertyName("batDau")]
     [System.ComponentModel.DataAnnotations.Schema.Column("BatDau")]
     public DateTime ThoiGianBatDau { get; set; }
@@ -50,5 +56,6 @@ public class SuKien
     public ICollection<LoaiVe> DanhSachLoaiVe { get; set; } = [];
 
     [System.Text.Json.Serialization.JsonPropertyName("donVes")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<DonVe> DanhSachDonVe { get; set; } = [];
 }

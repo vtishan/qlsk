@@ -41,8 +41,10 @@ public class LoaiVe
     public SuKien SuKien { get; set; } = null!;
 
     [System.Text.Json.Serialization.JsonPropertyName("chiTiets")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<ChiTietDonVe> ChiTietDonVe { get; set; } = [];
 
     [System.Text.Json.Serialization.JsonPropertyName("ves")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<Ve> DanhSachVe { get; set; } = [];
 }

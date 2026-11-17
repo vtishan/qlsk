@@ -60,6 +60,7 @@ window.giaoDienQuanLySuKien = (function () {
     return (suKien.DatDiaDiem && suKien.DatDiaDiem.DiaDiem) || {};
   }
   function layGiaVeThapNhat(suKien) {
+    if (suKien.MetadataComplete) return suKien.GiaThapNhat == null ? null : Number(suKien.GiaThapNhat);
     var danhSachLoaiVe = suKien.LoaiVes || [];
     var danhSachGiaVe = danhSachLoaiVe
       .map(function (loaiVe) {
@@ -294,7 +295,7 @@ window.giaoDienQuanLySuKien = (function () {
         new Set(
           suKienTrongPhamVi
             .map(function (suKien) {
-              return suKien.BanToChucId || (suKien.BanToChuc && suKien.BanToChuc.Id);
+              return suKien.BanToChucId || (suKien.BanToChuc && (suKien.BanToChuc.Id || suKien.BanToChuc.Ten));
             })
             .filter(Boolean),
         ).size,
@@ -338,7 +339,7 @@ window.giaoDienQuanLySuKien = (function () {
   function xepHangTaiChiTietSuKien(danhSachSuKien) {
     danhSachSuKien.forEach(function (suKien) {
       var suKienId = Number(suKien.Id);
-      if (suKienId > 0 && !chiTietSuKienTheoId.has(suKienId) && !suKienDangTaiChiTiet.has(suKienId) && !suKienTaiChiTietThatBai.has(suKienId)) {
+      if (suKienId > 0 && !suKien.MetadataComplete && !chiTietSuKienTheoId.has(suKienId) && !suKienDangTaiChiTiet.has(suKienId) && !suKienTaiChiTietThatBai.has(suKienId)) {
         suKienDangTaiChiTiet.add(suKienId);
         hangDoiTaiChiTiet.push({
           id: suKienId,
@@ -524,7 +525,8 @@ window.giaoDienQuanLySuKien = (function () {
     moHopChiTiet('<h2 id="ui-drawer-title">Chi tiết sự kiện</h2><div id="drawer-event-loading"></div>');
     hienKhungDangTai("drawer-event-loading", 4);
     try {
-      var phanHoiSuKien = await guiYeuCauApi("/api/events/" + Number(suKienId)),
+      var workspace = ["BanToChuc", "QuanLySuKien", "QuanTriVien"].indexOf(phienDangNhap.vaiTro) !== -1;
+      var phanHoiSuKien = await guiYeuCauApi("/api/events/" + Number(suKienId) + (workspace ? "/manage" : "")),
         suKien = chuanHoaDuLieuSuKien(phanHoiSuKien.data || {}),
         diaDiem = layDiaDiemSuKien(suKien);
       if (lanTaiChiTietHienTai !== lanTaiHopChiTiet || !timPhanTuTheoId("ui-drawer").open) return;
@@ -1095,7 +1097,7 @@ window.giaoDienQuanLySuKien = (function () {
     );
     hienKhungDangTai("ticket-history", 3);
     try {
-      var phanHoiLichSuXuat = await guiYeuCauApi("/api/tickets/" + Number(veId) + "/exports");
+      var phanHoiLichSuXuat = await guiYeuCauDanhSach("/api/tickets/" + Number(veId) + "/exports", "ticket-history", function () { return moLichSuXuatVe(veId); });
       if (lanTaiChiTietHienTai !== lanTaiHopChiTiet) return;
       capNhatHtml(
         "ticket-history",

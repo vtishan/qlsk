@@ -7,10 +7,15 @@ namespace QLSK.Features.LoaiVe;
 public class LoaiVeController(LoaiVeService dichVuLoaiVe) : ControllerBase
 {
     [HttpGet("api/events/{eventId:int}/ticket-types"), AllowAnonymous]
-    public async Task<IActionResult> LayLoaiVeTheoSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "eventId")] int suKienId) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuLoaiVe.LayLoaiVeTheoSuKien(
-        suKienId,
-        User.Identity?.IsAuthenticated == true ? User.LayTaiKhoanId() : null,
-        User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien"))));
+    public async Task<IActionResult> LayLoaiVeTheoSuKien([FromRoute(Name = "eventId")] int suKienId)
+    {
+        var types = await dichVuLoaiVe.LayLoaiVeTheoSuKien(suKienId,
+            User.Identity?.IsAuthenticated == true ? User.LayTaiKhoanId() : null,
+            User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien"));
+        return Ok(ApiResponse.TaoPhanHoiThanhCong(types.Select(v => new PublicTicketTypeDto(
+            v.LoaiVeId, v.SuKienId, v.TenLoaiVe, v.GiaVe, v.SoLuong, v.SoLuongDaBan, v.SoLuongDangGiu,
+            v.ThoiGianMoBan, v.ThoiGianDongBan)).ToList()));
+    }
     [HttpPost("api/events/{eventId:int}/ticket-types"), Authorize(Roles = "BanToChuc,QuanTriVien")]
     public async Task<IActionResult> TaoLoaiVe([Microsoft.AspNetCore.Mvc.FromRoute(Name = "eventId")] int suKienId, LoaiVeDto duLieuLoaiVe) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuLoaiVe.TaoLoaiVe(User.LayTaiKhoanId(), suKienId, duLieuLoaiVe, User.IsInRole("QuanTriVien"))));
     [HttpPut("api/ticket-types/{id:int}"), Authorize(Roles = "BanToChuc,QuanTriVien")]

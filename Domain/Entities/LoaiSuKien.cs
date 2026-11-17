@@ -17,5 +17,6 @@ public class LoaiSuKien
     public bool HoatDong { get; set; } = true;
 
     [System.Text.Json.Serialization.JsonPropertyName("suKiens")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<SuKien> DanhSachSuKien { get; set; } = [];
 }

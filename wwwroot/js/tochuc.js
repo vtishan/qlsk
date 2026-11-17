@@ -124,8 +124,9 @@ async function tuChoiYeuCauToChuc(yeuCauXacThucId) {
 async function taiThongKeToChuc() {
   hienKhungDangTai("tk-tochuc", 3);
   try {
-    var phanHoiYeuCau = await guiYeuCauApi("/api/organizer-verifications");
-    hienThongKeToChuc(phanHoiYeuCau.data || []);
+    var phanHoiYeuCau = await guiYeuCauApi("/api/organizer-verifications/statistics");
+    var host = document.getElementById("tk-tochuc");
+    if (host) host.innerHTML = taoHtmlBang([["TrangThai", "Trạng thái"], ["SoLuong", "Số lượng"]], phanHoiYeuCau.data || []);
   } catch (loiXuLy) {
     hienLoiTai("tk-tochuc", loiXuLy, taiThongKeToChuc);
     thongBao(loiXuLy.message, "loi");

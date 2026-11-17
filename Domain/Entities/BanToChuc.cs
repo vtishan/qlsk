@@ -21,8 +21,10 @@ public class BanToChuc
 
     public DateTime NgayXacThuc { get; set; } = DateTime.UtcNow;
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public TaiKhoan TaiKhoan { get; set; } = null!;
 
     [JsonPropertyName("suKiens")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<SuKien> DanhSachSuKien { get; set; } = [];
 }

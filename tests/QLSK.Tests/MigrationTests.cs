@@ -28,6 +28,26 @@ public class MigrationTests
     }
 
     [Fact]
+    public async Task Security_upgrade_preserves_existing_accounts_and_password_hashes()
+    {
+        using var factory = new ApiFactory();
+        await factory.ThucThiVoiCoSoDuLieuKiemThu(async db =>
+        {
+            var migrator = db.GetService<IMigrator>();
+            await migrator.MigrateAsync("20261031170820_AddVenueImagePath");
+            const string email = "preserved@test.local";
+            const string hash = "existing-test-hash-must-stay-identical";
+            await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO [TaiKhoan] ([HoTen], [Email], [MatKhau], [VaiTroId], [HoatDong], [NgayTao]) VALUES ({"Preserved account"}, {email}, {hash}, {1}, {true}, {DateTime.UtcNow})");
+            await migrator.MigrateAsync();
+            var account = await db.DanhSachTaiKhoan.AsNoTracking().SingleAsync(a => a.Email == email);
+            Assert.Equal(hash, account.MatKhauBam);
+            Assert.Equal("Preserved account", account.HoTen);
+            Assert.Equal(0, account.TokenVersion);
+            Assert.Equal(1, account.VaiTroId);
+        });
+    }
+
+    [Fact]
     public async Task All_migrations_can_be_reverted_and_reapplied_on_an_isolated_database()
     {
         using var ungDungKiemThu = new ApiFactory();

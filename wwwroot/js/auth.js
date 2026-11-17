@@ -1,5 +1,54 @@
 "use strict";
 
+function khoiTaoNutHienMatKhau() {
+  document.querySelectorAll('input[type="password"]').forEach(function (oMatKhau) {
+    if (oMatKhau.closest(".password-field")) return;
+    var nhanMatKhau = oMatKhau.labels && oMatKhau.labels[0];
+    var tenTruong = nhanMatKhau ? nhanMatKhau.textContent.trim().toLocaleLowerCase("vi") : "mật khẩu";
+    var khungMatKhau = document.createElement("span");
+    khungMatKhau.className = "password-field";
+    oMatKhau.before(khungMatKhau);
+    khungMatKhau.appendChild(oMatKhau);
+    var nutHienMatKhau = document.createElement("button");
+    nutHienMatKhau.type = "button";
+    nutHienMatKhau.className = "password-toggle";
+    nutHienMatKhau.setAttribute("aria-controls", oMatKhau.id);
+    function capNhatTrangThaiMatKhau(hienMatKhau) {
+      oMatKhau.type = hienMatKhau ? "text" : "password";
+      var nhanThaoTac = (hienMatKhau ? "Ẩn " : "Hiện ") + tenTruong;
+      nutHienMatKhau.setAttribute("aria-label", nhanThaoTac);
+      nutHienMatKhau.title = nhanThaoTac;
+      nutHienMatKhau.innerHTML =
+        '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>' +
+        (hienMatKhau ? '<path d="m3 3 18 18"/>' : "") + "</svg>";
+    }
+    nutHienMatKhau.addEventListener("click", function () {
+      capNhatTrangThaiMatKhau(oMatKhau.type === "password");
+    });
+    khungMatKhau.appendChild(nutHienMatKhau);
+    capNhatTrangThaiMatKhau(false);
+    if (oMatKhau.form) oMatKhau.form.addEventListener("reset", function () {
+      capNhatTrangThaiMatKhau(false);
+    });
+    window.addEventListener("pageshow", function () {
+      capNhatTrangThaiMatKhau(false);
+    });
+  });
+  [["dk-mk", "dk-nhaplai"], ["dmk-moi", "dmk-nhaplai"]].forEach(function (capMatKhau) {
+    var oMatKhau = document.getElementById(capMatKhau[0]);
+    var oNhapLai = document.getElementById(capMatKhau[1]);
+    if (!oMatKhau || !oNhapLai || oNhapLai.dataset.passwordValidation) return;
+    oNhapLai.dataset.passwordValidation = "true";
+    function capNhatLoiNhapLai() {
+      if (oNhapLai.getAttribute("aria-invalid") === "true" && oMatKhau.value === oNhapLai.value)
+        hienLoiNhapLieu(oNhapLai.id, "");
+    }
+    oMatKhau.addEventListener("input", capNhatLoiNhapLai);
+    oNhapLai.addEventListener("input", capNhatLoiNhapLai);
+  });
+}
+document.addEventListener("DOMContentLoaded", khoiTaoNutHienMatKhau);
+
 async function dangKyTaiKhoan() {
   var hoTen = docGiaTriInput("dk-hoten"),
     email = docGiaTriInput("dk-email");
@@ -50,8 +99,8 @@ async function dangNhapTaiKhoan() {
     sessionStorage.setItem("sk_tkid", taiKhoan.id || taiKhoan.TaiKhoanID || "");
     thongBao("Đăng nhập thành công: " + (taiKhoan.hoTen || ""));
     if (typeof taiDanhSachSuKien === "function") taiDanhSachSuKien();
-    var duongDanSauDangNhap = new URLSearchParams(location.search).get("next");
-    if (duongDanSauDangNhap && duongDanSauDangNhap.startsWith("/") && !duongDanSauDangNhap.startsWith("//") && !duongDanSauDangNhap.includes("\\")) location.assign(duongDanSauDangNhap);
+    var duongDanSauDangNhap = duongDanNoiBo(new URLSearchParams(location.search).get("next"));
+    if (duongDanSauDangNhap) location.assign(duongDanSauDangNhap);
     else if (phienDangNhap.vaiTro === "BanToChuc") location.assign("/pages/ban-to-chuc/su-kien-cua-toi.html");
     else if (["QuanLySuKien", "QuanTriVien"].indexOf(phienDangNhap.vaiTro) !== -1)
       location.assign("/pages/quan-tri/tong-quan.html");
@@ -73,10 +122,13 @@ function dangXuatTaiKhoan() {
   try {
     sessionStorage.clear();
   } catch (loiDuPhong) {}
+  cacDanhSachPhanTrang.clear();
+  cacYeuCauDocDangChay.clear();
   if (typeof apDungQuyen === "function") apDungQuyen();
   hienTrangTheoTen("dangnhap");
 }
 async function doiMatKhauTaiKhoan() {
+  if (doiMatKhauTaiKhoan.dangGui) return;
   var matKhauCu = document.getElementById("dmk-cu") ? document.getElementById("dmk-cu").value : "";
   var matKhauMoi = document.getElementById("dmk-moi") ? document.getElementById("dmk-moi").value : "";
   var matKhauNhapLai = document.getElementById("dmk-nhaplai")
@@ -87,6 +139,12 @@ async function doiMatKhauTaiKhoan() {
     return;
   }
   if (!kiemTraMatKhauForm(matKhauMoi, matKhauNhapLai, "dmk-nhaplai")) return;
+  var nutDoiMatKhau = document.querySelector('[data-action="doiMatKhau"]');
+  doiMatKhauTaiKhoan.dangGui = true;
+  if (nutDoiMatKhau) {
+    nutDoiMatKhau.disabled = true;
+    nutDoiMatKhau.setAttribute("aria-busy", "true");
+  }
   try {
     await guiYeuCauApi("/api/auth/change-password", "PUT", {
       MatKhauCu: matKhauCu,
@@ -96,6 +154,12 @@ async function doiMatKhauTaiKhoan() {
     dangXuatTaiKhoan();
   } catch (loiXuLy) {
     thongBao(loiXuLy.message, "loi");
+  } finally {
+    doiMatKhauTaiKhoan.dangGui = false;
+    if (nutDoiMatKhau) {
+      nutDoiMatKhau.disabled = false;
+      nutDoiMatKhau.removeAttribute("aria-busy");
+    }
   }
 }
 
@@ -106,7 +170,7 @@ async function taiDanhSachTaiKhoan() {
   try {
     var tuKhoaTimKiem = docGiaTriInput("qtk-tukhoa") || null;
     var duongDanTruyVan = "/api/accounts?page=1&size=50" + (tuKhoaTimKiem ? "&q=" + encodeURIComponent(tuKhoaTimKiem) : "");
-    var phanHoiTaiKhoan = await guiYeuCauApi(duongDanTruyVan);
+    var phanHoiTaiKhoan = await guiYeuCauDanhSach(duongDanTruyVan, "ds-taikhoan", taiDanhSachTaiKhoan);
     if (typeof giaoDienQuanLySuKien !== "undefined") giaoDienQuanLySuKien.hienDanhSachTaiKhoan(phanHoiTaiKhoan.data || []);
     else {
       document.getElementById("ds-taikhoan").innerHTML = taoHtmlBang(

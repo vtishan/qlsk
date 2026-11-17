@@ -5,6 +5,7 @@ function chuanHoaDuLieuSuKien(giaTriCanXuLy) {
   if (!giaTriCanXuLy || typeof giaTriCanXuLy !== "object") return giaTriCanXuLy;
   var suKienChuanHoa = {};
   Object.keys(giaTriCanXuLy).forEach(function (tenThuocTinhJson) {
+    if (["__proto__", "constructor", "prototype"].indexOf(tenThuocTinhJson) !== -1) return;
     var tenThuocTinhVietHoa = tenThuocTinhJson.charAt(0).toUpperCase() + tenThuocTinhJson.slice(1);
     if (tenThuocTinhJson !== tenThuocTinhVietHoa && tenThuocTinhVietHoa in giaTriCanXuLy) return;
     suKienChuanHoa[tenThuocTinhVietHoa] = chuanHoaDuLieuSuKien(giaTriCanXuLy[tenThuocTinhJson]);
@@ -40,6 +41,20 @@ var __suKienCache = null;
 var __suKienTrang = 1;
 var __suKienLoai = "";
 var __suKienDangTai = null;
+var __suKienConTrang = false;
+var __duongDanDanhSachDaTai = "";
+var __henTimSuKien = null;
+function duongDanDanhSachSuKien() {
+  var scope = phamViDanhSachSuKien();
+  var query = new URLSearchParams();
+  [
+    ["q", docGiaTriInput("sk-tukhoa-page") || docGiaTriInput("sk-tukhoa")],
+    ["category", __suKienLoai], ["date", docGiaTriInput("filter-date")],
+    ["location", docGiaTriInput("filter-location")], ["price", docGiaTriInput("filter-price")],
+    ["sort", docGiaTriInput("event-sort")]
+  ].forEach(function (pair) { if (pair[1]) query.set(pair[0], pair[1]); });
+  return "/api/events" + (scope === "public" ? "" : "/" + scope) + (query.toString() ? "?" + query : "");
+}
 function phamViDanhSachSuKien() {
   var khungDanhSachSuKien = document.getElementById("ds-sukien");
   return (khungDanhSachSuKien && khungDanhSachSuKien.getAttribute("data-event-scope")) || "public";
@@ -54,8 +69,7 @@ function chuoiTimKiem(giaTriCanXuLy) {
 function locLoaiSuKien(tenLoaiSuKien) {
   __suKienLoai = tenLoaiSuKien || "";
   __suKienTrang = 1;
-  if (Array.isArray(__suKienCache)) hienThiDanhSachSuKien();
-  else taiDanhSachSuKien();
+  taiDanhSachSuKien(true);
 }
 function chuyenTrangSuKien(soTrangHienTai) {
   __suKienTrang = soTrangHienTai;
@@ -88,7 +102,10 @@ async function taiDanhSachSuKien(canTaiLaiDanhSach) {
   hienKhungDangTai("ds-sukien", 4);
   __suKienDangTai = (async function () {
     try {
-      var phanHoiSuKien = await guiYeuCauApi("/api/events" + (phamViHienThi === "public" ? "" : "/" + phamViHienThi));
+      var requestPath = duongDanDanhSachSuKien();
+      var phanHoiSuKien = await guiYeuCauDanhSach(requestPath, "ds-sukien", taiDanhSachSuKien);
+      __duongDanDanhSachDaTai = requestPath;
+      __suKienConTrang = !!phanHoiSuKien.hasMore;
       __suKienCache = chuanHoaDuLieuSuKien(phanHoiSuKien.data || []);
       if (typeof giaoDienQuanLySuKien !== "undefined") giaoDienQuanLySuKien.ghiNhanDaTaiSuKien();
       hienThiDanhSachSuKien();
@@ -107,6 +124,10 @@ async function taiDanhSachSuKien(canTaiLaiDanhSach) {
 function hienThiDanhSachSuKien() {
   var khungDanhSachSuKien = document.getElementById("ds-sukien");
   if (!khungDanhSachSuKien || !Array.isArray(__suKienCache)) return;
+  if (__duongDanDanhSachDaTai && duongDanDanhSachSuKien() !== __duongDanDanhSachDaTai) {
+    clearTimeout(__henTimSuKien);
+    __henTimSuKien = setTimeout(function () { taiDanhSachSuKien(true); }, 350);
+  }
   var phamViHienThi = phamViDanhSachSuKien();
   var tuKhoaTimKiem = chuoiTimKiem(docGiaTriInput("sk-tukhoa-page") || docGiaTriInput("sk-tukhoa"));
   var danhSachSuKien = typeof giaoDienQuanLySuKien !== "undefined" ? __suKienCache.map(giaoDienQuanLySuKien.hopNhatChiTietSuKien) : __suKienCache;
@@ -135,7 +156,7 @@ function hienThiDanhSachSuKien() {
   if (khungSoLuongKetQua)
     khungSoLuongKetQua.textContent = suKienSauBoLoc.length
       ? document.getElementById("event-pagination")
-        ? suKienSauBoLoc.length +
+        ? suKienSauBoLoc.length + (__suKienConTrang ? "+" : "") +
           " sự kiện · Hiển thị " +
           (chiSoSuKienDauTrang + 1) +
           "–" +
@@ -398,7 +419,10 @@ async function taiLoaiSuKien() {
   hienKhungDangTai("ds-loai", 3);
   try {
     var laDanhMucQuanTri = !!document.getElementById("ds-loai") && phienDangNhap.vaiTro === "QuanTriVien";
-    var phanHoiLoaiSuKien = await guiYeuCauApi("/api/event-types" + (laDanhMucQuanTri ? "/all" : ""));
+    var categoryHost = document.getElementById("ds-loai") || document.getElementById("sk-loai") ||
+      document.querySelector("[data-event-categories], [data-home-categories]");
+    if (categoryHost && !categoryHost.id) categoryHost.id = "event-category-host";
+    var phanHoiLoaiSuKien = await guiYeuCauDanhSach("/api/event-types" + (laDanhMucQuanTri ? "/all" : ""), categoryHost ? categoryHost.id : "", taiLoaiSuKien);
     __loaiSuKienCache = phanHoiLoaiSuKien.data || [];
     if (typeof giaoDienQuanLySuKien !== "undefined") giaoDienQuanLySuKien.hienLoaiSuKienTrangChu(__loaiSuKienCache);
     document.querySelectorAll("[data-event-categories]").forEach(function (khungLocLoaiSuKien) {

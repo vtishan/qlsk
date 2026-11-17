@@ -28,5 +28,6 @@ public class DiaDiem
     public byte[] PhienBanDong { get; set; } = [];
 
     [JsonPropertyName("datCho")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<DatDiaDiem> DanhSachDatDiaDiem { get; set; } = [];
 }

@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 
 using QuestPDF.Infrastructure;
 
+using QLSK.Common.Security;
 using QLSK.Common.Auth;
 using QLSK.Common.Exceptions;
 using QLSK.Common.Models;
@@ -43,6 +44,41 @@ using QLSK.Infrastructure.QR;
 var boDungUngDung = WebApplication.CreateBuilder(args);
 
 QuestPDF.Settings.License = LicenseType.Community;
+boDungUngDung.Services.AddHttpProtection(boDungUngDung.Configuration);
+boDungUngDung.Services.AddResponseCompression(options => options.EnableForHttps = true);
+boDungUngDung.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options =>
+    options.Level = System.IO.Compression.CompressionLevel.Fastest);
+boDungUngDung.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options =>
+    options.Level = System.IO.Compression.CompressionLevel.Fastest);
+var knownProxies = boDungUngDung.Configuration.GetSection("Security:KnownProxies").Get<string[]>() ?? [];
+if (knownProxies.Length > 0)
+{
+    boDungUngDung.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+            Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+        options.ForwardLimit = 1;
+        options.KnownProxies.Clear();
+        options.KnownIPNetworks.Clear();
+        foreach (var proxy in knownProxies) options.KnownProxies.Add(System.Net.IPAddress.Parse(proxy));
+    });
+}
+boDungUngDung.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+    options.Limits.MaxRequestBodySize = 128 * 1024;
+    options.Limits.MaxRequestHeadersTotalSize = 16 * 1024;
+    options.Limits.MaxRequestLineSize = 4096;
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(10);
+    options.Limits.KeepAliveTimeout = TimeSpan.FromSeconds(30);
+    options.Limits.MaxConcurrentConnections = 512;
+    options.Limits.MaxConcurrentUpgradedConnections = 16;
+});
+boDungUngDung.Services.Configure<Microsoft.AspNetCore.Builder.IISServerOptions>(options =>
+    options.MaxRequestBodySize = 128 * 1024);
+// Development gets a new unpredictable key each run unless user-secrets supplies one.
+if (boDungUngDung.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(boDungUngDung.Configuration["Jwt:Key"]))
+    boDungUngDung.Configuration["Jwt:Key"] = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
 
 
 // ================================
@@ -53,14 +89,23 @@ boDungUngDung.Services
     .AddControllers(tuyChonMvc =>
     {
         tuyChonMvc.Filters.Add<ActiveUserFilter>();
+        tuyChonMvc.Filters.Add<PaginationResultFilter>();
+        tuyChonMvc.Filters.Add<CatalogCacheFilter>();
     })
     .AddJsonOptions(tuyChonJson =>
     {
         tuyChonJson.JsonSerializerOptions.ReferenceHandler =
             ReferenceHandler.IgnoreCycles;
+        tuyChonJson.JsonSerializerOptions.MaxDepth = 32;
     });
 
 boDungUngDung.Services.AddScoped<ActiveUserFilter>();
+boDungUngDung.Services.AddOutputCache(options =>
+{
+    options.SizeLimit = 4 * 1024 * 1024;
+    options.MaximumBodySize = 128 * 1024;
+    options.AddPolicy("PublicCatalog", policy => policy.Expire(TimeSpan.FromSeconds(30)).Tag("catalog"));
+});
 
 
 // ================================
@@ -79,7 +124,11 @@ if (string.IsNullOrWhiteSpace(chuoiKetNoiCoSoDuLieu))
 
 boDungUngDung.Services.AddDbContext<ApplicationDbContext>(tuyChonDb =>
 {
-    tuyChonDb.UseSqlServer(chuoiKetNoiCoSoDuLieu);
+    tuyChonDb.UseSqlServer(chuoiKetNoiCoSoDuLieu, sql =>
+    {
+        sql.CommandTimeout(15);
+        sql.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+    });
 });
 
 
@@ -144,6 +193,8 @@ boDungUngDung.Services.AddHttpClient<PayOsService>(
     {
         clientHttpThanhToan.BaseAddress =
             new Uri("https://api-merchant.payos.vn/");
+        clientHttpThanhToan.Timeout = TimeSpan.FromSeconds(15);
+        clientHttpThanhToan.MaxResponseContentBufferSize = 128 * 1024;
     }
 );
 
@@ -177,6 +228,8 @@ boDungUngDung.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(tuyChonJwt =>
     {
+        tuyChonJwt.IncludeErrorDetails = false;
+        tuyChonJwt.MapInboundClaims = true;
         tuyChonJwt.TokenValidationParameters =
             new TokenValidationParameters
             {
@@ -194,6 +247,7 @@ boDungUngDung.Services
                     )
                 ),
 
+                ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
                 ClockSkew = TimeSpan.Zero
             };
     });
@@ -271,8 +325,9 @@ boDungUngDung.Services.AddCors(tuyChonCors =>
         {
             chinhSachCors
                 .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+                .WithHeaders("Content-Type", "Authorization", "Idempotency-Key")
+                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .WithExposedHeaders("Retry-After", "X-Has-More");
         }
     );
 });
@@ -319,18 +374,31 @@ boDungUngDung.Services.Configure<ApiBehaviorOptions>(
 // ================================
 
 var ungDungWeb = boDungUngDung.Build();
+if (knownProxies.Length > 0) ungDungWeb.UseForwardedHeaders();
 
 
 // ================================
 // 13. HTTP PIPELINE
 // ================================
 
+ungDungWeb.UseMiddleware<SecurityHeadersMiddleware>();
 ungDungWeb.UseMiddleware<ApiExceptionMiddleware>();
+ungDungWeb.UseRouting();
+ungDungWeb.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), branch => branch.UseResponseCompression());
 
 ungDungWeb.UseCors("Frontend");
 
 ungDungWeb.UseDefaultFiles();
-ungDungWeb.UseStaticFiles();
+ungDungWeb.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        var extension = Path.GetExtension(context.File.Name);
+        context.Context.Response.Headers.CacheControl = extension.Equals(".html", StringComparison.OrdinalIgnoreCase)
+            ? "no-cache" : context.Context.Request.Query.ContainsKey("v")
+                ? "public,max-age=31536000,immutable" : "public,max-age=3600";
+    }
+});
 
 
 // Swagger chỉ chạy ở Development
@@ -377,6 +445,8 @@ ungDungWeb.UseStatusCodePages(
 
             StatusCodes.Status404NotFound =>
                 "NOT_FOUND",
+            StatusCodes.Status429TooManyRequests => "RATE_LIMIT_EXCEEDED",
+            StatusCodes.Status503ServiceUnavailable => "SERVICE_UNAVAILABLE",
 
             _ =>
                 "REQUEST_ERROR"
@@ -396,8 +466,13 @@ ungDungWeb.UseStatusCodePages(
 // 15. AUTHENTICATION + AUTHORIZATION
 // ================================
 
+ungDungWeb.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), branch =>
+    branch.UseMiddleware<ApiCapacityMiddleware>());
+ungDungWeb.UseRequestTimeouts();
 ungDungWeb.UseAuthentication();
+ungDungWeb.UseRateLimiter();
 ungDungWeb.UseAuthorization();
+ungDungWeb.UseOutputCache();
 
 
 // ================================

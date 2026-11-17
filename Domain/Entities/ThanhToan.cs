@@ -18,6 +18,12 @@ public class ThanhToan
 
     public string? MaLienKet { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? CheckoutUrl { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public DateTime? LinkCreationStartedAt { get; set; }
+
     public string? MaHoanTien { get; set; }
 
     public TrangThaiThanhToan TrangThai { get; set; } = TrangThaiThanhToan.DangXuLy;
@@ -30,5 +36,6 @@ public class ThanhToan
     [System.ComponentModel.DataAnnotations.Schema.Column("RowVersion")]
     public byte[] PhienBanDong { get; set; } = [];
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public DonVe DonVe { get; set; } = null!;
 }

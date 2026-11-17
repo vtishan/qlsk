@@ -22,6 +22,7 @@ public class SuKienConfig : IEntityTypeConfiguration<SuKien>
         });
 
         cauHinhSuKien.HasKey(suKienDb => suKienDb.SuKienId);
+        cauHinhSuKien.HasIndex(suKienDb => new { suKienDb.TrangThai, suKienDb.ThoiGianKetThuc });
 
         cauHinhSuKien.Property(suKienDb => suKienDb.TenSuKien)
             .HasMaxLength(200)

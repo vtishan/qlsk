@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 namespace QLSK.Features.DonVe;
 public class TaoDonDto
 {
-    [System.Text.Json.Serialization.JsonPropertyName("items")] [Required, MinLength(1)] public List<DatVeItemDto> ChiTietDatVe { get; set; } = [];
+    [System.Text.Json.Serialization.JsonPropertyName("items")] [Required, MinLength(1), MaxLength(20)] public List<DatVeItemDto> ChiTietDatVe { get; set; } = [];
 }
 public class DatVeItemDto
 {

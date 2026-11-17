@@ -14,7 +14,11 @@ public class AuthController(TaiKhoanService dichVuTaiKhoan) : ControllerBase
     public async Task<IActionResult> DangNhapTaiKhoan(DangNhapDto duLieuDangNhap) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuTaiKhoan.DangNhapTaiKhoan(duLieuDangNhap)));
 
     [HttpPost("logout"), Authorize]
-    public IActionResult DangXuatTaiKhoan() => Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đăng xuất thành công. Hãy xóa JWT ở client." }));
+    public async Task<IActionResult> DangXuatTaiKhoan()
+    {
+        await dichVuTaiKhoan.DangXuatTaiKhoan(User.LayTaiKhoanId());
+        return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã đăng xuất các phiên của tài khoản." }));
+    }
 
     [HttpPut("change-password"), Authorize]
     public async Task<IActionResult> DoiMatKhauTaiKhoan(DoiMatKhauDto duLieuDoiMatKhau)

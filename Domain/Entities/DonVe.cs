@@ -10,6 +10,9 @@ public class DonVe
 
     public int TaiKhoanId { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? IdempotencyKey { get; set; }
+
     public int SuKienId { get; set; }
 
     public int SoLuong { get; set; }
@@ -28,6 +31,7 @@ public class DonVe
     [System.ComponentModel.DataAnnotations.Schema.Column("RowVersion")]
     public byte[] PhienBanDong { get; set; } = [];
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public TaiKhoan TaiKhoan { get; set; } = null!;
 
     public SuKien SuKien { get; set; } = null!;

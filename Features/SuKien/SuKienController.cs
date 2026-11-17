@@ -6,7 +6,8 @@ namespace QLSK.Features.SuKien;
 [ApiController, Route("api/event-types")]
 public class LoaiSuKienController(SuKienService dichVuSuKien) : ControllerBase
 {
-    [HttpGet, AllowAnonymous] public async Task<IActionResult> LayLoaiSuKienHoatDong() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayDanhSachLoaiSuKien()));
+    [HttpGet, AllowAnonymous, Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "PublicCatalog")] public async Task<IActionResult> LayLoaiSuKienHoatDong() => Ok(ApiResponse.TaoPhanHoiThanhCong(
+        (await dichVuSuKien.LayDanhSachLoaiSuKien()).Select(e => new PublicEventTypeDto(e.LoaiSuKienId, e.TenLoaiSuKien, e.MoTaLoaiSuKien)).ToList()));
     [HttpGet("all"), Authorize(Roles = "QuanTriVien")] public async Task<IActionResult> LayTatCaLoaiSuKien() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayDanhSachLoaiSuKien(true)));
     [HttpPost, Authorize(Roles = "QuanTriVien")] public async Task<IActionResult> TaoLoaiSuKien(LoaiSuKienDto duLieuLoaiSuKien) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.TaoLoaiSuKien(duLieuLoaiSuKien)));
     [HttpPut("{id:int}"), Authorize(Roles = "QuanTriVien")] public async Task<IActionResult> CapNhatLoaiSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int loaiSuKienId, LoaiSuKienDto duLieuLoaiSuKien) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.CapNhatLoaiSuKien(loaiSuKienId, duLieuLoaiSuKien)));
@@ -14,10 +15,24 @@ public class LoaiSuKienController(SuKienService dichVuSuKien) : ControllerBase
 [ApiController, Route("api/events")]
 public class SuKienController(SuKienService dichVuSuKien) : ControllerBase
 {
-    [HttpGet, AllowAnonymous] public async Task<IActionResult> LaySuKienCongKhai() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayDanhSachSuKien()));
+    [HttpGet, AllowAnonymous] public async Task<IActionResult> LaySuKienCongKhai() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayDanhSachSuKienCongKhai()));
     [HttpGet("manage"), Authorize(Roles = "QuanLySuKien,QuanTriVien")] public async Task<IActionResult> LaySuKienQuanLy() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayDanhSachSuKien(true)));
     [HttpGet("mine"), Authorize(Roles = "BanToChuc")] public async Task<IActionResult> LaySuKienCuaToi() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LaySuKienCuaTaiKhoan(User.LayTaiKhoanId())));
-    [HttpGet("{id:int}"), AllowAnonymous] public async Task<IActionResult> LayChiTietSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int suKienId) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.LayChiTietSuKien(suKienId, User.Identity?.IsAuthenticated == true ? User.LayTaiKhoanId() : null, User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien"))));
+    [HttpGet("{id:int}"), AllowAnonymous] public async Task<IActionResult> LayChiTietSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int suKienId)
+    {
+        var userId = User.Identity?.IsAuthenticated == true ? User.LayTaiKhoanId() : (int?)null;
+        var manager = User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien");
+        var item = await dichVuSuKien.LayChiTietSuKien(suKienId, userId, manager);
+        return Ok(ApiResponse.TaoPhanHoiThanhCong(PublicEventResponse.From(item)));
+    }
+    [HttpGet("{id:int}/manage"), Authorize(Roles = "BanToChuc,QuanLySuKien,QuanTriVien")]
+    public async Task<IActionResult> LayChiTietQuanLy([FromRoute(Name = "id")] int suKienId)
+    {
+        var manager = User.IsInRole("QuanLySuKien") || User.IsInRole("QuanTriVien");
+        var item = await dichVuSuKien.LayChiTietSuKien(suKienId, User.LayTaiKhoanId(), manager);
+        if (!manager && item.BanToChuc.TaiKhoanId != User.LayTaiKhoanId()) return Forbid();
+        return Ok(ApiResponse.TaoPhanHoiThanhCong(item));
+    }
     [HttpPost, Authorize(Roles = "BanToChuc")] public async Task<IActionResult> TaoSuKien(TaoSuKienDto duLieuTaoSuKien) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.TaoSuKien(User.LayTaiKhoanId(), duLieuTaoSuKien)));
     [HttpPut("{id:int}"), Authorize(Roles = "BanToChuc")] public async Task<IActionResult> CapNhatVaGuiLaiSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int suKienId, TaoSuKienDto duLieuTaoSuKien) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.CapNhatVaGuiLaiSuKien(User.LayTaiKhoanId(), suKienId, duLieuTaoSuKien)));
     [HttpPost("{id:int}/submit"), Authorize(Roles = "BanToChuc")] public async Task<IActionResult> GuiDuyetSuKien([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int suKienId) => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuSuKien.GuiDuyetSuKien(User.LayTaiKhoanId(), suKienId)));

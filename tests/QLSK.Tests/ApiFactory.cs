@@ -25,7 +25,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     public const string JwtKey = "QLSK_TEST_ONLY_KEY_NOT_FOR_DEPLOYMENT_32_BYTES";
     private readonly string tenCoSoDuLieuKiemThu = $"QLSK_Test_{Guid.NewGuid():N}";
     private IHost? hostKiemThuDaKhoiTao;
-    private string ConnectionString => $"Server=.\\SQL2022EXP;Database={tenCoSoDuLieuKiemThu};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True";
+    public DatabaseQueryCounter QueryCounter { get; } = new();
+    private string ConnectionString => $"Server=(localdb)\\MSSQLLocalDB;Database={tenCoSoDuLieuKiemThu};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True";
 
     protected override IHost CreateHost(IHostBuilder boDungHost)
     {
@@ -58,6 +59,10 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         boDungWebHost.UseSetting("PayOS:ApiKey", "test-api-key");
         boDungWebHost.UseSetting("PayOS:ChecksumKey", "test-checksum-key");
         boDungWebHost.UseSetting("Email:Host", "");
+        // Large regression suites intentionally send many requests; limit behaviour has a dedicated low-limit host.
+        boDungWebHost.UseSetting("Security:RequestsPerMinute", "10000");
+        boDungWebHost.UseSetting("Security:AuthRequestsPerMinute", "10000");
+        boDungWebHost.UseSetting("Security:WritesPerMinute", "10000");
 
         boDungWebHost.ConfigureServices(danhSachDichVu =>
         {
@@ -71,7 +76,9 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
                 .ConfigurePrimaryHttpMessageHandler(() => new TestPayOsHandler());
 
             danhSachDichVu.AddDbContext<ApplicationDbContext>(tuyChonCoSoDuLieu =>
-                tuyChonCoSoDuLieu.UseSqlServer(ConnectionString));
+                tuyChonCoSoDuLieu.UseSqlServer(ConnectionString, sql =>
+                    sql.CommandTimeout(15).UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .AddInterceptors(QueryCounter));
         });
     }
 
@@ -131,7 +138,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     {
         var boPhanTichChuoiKetNoi = new SqlConnectionStringBuilder(nguCanhDuLieu.Database.GetConnectionString()
             ?? throw new InvalidOperationException("An isolated SQL Server test connection is required."));
-        if (boPhanTichChuoiKetNoi.InitialCatalog != tenCoSoDuLieuKiemThu || boPhanTichChuoiKetNoi.DataSource != ".\\SQL2022EXP")
+        if (boPhanTichChuoiKetNoi.InitialCatalog != tenCoSoDuLieuKiemThu || boPhanTichChuoiKetNoi.DataSource != "(localdb)\\MSSQLLocalDB")
             throw new InvalidOperationException("Test database setup and cleanup require this factory's isolated local database.");
     }
 
@@ -167,16 +174,26 @@ public sealed class TestPayOsHandler : HttpMessageHandler
 
         using var taiLieuJsonPhanHoi = JsonDocument.Parse(await yeuCauHttp.Content.ReadAsStringAsync(tokenHuyThaoTac));
         var maDonVe = taiLieuJsonPhanHoi.RootElement.GetProperty("orderCode").GetInt64();
+        var data = new
+        {
+            amount = taiLieuJsonPhanHoi.RootElement.GetProperty("amount").GetInt64(),
+            checkoutUrl = $"https://pay.payos.vn/web/test-payment-{maDonVe}",
+            currency = "VND",
+            orderCode = maDonVe,
+            paymentLinkId = $"test-payment-{maDonVe}"
+        };
+        var element = JsonSerializer.SerializeToElement(data);
+        var signingData = string.Join("&", element.EnumerateObject().OrderBy(p => p.Name, StringComparer.Ordinal)
+            .Select(p => $"{p.Name}={p.Value}"));
+        var signature = Convert.ToHexString(System.Security.Cryptography.HMACSHA256.HashData(
+            Encoding.UTF8.GetBytes("test-checksum-key"), Encoding.UTF8.GetBytes(signingData))).ToLowerInvariant();
         return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
         {
             Content = JsonContent.Create(new
             {
                 code = "00",
-                data = new
-                {
-                    checkoutUrl = $"https://checkout.test/pay/{maDonVe}",
-                    paymentLinkId = $"test-payment-{maDonVe}"
-                }
+                data,
+                signature
             })
         };
     }
@@ -188,5 +205,6 @@ public sealed class TestEmailService() : EmailService(Options.Create(new EmailOp
         string emailNhan,
         string tieuDe,
         string noiDung,
-        byte[]? tepPdfVe = null) => Task.CompletedTask;
+        byte[]? tepPdfVe = null,
+        CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

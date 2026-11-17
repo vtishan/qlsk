@@ -12,6 +12,8 @@ public class XacThucController(XacThucService dichVuXacThuc) : ControllerBase
     public async Task<IActionResult> LayYeuCauDangXuLyCuaToi() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.LayYeuCauDangXuLyCuaTaiKhoan(User.LayTaiKhoanId())));
     [HttpGet, Authorize(Roles = "QuanLySuKien,QuanTriVien")]
     public async Task<IActionResult> LayDanhSachYeuCauDangXuLy() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.LayDanhSachYeuCauDangXuLy()));
+    [HttpGet("statistics"), Authorize(Roles = "QuanLySuKien,QuanTriVien")]
+    public async Task<IActionResult> LayThongKeYeuCau() => Ok(ApiResponse.TaoPhanHoiThanhCong(await dichVuXacThuc.LayThongKeYeuCau()));
     [HttpPost("{id:int}/approve"), Authorize(Roles = "QuanLySuKien,QuanTriVien")]
     public async Task<IActionResult> DuyetYeuCauXacThuc([Microsoft.AspNetCore.Mvc.FromRoute(Name = "id")] int yeuCauXacThucId) { await dichVuXacThuc.DuyetYeuCauXacThuc(User.LayTaiKhoanId(), yeuCauXacThucId); return Ok(ApiResponse.TaoPhanHoiThanhCong(new { message = "Đã duyệt yêu cầu." })); }
     [HttpPost("{id:int}/reject"), Authorize(Roles = "QuanLySuKien,QuanTriVien")]

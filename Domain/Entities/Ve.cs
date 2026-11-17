@@ -33,5 +33,6 @@ public class Ve
     public LoaiVe LoaiVe { get; set; } = null!;
 
     [System.Text.Json.Serialization.JsonPropertyName("xuatVes")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<XuatVe> LichSuXuatVe { get; set; } = [];
 }

@@ -1876,6 +1876,10 @@
     gap: 20px
 }
 
+.catalog-data-panel .grid>.field {
+    margin: 0
+}
+
 .catalog-tabs {
     margin-top: 24px
 }

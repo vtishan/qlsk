@@ -206,7 +206,7 @@ async function taiLichSuXuatVe(veDaPhatHanhId) {
   }
   hienKhungDangTai("ds-xuatve", 3);
   try {
-    var phanHoiLichSuXuat = await guiYeuCauApi("/api/tickets/" + veId + "/exports");
+    var phanHoiLichSuXuat = await guiYeuCauDanhSach("/api/tickets/" + veId + "/exports", "ds-xuatve", function () { return taiLichSuXuatVe(veId); });
     var danhSachLanXuatVe = (phanHoiLichSuXuat.data || []).map(function (lanXuatVe) {
       return {
         HinhThucXuat: lanXuatVe.Kieu,

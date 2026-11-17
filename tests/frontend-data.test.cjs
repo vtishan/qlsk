@@ -7,6 +7,9 @@ function taoMoiTruongKiemThuFrontend(danhSachTepJavaScript, cacPhanTuDom = {}) {
   const nguCanhKiemThu = mayAoJavaScript.createContext({
     console,
     URL,
+    URLSearchParams,
+    setTimeout,
+    clearTimeout,
     Date,
     Map,
     Set,
@@ -23,6 +26,7 @@ function taoMoiTruongKiemThuFrontend(danhSachTepJavaScript, cacPhanTuDom = {}) {
       getElementById: (phanTuDomId) => cacPhanTuDom[phanTuDomId] || null,
       addEventListener() {},
       querySelectorAll: () => [],
+      querySelector: () => null,
     },
     phienDangNhap: {
       token: "test-only",
@@ -42,6 +46,7 @@ function taoMoiTruongKiemThuFrontend(danhSachTepJavaScript, cacPhanTuDom = {}) {
     docSoTuInput: (phanTuDomId) => Number(cacPhanTuDom[phanTuDomId]?.value) || null,
     chuyenNgayDuLieuSangDate: (giaTriCanXuLy) => new Date(/Z$/.test(giaTriCanXuLy) ? giaTriCanXuLy : giaTriCanXuLy + "Z"),
   });
+  nguCanhKiemThu.guiYeuCauDanhSach = (...args) => nguCanhKiemThu.guiYeuCauApi(args[0]);
   nguCanhKiemThu.window = nguCanhKiemThu;
   for (const tenTepJavaScript of danhSachTepJavaScript)
     mayAoJavaScript.runInContext(heThongTep.readFileSync(duongDanTep.join(__dirname, "../wwwroot/js", tenTepJavaScript), "utf8"), nguCanhKiemThu);
@@ -288,6 +293,25 @@ khaiBaoKiemThu("Viewing issued tickets only reads the order and navigates", asyn
       method: undefined,
     },
   ]);
+});
+khaiBaoKiemThu("Event drawers use the authorized management endpoint only for workspace roles", async () => {
+  for (const role of ["NguoiDung", "", "BanToChuc", "QuanLySuKien", "QuanTriVien"]) {
+    const elements = {
+      "ui-drawer": { open: false, showModal() { this.open = true; } },
+      "ui-drawer-content": { innerHTML: "" },
+    };
+    const c = taoMoiTruongKiemThuFrontend(["sukien.js", "ui.js"], elements);
+    c.phienDangNhap.vaiTro = role;
+    const requests = [];
+    c.guiYeuCauApi = async url => {
+      requests.push(url);
+      return { data: { Id: 7, Ten: "Public name", BatDau: "2030-01-01", KetThuc: "2030-01-02",
+        BanToChuc: { Ten: "Public organizer" }, TrangThai: 1, LoaiVes: [] } };
+    };
+    await c.giaoDienQuanLySuKien.moChiTietSuKien(7);
+    kiemTraKetQua.deepEqual(requests, ["/api/events/7" + (["BanToChuc", "QuanLySuKien", "QuanTriVien"].includes(role) ? "/manage" : "")]);
+    kiemTraKetQua.match(elements["ui-drawer-content"].innerHTML, /Public organizer/);
+  }
 });
 khaiBaoKiemThu("Explicit drawer decisions preserve handlers, refresh, and duplicate-click protection", async () => {
   for (const [thaoTacCanThucThi, tenHamXuLyThaoTac, canTaiLaiDanhSach] of [

@@ -4,17 +4,17 @@ public class DangKyDto
 {
     [Required, MaxLength(120)] public string HoTen { get; set; } = "";
     [Required, EmailAddress, MaxLength(200)] public string Email { get; set; } = "";
-    [Required, MinLength(6), MaxLength(100)] public string MatKhau { get; set; } = "";
+    [Required, MinLength(8), MaxLength(100)] public string MatKhau { get; set; } = "";
 }
 public class DangNhapDto
 {
-    [Required, EmailAddress] public string Email { get; set; } = "";
-    [Required] public string MatKhau { get; set; } = "";
+    [Required, EmailAddress, MaxLength(200)] public string Email { get; set; } = "";
+    [Required, MaxLength(100)] public string MatKhau { get; set; } = "";
 }
 public class DoiMatKhauDto
 {
-    [Required] public string MatKhauCu { get; set; } = "";
-    [Required, MinLength(6), MaxLength(100)] public string MatKhauMoi { get; set; } = "";
+    [Required, MaxLength(100)] public string MatKhauCu { get; set; } = "";
+    [Required, MinLength(8), MaxLength(100)] public string MatKhauMoi { get; set; } = "";
 }
 public class SuaTaiKhoanDto
 {

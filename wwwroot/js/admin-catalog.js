@@ -27,7 +27,7 @@ async function taiDanhMucQuanTri() {
     hienKhungDangTai(idKhungDanhMuc, 3);
   });
   try {
-    var phanHoiDanhMuc = await guiYeuCauApi("/api/admin/catalog");
+    var phanHoiDanhMuc = await guiYeuCauDanhSach("/api/admin/catalog", "qt-ds-sk", taiDanhMucQuanTri);
     danhMucQuanTri = phanHoiDanhMuc.data;
     luaChonQuanTri("qt-sk-btc", danhMucQuanTri.ToChuc, function (suKien) {
       return suKien.Ten;
@@ -226,7 +226,7 @@ function luuTaiKhoanQuanTri(suKienDom) {
     var duLieuTaiKhoan = {
       HoTen: docGiaTriInput("qt-tk-ten"),
       Email: docGiaTriInput("qt-tk-email"),
-      MatKhauMoi: docGiaTriInput("qt-tk-mk") || null,
+      MatKhauMoi: document.getElementById("qt-tk-mk").value || null,
     };
     if (!taiKhoanId) {
       duLieuTaiKhoan.MatKhau = duLieuTaiKhoan.MatKhauMoi;
@@ -260,7 +260,7 @@ async function taiLoaiVeQuanTri() {
   }
   hienKhungDangTai("qt-ds-ve", 3);
   try {
-    var phanHoiLoaiVe = await guiYeuCauApi("/api/events/" + suKienId + "/ticket-types");
+    var phanHoiLoaiVe = await guiYeuCauDanhSach("/api/events/" + suKienId + "/ticket-types", "qt-ds-ve", taiLoaiVeQuanTri);
     danhSachLoaiVeQuanTri = phanHoiLoaiVe.data;
     document.getElementById("qt-ds-ve").innerHTML = taoHtmlBang(
       [

@@ -422,6 +422,43 @@ textarea::placeholder {
     color: #98a2b3
 }
 
+.password-field {
+    display: block;
+    position: relative;
+    min-width: 0;
+    width: 100%
+}
+
+.password-field>input:not([type=hidden]):not([type=checkbox]):not([type=radio]) {
+    padding-right: 54px
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 2px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted)
+}
+
+.password-toggle:hover {
+    background: var(--surface-secondary);
+    color: var(--blue-600)
+}
+
+.password-field>input::-ms-reveal {
+    display: none
+}
+
 input:focus,
 textarea:focus,
 select:focus {

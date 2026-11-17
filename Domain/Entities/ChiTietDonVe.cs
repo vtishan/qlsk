@@ -19,6 +19,7 @@ public class ChiTietDonVe
 
     public decimal ThanhTien { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public DonVe DonVe { get; set; } = null!;
 
     public LoaiVe LoaiVe { get; set; } = null!;

@@ -41,6 +41,7 @@ function chuanHoaPhanHoi(giaTriCanXuLy) {
   if (!giaTriCanXuLy || typeof giaTriCanXuLy !== "object") return giaTriCanXuLy;
   var phanHoiChuanHoa = {};
   Object.keys(giaTriCanXuLy).forEach(function (tenThuocTinhJson) {
+    if (["__proto__", "constructor", "prototype"].indexOf(tenThuocTinhJson) !== -1) return;
     var giaTriChuanHoa = chuanHoaPhanHoi(giaTriCanXuLy[tenThuocTinhJson]);
     phanHoiChuanHoa[tenThuocTinhJson] = giaTriChuanHoa;
     var tenThuocTinhVietHoa = tenThuocTinhJson.charAt(0).toUpperCase() + tenThuocTinhJson.slice(1);
@@ -68,13 +69,36 @@ function anBieuTuongDangTai() {
     if (bieuTuongDangTai) bieuTuongDangTai.classList.remove("hien");
   }
 }
-async function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuDuLieuPhanHoi) {
+var cacYeuCauDocDangChay = new Map();
+var hanThuLaiYeuCau = 0;
+function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuDuLieuPhanHoi, tuyChonThem) {
+  var method = String(phuongThucHttp || "GET").toUpperCase();
+  var key = phienDangNhap.token + "|" + duongDanYeuCau + "|" + (kieuDuLieuPhanHoi || "json");
+  if (method !== "GET") cacYeuCauDocDangChay.clear();
+  if (method === "GET" && cacYeuCauDocDangChay.has(key)) return cacYeuCauDocDangChay.get(key);
+  var pending = thucHienYeuCauApi(duongDanYeuCau, method, noiDungYeuCau, kieuDuLieuPhanHoi, tuyChonThem);
+  if (method === "GET") {
+    cacYeuCauDocDangChay.set(key, pending);
+    var cleanup = function () {
+      if (cacYeuCauDocDangChay.get(key) === pending) cacYeuCauDocDangChay.delete(key);
+    };
+    pending.then(cleanup, cleanup);
+  }
+  return pending;
+}
+async function thucHienYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuDuLieuPhanHoi, tuyChonThem) {
+  if (Date.now() < hanThuLaiYeuCau && duongDanYeuCau !== "/api/auth/logout") {
+    var cooling = new Error("Vui lòng đợi " + Math.ceil((hanThuLaiYeuCau - Date.now()) / 1000) + " giây rồi thử lại.");
+    cooling.maTrangThaiHttp = 429;
+    throw cooling;
+  }
   phuongThucHttp = phuongThucHttp || "GET";
   if (!duongDanYeuCau.startsWith("/api/")) duongDanYeuCau = "/api" + (duongDanYeuCau.startsWith("/") ? "" : "/") + duongDanYeuCau;
   var tieuDeYeuCauHttp = {
     "Content-Type": "application/json",
   };
   if (phienDangNhap.token) tieuDeYeuCauHttp["Authorization"] = "Bearer " + phienDangNhap.token;
+  if (tuyChonThem && tuyChonThem.idempotencyKey) tieuDeYeuCauHttp["Idempotency-Key"] = tuyChonThem.idempotencyKey;
   hienBieuTuongDangTai();
   var boHuyYeuCau = new AbortController();
   var boDemHanYeuCau = setTimeout(function () {
@@ -84,6 +108,7 @@ async function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuD
     var phanHoiHttp = await fetch(URL_GOC_API + duongDanYeuCau, {
       method: phuongThucHttp,
       cache: "no-store",
+      credentials: "omit",
       headers: tieuDeYeuCauHttp,
       signal: boHuyYeuCau.signal,
       body: noiDungYeuCau ? JSON.stringify(noiDungYeuCau) : null,
@@ -94,6 +119,17 @@ async function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuD
       noiDungPhanHoi = await phanHoiHttp.json();
     } catch (loiXuLy) {
       noiDungPhanHoi = {};
+    }
+    if (phanHoiHttp.status === 429 || phanHoiHttp.status === 503) {
+      var retryHeader = phanHoiHttp.headers.get("Retry-After");
+      var retrySeconds = Number(retryHeader) || Math.ceil((Date.parse(retryHeader) - Date.now()) / 1000) || 5;
+      retrySeconds = Math.max(1, Math.min(retrySeconds, 300));
+      hanThuLaiYeuCau = Date.now() + retrySeconds * 1000;
+      var busy = new Error((phanHoiHttp.status === 429 ? "Bạn gửi yêu cầu quá nhanh. " : "Dịch vụ đang bận. ") +
+        "Vui lòng thử lại sau " + retrySeconds + " giây.");
+      busy.maTrangThaiHttp = phanHoiHttp.status;
+      busy.retryAfter = retrySeconds;
+      throw busy;
     }
     if (phanHoiHttp.status === 401 || phanHoiHttp.status === 403) {
       var maKetQuaHttp = (noiDungPhanHoi && noiDungPhanHoi.code) || "";
@@ -124,7 +160,9 @@ async function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuD
           : (noiDungPhanHoi && noiDungPhanHoi.message) ||
               "Không thể hoàn tất yêu cầu. Vui lòng kiểm tra thông tin và thử lại.",
       );
-    return chuanHoaPhanHoi(noiDungPhanHoi);
+    var ketQua = chuanHoaPhanHoi(noiDungPhanHoi);
+    ketQua.hasMore = phanHoiHttp.headers.get("X-Has-More") === "true";
+    return ketQua;
   } catch (loiXuLy) {
     if (loiXuLy.name === "AbortError") throw new Error("Kết nối mất nhiều thời gian. Vui lòng thử lại.");
     loiXuLy.message = thongDiepNguoiDung(loiXuLy.message);
@@ -133,6 +171,74 @@ async function guiYeuCauApi(duongDanYeuCau, phuongThucHttp, noiDungYeuCau, kieuD
     clearTimeout(boDemHanYeuCau);
     anBieuTuongDangTai();
   }
+}
+
+function duongDanNoiBo(duongDan) {
+  if (!duongDan || !duongDan.startsWith("/") || /[\\\x00-\x20]/.test(duongDan)) return null;
+  try {
+    var target = new URL(duongDan, location.origin);
+    return target.origin === location.origin ? target.pathname + target.search + target.hash : null;
+  } catch (error) { return null; }
+}
+
+var cacDanhSachPhanTrang = new Map();
+async function guiYeuCauDanhSach(duongDan, idKhung, hamTaiLai) {
+  var key = phienDangNhap.token + "|" + duongDan;
+  var state = cacDanhSachPhanTrang.get(key);
+  var append = state && state.next;
+  if (!append) state = { page: 0, data: null, next: false };
+  state.next = false;
+  cacDanhSachPhanTrang.set(key, state);
+  if (cacDanhSachPhanTrang.size > 20) cacDanhSachPhanTrang.delete(cacDanhSachPhanTrang.keys().next().value);
+  var url = new URL(duongDan, location.origin);
+  url.searchParams.set("page", state.page + 1);
+  if (!url.searchParams.has("size")) url.searchParams.set("size", "100");
+  var result;
+  try { result = await guiYeuCauApi(url.pathname + url.search); }
+  catch (error) { state.next = !!append; throw error; }
+  state.page++;
+  function merge(previous, incoming) {
+    if (Array.isArray(incoming)) {
+      var rows = (previous || []).concat(incoming);
+      var ids = new Set();
+      return rows.filter(function (row) {
+        var id = row && (row.Id || row.id);
+        if (!id) return true;
+        if (ids.has(id)) return false;
+        ids.add(id);
+        return true;
+      });
+    }
+    if (!incoming || typeof incoming !== "object") return incoming;
+    var merged = {};
+    Object.keys(incoming || {}).forEach(function (property) {
+      merged[property] = merge(previous && previous[property], incoming[property]);
+    });
+    return merged;
+  }
+  state.data = append ? merge(state.data, result.data) : result.data;
+  result.data = result.Data = state.data;
+  var host = document.getElementById(idKhung);
+  var button = document.getElementById(idKhung + "-load-more");
+  if (host && result.hasMore) {
+    if (!button) {
+      button = document.createElement("button");
+      button.id = idKhung + "-load-more";
+      button.type = "button";
+      button.className = "phu";
+      button.textContent = "Tải thêm";
+      host.after(button);
+    }
+    button.hidden = false;
+    button.disabled = false;
+    button.onclick = async function () {
+      if (button.disabled) return;
+      button.disabled = true;
+      state.next = true;
+      try { await hamTaiLai(); } finally { button.disabled = false; }
+    };
+  } else if (button) button.hidden = true;
+  return result;
 }
 function maHoaKyTuHtml(giaTri) {
   return chuyenGiaTriThanhVanBan(giaTri)

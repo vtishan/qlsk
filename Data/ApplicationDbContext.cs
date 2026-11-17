@@ -7,9 +7,12 @@ using QLSK.Domain.Entities;
 
 namespace QLSK.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> tuyChonCoSoDuLieu)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> tuyChonCoSoDuLieu, IHttpContextAccessor? httpContextAccessor = null)
     : DbContext(tuyChonCoSoDuLieu)
 {
+    public CancellationToken RequestAborted => httpContextAccessor?.HttpContext?.RequestAborted ?? CancellationToken.None;
+    public HttpContext? HttpContext => httpContextAccessor?.HttpContext;
+
     // Cho phép code truy cập và thao tác với bảng VaiTro.
     public DbSet<VaiTro> DanhSachVaiTro => Set<VaiTro>();
 
@@ -25,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> tuyChon
     public DbSet<DonVe> DanhSachDonVe => Set<DonVe>();
     public DbSet<ChiTietDonVe> ChiTietDonVe => Set<ChiTietDonVe>();
     public DbSet<ThanhToan> DanhSachThanhToan => Set<ThanhToan>();
+    public DbSet<HoanTien> DanhSachHoanTien => Set<HoanTien>();
     public DbSet<Ve> DanhSachVe => Set<Ve>();
     public DbSet<XuatVe> LichSuXuatVe => Set<XuatVe>();
 

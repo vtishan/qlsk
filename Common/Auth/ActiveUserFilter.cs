@@ -13,8 +13,8 @@ public class ActiveUserFilter(ApplicationDbContext nguCanhDuLieu) : IAsyncAuthor
         var taiKhoanId = nguCanhPhanQuyen.HttpContext.User.LayTaiKhoanId();
         var thongTinXacThucTaiKhoan = await nguCanhDuLieu.DanhSachTaiKhoan.AsNoTracking()
             .Where(taiKhoanDb => taiKhoanDb.TaiKhoanId == taiKhoanId)
-            .Select(taiKhoanDb => new { taiKhoanDb.HoatDong, VaiTro = taiKhoanDb.VaiTro.TenVaiTro, MatKhau = taiKhoanDb.MatKhauBam })
-            .SingleOrDefaultAsync();
+            .Select(taiKhoanDb => new { taiKhoanDb.HoatDong, VaiTro = taiKhoanDb.VaiTro.TenVaiTro, MatKhau = taiKhoanDb.MatKhauBam, taiKhoanDb.TokenVersion })
+            .SingleOrDefaultAsync(nguCanhDuLieu.RequestAborted);
         if (thongTinXacThucTaiKhoan is not { HoatDong: true })
         {
             nguCanhPhanQuyen.Result = new ObjectResult(ApiResponse.TaoPhanHoiThatBai("ACCOUNT_LOCKED", "Tài khoản đã bị khóa.")) { StatusCode = 403 };
@@ -23,7 +23,9 @@ public class ActiveUserFilter(ApplicationDbContext nguCanhDuLieu) : IAsyncAuthor
 
         var vaiTroTrongToken = nguCanhPhanQuyen.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         var dauVanTayMatKhauTrongToken = nguCanhPhanQuyen.HttpContext.User.FindFirst(JwtService.PasswordFingerprintClaim)?.Value;
-        if (!string.Equals(vaiTroTrongToken, thongTinXacThucTaiKhoan.VaiTro, StringComparison.Ordinal) ||
+        var version = nguCanhPhanQuyen.HttpContext.User.FindFirst("ver")?.Value ?? "0";
+        if (version != thongTinXacThucTaiKhoan.TokenVersion.ToString(System.Globalization.CultureInfo.InvariantCulture) ||
+            !string.Equals(vaiTroTrongToken, thongTinXacThucTaiKhoan.VaiTro, StringComparison.Ordinal) ||
             !string.Equals(dauVanTayMatKhauTrongToken, JwtService.TaoDauVanTayMatKhau(thongTinXacThucTaiKhoan.MatKhau), StringComparison.Ordinal))
             nguCanhPhanQuyen.Result = new ObjectResult(ApiResponse.TaoPhanHoiThatBai("TOKEN_STALE", "Thông tin đăng nhập đã thay đổi. Vui lòng đăng nhập lại.")) { StatusCode = 401 };
     }

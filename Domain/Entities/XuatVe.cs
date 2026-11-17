@@ -21,5 +21,6 @@ public class XuatVe
     public DateTime NgayTao { get; set; } = DateTime.UtcNow;
 
     [System.Text.Json.Serialization.JsonPropertyName("ve")]
+    [System.Text.Json.Serialization.JsonIgnore]
     public Ve VeDuocXuat { get; set; } = null!;
 }

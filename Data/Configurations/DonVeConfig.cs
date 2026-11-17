@@ -22,6 +22,11 @@ public class DonVeConfig : IEntityTypeConfiguration<DonVe>
         });
 
         cauHinhDonVe.HasKey(donVeDb => donVeDb.DonVeId);
+        cauHinhDonVe.Property(donVeDb => donVeDb.IdempotencyKey).HasMaxLength(64).UseCollation("Latin1_General_100_BIN2");
+        cauHinhDonVe.HasIndex(donVeDb => new { donVeDb.TaiKhoanId, donVeDb.IdempotencyKey })
+            .IsUnique().HasFilter("[IdempotencyKey] IS NOT NULL");
+        cauHinhDonVe.HasIndex(donVeDb => new { donVeDb.TaiKhoanId, donVeDb.TrangThai, donVeDb.ThoiGianHetHan });
+        cauHinhDonVe.HasIndex(donVeDb => new { donVeDb.TaiKhoanId, donVeDb.DonVeId });
 
         cauHinhDonVe.Property(donVeDb => donVeDb.TongTien)
             .HasPrecision(18, 2);

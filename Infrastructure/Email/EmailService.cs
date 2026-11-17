@@ -13,7 +13,8 @@ public class EmailService(IOptions<EmailOptions> tuyChonEmail)
         string emailNhan,
         string tieuDe,
         string noiDung,
-        byte[]? tepPdfVe = null)
+        byte[]? tepPdfVe = null,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(cauHinh.MayChuSmtp))
         {
@@ -53,6 +54,8 @@ public class EmailService(IOptions<EmailOptions> tuyChonEmail)
             )
         };
 
-        await clientGuiEmailSmtp.SendMailAsync(thuEmail);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(15));
+        await clientGuiEmailSmtp.SendMailAsync(thuEmail, timeout.Token);
     }
 }

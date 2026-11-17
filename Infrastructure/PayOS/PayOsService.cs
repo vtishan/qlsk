@@ -14,16 +14,47 @@ public class PayOsService(
     private readonly PayOsOptions cauHinh = tuyChonPayOs.Value;
 
     public async Task<PayOsLink> TaoLienKetThanhToan(
+        long maDonVe, decimal soTienThanhToan, string moTaThanhToan,
+        DateTime? thoiDiemHetHanLienKet = null, CancellationToken cancellationToken = default, bool recoverExisting = false)
+    {
+        try
+        {
+            return await TaoLienKetThanhToanCore(maDonVe, soTienThanhToan, moTaThanhToan,
+                thoiDiemHetHanLienKet, cancellationToken, recoverExisting);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new ApiException(503, "PAYMENT_GATEWAY_TIMEOUT", "Cổng thanh toán phản hồi chậm. Vui lòng kiểm tra đơn rồi thử lại.");
+        }
+        catch (ApiException error) when (error.MaLoi == "PAYMENT_VERIFICATION_FAILED")
+        {
+            throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Không thể xác thực thông tin từ cổng thanh toán.");
+        }
+        catch (Exception error) when (error is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or OverflowException)
+        {
+            throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Phản hồi từ cổng thanh toán không hợp lệ.");
+        }
+    }
+
+    private async Task<PayOsLink> TaoLienKetThanhToanCore(
         long maDonVe,
         decimal soTienThanhToan,
         string moTaThanhToan,
-        DateTime? thoiDiemHetHanLienKet = null)
+        DateTime? thoiDiemHetHanLienKet = null,
+        CancellationToken cancellationToken = default,
+        bool recoverExisting = false)
     {
         KiemTraSoTienThanhToan(soTienThanhToan);
 
         if (ThieuCauHinhThanhToan())
         {
             throw new ApiException(503, "PAYMENT_NOT_CONFIGURED", "Thanh toán trực tuyến hiện chưa khả dụng. Vui lòng thử lại sau.");
+        }
+
+        if (recoverExisting)
+        {
+            var existing = await LayLienKetDaTao(maDonVe, soTienThanhToan, cancellationToken);
+            if (existing is not null) return existing;
         }
 
         var soTienNguyen = decimal.ToInt64(soTienThanhToan);
@@ -57,12 +88,14 @@ public class PayOsService(
         yeuCauHttp.Headers.Add("x-client-id", cauHinh.ClientId);
         yeuCauHttp.Headers.Add("x-api-key", cauHinh.ApiKey);
 
-        using var phanHoiHttp = await clientHttp.SendAsync(yeuCauHttp);
+        using var phanHoiHttp = await clientHttp.SendAsync(yeuCauHttp, cancellationToken);
 
-        var noiDungPhanHoi = await phanHoiHttp.Content.ReadAsStringAsync();
+        var noiDungPhanHoi = await phanHoiHttp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!phanHoiHttp.IsSuccessStatusCode)
         {
+            if (phanHoiHttp.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                throw new ApiException(503, "PAYMENT_GATEWAY_BUSY", "Cổng thanh toán đang bận. Vui lòng thử lại sau.");
             throw new ApiException(
                 502,
                 "PAYMENT_GATEWAY_ERROR",
@@ -77,6 +110,9 @@ public class PayOsService(
 
         if (maKetQua != "00")
         {
+            // payOS orderCode is stable across retries. Never create a second payable order after a timeout.
+            var existing = await LayLienKetDaTao(maDonVe, soTienThanhToan, cancellationToken);
+            if (existing is not null) return existing;
             throw new ApiException(
                 502,
                 "PAYMENT_GATEWAY_ERROR",
@@ -85,6 +121,11 @@ public class PayOsService(
         }
 
         var duLieuJson = gocJson.GetProperty("data");
+        KiemTraChuKy(duLieuJson, gocJson.TryGetProperty("signature", out var signature) ? signature.GetString() : null);
+        if (!duLieuJson.TryGetProperty("orderCode", out var orderCode) || !orderCode.TryGetInt64(out var order) || order != maDonVe ||
+            !duLieuJson.TryGetProperty("amount", out var amount) || !amount.TryGetDecimal(out var paidAmount) || paidAmount != soTienThanhToan ||
+            !duLieuJson.TryGetProperty("currency", out var currency) || currency.GetString() != "VND")
+            throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Thông tin liên kết thanh toán không khớp đơn.");
 
         var checkoutUrl =
             duLieuJson.GetProperty("checkoutUrl").GetString() ?? "";
@@ -93,6 +134,12 @@ public class PayOsService(
             duLieuJson.TryGetProperty("paymentLinkId", out var lienKetJson)
                 ? lienKetJson.GetString()
                 : null;
+
+        if (string.IsNullOrWhiteSpace(maLienKetThanhToan) || maLienKetThanhToan.Length > 120 ||
+            !Uri.TryCreate(checkoutUrl, UriKind.Absolute, out var checkout) || checkout.Scheme != "https" ||
+            !checkout.IsDefaultPort || checkout.UserInfo.Length != 0 ||
+            (checkout.Host != "pay.payos.vn" && checkout.Host != "checkout.payos.vn"))
+            throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Liên kết thanh toán không hợp lệ.");
 
         return new PayOsLink(
             checkoutUrl,
@@ -104,26 +151,18 @@ public class PayOsService(
     {
         KiemTraKhoaXacThucWebhook();
 
-        var chuoiCanKy = TaoChuoiKyDuLieuWebhook(webhook.DuLieuWebhook);
-        var chuKyMongDoi = TaoChuKyHmac(chuoiCanKy);
-
-        var chuKyHopLe = CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(chuKyMongDoi.ToLowerInvariant()),
-            Encoding.UTF8.GetBytes(
-                webhook.ChuKyWebhook.ToLowerInvariant()
-            )
-        );
-
-        if (!chuKyHopLe)
-        {
-            throw new ApiException(
-                400,
-                "PAYMENT_VERIFICATION_FAILED",
-                "Webhook payOS không hợp lệ."
-            );
-        }
+        KiemTraChuKy(webhook.DuLieuWebhook, webhook.ChuKyWebhook);
 
         var duLieuJson = webhook.DuLieuWebhook;
+
+        if (!duLieuJson.TryGetProperty("orderCode", out var orderElement) || orderElement.ValueKind != JsonValueKind.Number || !orderElement.TryGetInt64(out var parsedOrder) || parsedOrder is < 1 or > int.MaxValue ||
+            !duLieuJson.TryGetProperty("amount", out var amountElement) || amountElement.ValueKind != JsonValueKind.Number || !amountElement.TryGetDecimal(out var parsedAmount) ||
+            parsedAmount <= 0 || parsedAmount != decimal.Truncate(parsedAmount) ||
+            (duLieuJson.TryGetProperty("currency", out var currencyElement) && (currencyElement.ValueKind != JsonValueKind.String || currencyElement.GetString() != "VND")))
+            throw new ApiException(400, "PAYMENT_INVALID", "Dữ liệu webhook không hợp lệ.");
+        foreach (var name in new[] { "reference", "paymentLinkId", "code", "desc" })
+            if (duLieuJson.TryGetProperty(name, out var value) && value.ValueKind != JsonValueKind.String)
+                throw new ApiException(400, "PAYMENT_INVALID", "Dữ liệu webhook không hợp lệ.");
 
         var maDonVe =
             duLieuJson.GetProperty("orderCode").GetInt64();
@@ -151,6 +190,10 @@ public class PayOsService(
                 ? moTaJson.GetString() ?? ""
                 : "";
 
+        if (string.IsNullOrWhiteSpace(maThamChieuThanhToan) || maThamChieuThanhToan.Length > 120 ||
+            string.IsNullOrWhiteSpace(maLienKetThanhToan) || maLienKetThanhToan.Length > 120)
+            throw new ApiException(400, "PAYMENT_INVALID", "Mã giao dịch hoặc liên kết thanh toán không hợp lệ.");
+
         return new PayOsWebhookData(
             maDonVe,
             soTienThanhToan,
@@ -159,6 +202,42 @@ public class PayOsService(
             maKetQua,
             moTaGiaoDich
         );
+    }
+
+    private void KiemTraChuKy(JsonElement data, string? signature)
+    {
+        if (data.ValueKind != JsonValueKind.Object || signature?.Length != 64 ||
+            signature.Any(c => !Uri.IsHexDigit(c)) ||
+            data.EnumerateObject().Select(p => p.Name).Distinct(StringComparer.Ordinal).Count() != data.EnumerateObject().Count())
+            throw new ApiException(400, "PAYMENT_VERIFICATION_FAILED", "Chữ ký thanh toán không hợp lệ.");
+        var expected = Convert.FromHexString(TaoChuKyHmac(TaoChuoiKyDuLieuWebhook(data)));
+        if (!CryptographicOperations.FixedTimeEquals(expected, Convert.FromHexString(signature)))
+            throw new ApiException(400, "PAYMENT_VERIFICATION_FAILED", "Chữ ký thanh toán không hợp lệ.");
+    }
+
+    private async Task<PayOsLink?> LayLienKetDaTao(long orderCode, decimal amount, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v2/payment-requests/{orderCode.ToString(CultureInfo.InvariantCulture)}");
+        request.Headers.Add("x-client-id", cauHinh.ClientId);
+        request.Headers.Add("x-api-key", cauHinh.ApiKey);
+        using var response = await clientHttp.SendAsync(request, cancellationToken);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        if (!response.IsSuccessStatusCode) throw new ApiException(503, "PAYMENT_GATEWAY_BUSY", "Không thể kiểm tra liên kết thanh toán. Vui lòng thử lại sau.");
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+        var root = json.RootElement;
+        // 201 is payOS's 'payment link not found' code; other errors must not trigger a new creation.
+        var code = root.GetProperty("code").GetString();
+        if (code == "201") return null;
+        if (code != "00") throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Không thể kiểm tra liên kết thanh toán.");
+        var data = root.GetProperty("data");
+        KiemTraChuKy(data, root.TryGetProperty("signature", out var signature) ? signature.GetString() : null);
+        if (data.GetProperty("orderCode").GetInt64() != orderCode || data.GetProperty("amount").GetDecimal() != amount ||
+            data.GetProperty("status").GetString() is not ("PENDING" or "PROCESSING"))
+            throw new ApiException(409, "PAYMENT_IN_PROGRESS", "Giao dịch đã thay đổi. Vui lòng kiểm tra trạng thái đơn.");
+        var id = data.GetProperty("id").GetString();
+        if (string.IsNullOrWhiteSpace(id) || id.Length > 120 || id.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '-'))
+            throw new ApiException(502, "PAYMENT_GATEWAY_ERROR", "Mã liên kết thanh toán không hợp lệ.");
+        return new PayOsLink($"https://pay.payos.vn/web/{id}", id);
     }
 
     private void KiemTraSoTienThanhToan(decimal soTienThanhToan)
@@ -279,29 +358,27 @@ public class PayOsService(
             JsonValueKind.String
                 => giaTriJsonCanXuLy.GetString() ?? "",
 
-            JsonValueKind.Array
+            JsonValueKind.Array or JsonValueKind.Object
                 => JsonSerializer.Serialize(
-                    giaTriJsonCanXuLy
-                        .EnumerateArray()
-                        .Select(phanTuJson =>
-                            phanTuJson.ValueKind == JsonValueKind.Object
-                                ? (object)SapXepThuocTinhJson(phanTuJson)
-                                : phanTuJson
-                        )
-                ),
-
-            JsonValueKind.Object
-                => JsonSerializer.Serialize(
-                    SapXepThuocTinhJson(giaTriJsonCanXuLy)
+                    SapXepGiaTriJson(giaTriJsonCanXuLy),
+                    new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }
                 ),
 
             _ => giaTriJsonCanXuLy.ToString()
         };
     }
 
-    private static SortedDictionary<string, object?>
-        SapXepThuocTinhJson(JsonElement giaTriJsonCanXuLy)
+    private static object? SapXepGiaTriJson(JsonElement giaTriJsonCanXuLy)
     {
+        if (giaTriJsonCanXuLy.ValueKind == JsonValueKind.Array)
+            return giaTriJsonCanXuLy.EnumerateArray().Select(SapXepGiaTriJson).ToArray();
+        if (giaTriJsonCanXuLy.ValueKind != JsonValueKind.Object)
+            return giaTriJsonCanXuLy.ValueKind switch
+            {
+                JsonValueKind.String => giaTriJsonCanXuLy.GetString(),
+                JsonValueKind.Null => null,
+                _ => giaTriJsonCanXuLy.Clone()
+            };
         var thuocTinhDaSapXep =
             new SortedDictionary<string, object?>(
                 StringComparer.Ordinal
@@ -311,10 +388,7 @@ public class PayOsService(
             .EnumerateObject()
             .OrderBy(thuocTinhJson => thuocTinhJson.Name, StringComparer.Ordinal))
         {
-            thuocTinhDaSapXep[thuocTinhJson.Name] =
-                thuocTinhJson.Value.ValueKind == JsonValueKind.String
-                    ? thuocTinhJson.Value.GetString()
-                    : thuocTinhJson.Value.GetRawText();
+            thuocTinhDaSapXep[thuocTinhJson.Name] = SapXepGiaTriJson(thuocTinhJson.Value);
         }
 
         return thuocTinhDaSapXep;

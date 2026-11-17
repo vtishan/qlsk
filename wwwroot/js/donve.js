@@ -21,7 +21,8 @@ async function taiLoaiVeTheoSuKien(suKienIdTruyenVao) {
   }
   if (khungDanhSachLoaiVe) hienKhungDangTai(khungDanhSachLoaiVe.id, 3);
   try {
-    var phanHoiLoaiVe = await guiYeuCauApi("/api/events/" + suKienId + "/ticket-types");
+    var phanHoiLoaiVe = await guiYeuCauDanhSach("/api/events/" + suKienId + "/ticket-types", khungDanhSachLoaiVe.id,
+      function () { return taiLoaiVeTheoSuKien(suKienId); });
     var danhSachLoaiVe = phanHoiLoaiVe.data || [];
     var noiDungHtml;
     if (!danhSachLoaiVe.length) {
@@ -97,6 +98,14 @@ async function taoDonDatVe() {
   taoDonDatVe.dangGui = true;
   if (nutTaoDon) nutTaoDon.disabled = true;
   try {
+    var payloadKey = phienDangNhap.taiKhoanID + ":" + loaiVeId + ":" + soLuong;
+    var savedRequest;
+    try { savedRequest = JSON.parse(sessionStorage.getItem("sk_order_request") || "null"); } catch (error) {}
+    if (!savedRequest || savedRequest.payload !== payloadKey) {
+      savedRequest = { payload: payloadKey, key: typeof crypto.randomUUID === "function" ? crypto.randomUUID() :
+        Array.from(crypto.getRandomValues(new Uint8Array(16)), function (b) { return b.toString(16).padStart(2, "0"); }).join("") };
+      sessionStorage.setItem("sk_order_request", JSON.stringify(savedRequest));
+    }
     var phanHoiTaoDon = await guiYeuCauApi("/api/orders", "POST", {
       Items: [
         {
@@ -104,8 +113,9 @@ async function taoDonDatVe() {
           SoLuong: soLuong,
         },
       ],
-    });
+    }, null, { idempotencyKey: savedRequest.key });
     var donVe = phanHoiTaoDon.data || phanHoiTaoDon;
+    sessionStorage.removeItem("sk_order_request");
     var maDonHang = donVe.MaDonHang || "DH-" + donVe.Id;
     thongBao("Tạo đơn thành công. Mã đơn: " + maDonHang);
     chayHieuUngGiayMau(90);
@@ -328,7 +338,7 @@ function ganSuKienBoLocDonVe() {
 async function taiDonVeCuaTaiKhoan() {
   hienKhungDangTai("ds-don", 3);
   try {
-    var phanHoiDonVe = await guiYeuCauApi("/api/orders/me");
+    var phanHoiDonVe = await guiYeuCauDanhSach("/api/orders/me", "ds-don", taiDonVeCuaTaiKhoan);
     var danhSachDonVe = phanHoiDonVe.data || [];
     __dsDonCache = danhSachDonVe;
     var khungChiTietDonVe = document.getElementById("ds-chitiet");

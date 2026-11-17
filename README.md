@@ -184,12 +184,22 @@ Khi publish project, thư mục `wwwroot` cũng được đóng gói cùng backe
 
 ## 4. Chạy project
 
+Môi trường phát triển mặc định dùng SQL Server Express LocalDB tại
+`(localdb)\MSSQLLocalDB`, database `QLSK_Local`. Cần cài
+[SQL Server Express LocalDB](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
+trên máy trước khi chạy. Nếu dùng SQL Server instance khác, cập nhật
+`ConnectionStrings:Default` trong `appsettings.Development.json`.
+
 Trên Windows, nạp các biến môi trường cho terminal PowerShell hiện tại:
 
 ```powershell
 ./scripts/Set-DevelopmentEnvironment.ps1
 dotnet run
 ```
+
+Với database mới, sau khi nạp môi trường, chạy
+`dotnet run --project tools/QLSK.Setup -- migrate` một lần để tạo schema và
+bốn vai trò hệ thống, rồi khởi chạy web bằng `dotnet run`.
 
 Script dùng connection string trong `appsettings.Development.json`, bật `Development`, cấu hình URL và nạp JWT từ .NET User Secrets. Nếu chưa có JWT, script tạo khóa ngẫu nhiên và lưu vào User Secrets. Các biến chỉ có hiệu lực trong terminal hiện tại; không in khóa hoặc lưu bí mật vào source. Có thể truyền `-ConnectionString` để chọn database phát triển khác. Sau khi nạp, `scripts/Set-AdminCredential.ps1` và công cụ `QLSK.Setup` cũng dùng được connection string này.
 
