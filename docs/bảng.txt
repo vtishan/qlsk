@@ -1,0 +1,172 @@
+THIẾT KẾ CƠ SỞ DỮ LIỆU QLSK
+
+Mô hình EF Core gồm 37 bảng thuộc 6 nhóm, dùng SQL Server 2022 trở lên. Mỗi bảng tương ứng với một DbSet trong Data/AppDbContext.cs.
+Xem ERD của sáu nhóm trong docs/so_do_erd.md.
+
+Quy ước
+- PK là khóa chính. FK là khóa ngoại. Dấu ? biểu thị cột cho phép NULL.
+- Id dùng int IDENTITY. Các cột tham chiếu dùng int cùng kiểu với khóa chính đích. FK mặc định dùng NO ACTION để giữ lịch sử.
+- Thời điểm dùng datetime2(3), lưu theo UTC và hiển thị theo giờ Việt Nam. Ngày không kèm giờ dùng date.
+- Tiền Việt Nam đồng dùng decimal(19,0). Tỷ lệ phần trăm dùng decimal(5,2), kiểm tra từ 0 đến 100. Số tiền, sức chứa và số lượng có ràng buộc theo nghiệp vụ.
+- Tên và mã ngắn dùng nvarchar có giới hạn. Nội dung dài dùng nvarchar(max). Các cột JSON được ghi rõ và phải qua ISJSON cùng kiểm tra cấu trúc ở máy chủ.
+- Các trạng thái và mã loại cố định dùng nvarchar(32) có CHECK. LoaiQuyen dùng nvarchar(64) để lưu mã quyền nghiệp vụ. Danh sách giá trị cố định nằm trong các tệp CauHinh*.cs.
+- TaiKhoan.VaiTro lưu mã số nguyên, mặc định 1. Quy ước 1 Người dùng, 2 Ban tổ chức, 3 Quản lý sự kiện, 4 Quản lý hệ thống, 5 Quản trị viên. Phạm vi của Quản lý sự kiện lấy từ PhanCongSuKien. Khách chưa đăng nhập không có mã vai trò.
+
+1. Tài khoản và phân quyền (4 bảng)
+
+STT	Bảng	Các trường chính
+1	TaiKhoan	Id (PK), HoTen, Email?, SoDienThoai?, TenDangNhap, MatKhauBam, VaiTro (mặc định 1), TrangThai, NgayTao, EmailXacMinhLuc?, SoDienThoaiXacMinhLuc?, MaBamKhoiPhuc?, HanKhoiPhuc?, PhienBanDangNhap, QuyenQuanLy? (JSON)
+2	HoSoBTC	Id (PK), TaiKhoanId (FK TaiKhoan), TenToChuc, NguoiDaiDien, MaSoThue?, DiaChi, ThongTinLienHe, ThongTinNhanTienMaHoa?, TrangThai, LyDoTuChoi?, NgayNop?, HanDuyet?, NguoiDuyetId? (FK TaiKhoan), NgayDuyet?
+3	GiayToBTC	Id (PK), HoSoBTCId (FK HoSoBTC), LoaiGiayTo, KhoaLuuTru, TenTep, LoaiNoiDung, NgayTaiLen
+4	PhanCongSuKien	Id (PK), SuKienId (FK SuKien), SuatDienId? (FK SuatDien), TaiKhoanId? (FK TaiKhoan), EmailMoi?, MaBamLoiMoi?, HanLoiMoi?, NguoiPhanCongId (FK TaiKhoan), LoaiQuyen, NgayPhanCong, NgayThuHoi?, TrangThai
+
+- Yêu cầu ít nhất một trong Email và SoDienThoai. Chuẩn hóa giá trị trước khi lưu, dùng NULL cho liên hệ chưa khai báo. Hai chỉ mục duy nhất chỉ xét liên hệ khác NULL. TenDangNhap cũng duy nhất. Vai trò có CHECK từ 1 đến 5 và đăng ký chỉ tạo Người dùng. Chỉ hồ sơ được duyệt mới cấp quyền Ban tổ chức. Lưu quyền được Admin giao cho Quản lý hệ thống trong QuyenQuanLy. Khóa tài khoản hoặc thu hồi toàn bộ phiên thì tăng PhienBanDangNhap.
+- Mã khôi phục dùng một lần trong 30 phút, lưu dạng băm và xóa sau khi dùng. Trường liên hệ được xác minh phải mất trạng thái xác minh khi người dùng đổi giá trị. Giấy tờ nằm ngoài thư mục công khai và chỉ mở sau khi kiểm tra quyền.
+- Hồ sơ nháp, chờ duyệt, cần bổ sung, bị từ chối hoặc đã duyệt. Lưu mỗi lần nộp lại thành hồ sơ mới để giữ giấy tờ và kết quả của lần trước. Tính hạn 7 ngày làm việc từ NgayNop theo lịch ngày nghỉ trong CauHinhHeThong.
+- Phân công kiểm tra sự kiện thuộc BTC cấp quyền và suất diễn thuộc đúng sự kiện. SuatDienId NULL nghĩa là quyền áp dụng toàn sự kiện. Lời mời chỉ gắn tài khoản sau khi xác minh đúng email. Hai chỉ mục duy nhất có lọc tách quyền DangHieuLuc toàn sự kiện (TaiKhoanId, SuKienId, LoaiQuyen) và quyền DangHieuLuc theo suất (TaiKhoanId, SuKienId, SuatDienId, LoaiQuyen). Kiểm tra lại quyền ở máy chủ khi thao tác.
+
+2. Quản lý sự kiện (4 bảng)
+
+STT	Bảng	Các trường chính
+5	SuKien	Id (PK), BTCId (FK HoSoBTC), DanhMucId (FK DanhMucSuKien), TenSuKien, MoTa, AnhBia, TrangThai, NgayTao, PhienBanCongKhaiId? (FK PhienBanSuKien), ChoPhepTuHuyVe, HanHoanKhiHoan?
+6	PhienBanSuKien	Id (PK), SuKienId (FK SuKien), SoPhienBan, LoaiYeuCau, NoiDung (JSON), LyDo?, TrangThaiDuyet, NguoiGuiId (FK TaiKhoan), NgayGui?, NguoiDuyetId? (FK TaiKhoan), NgayDuyet?, KetQuaDuyet?
+7	SuatDien	Id (PK), SuKienId (FK SuKien), DiaDiemId (FK DiaDiem), ThoiGianBatDau, ThoiGianKetThuc, ThoiGianMoBan, ThoiGianDongBan, SoDoChot (JSON), SucChua, TrangThai
+8	DanhMucSuKien	Id (PK), TenDanhMuc, MoTa?, TrangThai
+
+- Duy nhất (SuKienId, SoPhienBan). Bản chờ duyệt lưu đề xuất về nội dung, lịch, địa điểm, giá và sơ đồ. Chỉ khi duyệt mới cập nhật bản hiện hành cùng các suất liên quan trong một giao dịch. PhienBanCongKhaiId phải thuộc cùng sự kiện. Từ chối giữ nguyên bản đang công khai.
+- Một sự kiện có nhiều suất tại các địa điểm khác nhau. Bắt đầu phải trước kết thúc, mở bán phải trước đóng bán và đóng bán muộn nhất vào giờ bắt đầu suất diễn. Sơ đồ chốt lưu mã khu vực, mã ghế, nhóm ghế và sức chứa theo suất để chỉnh sơ đồ gốc của địa điểm không ảnh hưởng vé đã bán.
+- Chặn sửa đổi gây mất quyền lợi vé đã cấp hoặc làm suất vượt sức chứa. Duyệt hoãn giữ vé, gửi lịch mới và mở hạn yêu cầu hoàn. Duyệt hủy khóa vé và tạo yêu cầu hoàn đủ số tiền đã thu. Đình chỉ khóa công khai và mở bán.
+
+3. Địa điểm và ghế (6 bảng)
+
+STT	Bảng	Các trường chính
+9	DiaDiem	Id (PK), TenDiaDiem, DiaChi, SucChua, GiaThue, TienIch?, TrangThai
+10	KhuVuc	Id (PK), DiaDiemId (FK DiaDiem), TenKhuVuc, SucChua
+11	Ghe	Id (PK), KhuVucId (FK KhuVuc), CumGheId? (FK CumGhe), MaGhe, LoaiGhe, TrangThai
+12	CumGhe	Id (PK), KhuVucId (FK KhuVuc), TenCum, LoaiCum, SoCho
+13	YeuCauThue	Id (PK), TaiKhoanId (FK TaiKhoan), DiaDiemId (FK DiaDiem), ThoiGianBatDau, ThoiGianKetThuc, TongTien, TienCoc, HanDatCoc?, ChinhSachId (FK ChinhSach), TrangThai, NguoiDuyetId? (FK TaiKhoan), LyDoXuLy?, NgayHuy?
+14	LichDatDiaDiem	Id (PK), DiaDiemId (FK DiaDiem), YeuCauThueId? (FK YeuCauThue), SuatDienId? (FK SuatDien), BatDau, KetThuc, LoaiLich, TrangThai
+
+- Duy nhất (DiaDiemId, TenKhuVuc) và (KhuVucId, MaGhe). Ghế thuộc cụm cùng khu vực. TrangThai của Ghe chỉ phản ánh tình trạng vật lý. Việc giữ hoặc bán được xác định theo suất diễn.
+- Khi duyệt thuê, khóa hàng DiaDiem để kiểm tra chồng lấn khung giờ trong LichDatDiaDiem rồi mới giữ lịch. Hai khung giờ liền nhau được phép. Lịch bảo trì của Admin có thể không gắn yêu cầu thuê hoặc suất. Suất diễn phải nằm trong khung giờ thuê đã xác nhận tại đúng địa điểm trước khi công khai.
+- Chốt cọc 30% tổng tiền thuê, làm tròn đến đồng, và hạn 24 giờ từ khi duyệt. Hết hạn chưa đối soát cọc hợp lệ thì chuyển trạng thái và nhả lịch. Khi hủy, tính hoàn trên số cọc thực thu theo mốc từ 14 ngày là 80%, từ 7 đến dưới 14 ngày là 50%, dưới 7 ngày là 0%. Đây là các mốc cố định của nghiệp vụ. ChinhSachId giữ phiên bản điều khoản đã công bố khi thuê. Cọc và hoàn cọc có chứng từ trong nhóm tài chính.
+
+4. Đặt vé và check-in (8 bảng)
+
+STT	Bảng	Các trường chính
+15	LoaiVe	Id (PK), SuatDienId (FK SuatDien), KhuVucId (FK KhuVuc), TenLoaiVe, NhomVe, GiaVe, SoLuong, QuyenLoi?, BatDauBan, KetThucBan
+16	DonHang	Id (PK), TaiKhoanId (FK TaiKhoan), SuatDienId (FK SuatDien), HopDongId? (FK HopDong), ChinhSachId (FK ChinhSach), TienVe, TienGiam, PhiDichVu, PhiNenTang, TongTien, TrangThai, NgayTao, HanThanhToan
+17	ChiTietDonHang	Id (PK), DonHangId (FK DonHang), LoaiVeId (FK LoaiVe), SoLuong, DonGia, ThanhTien
+18	GiuGhe	Id (PK), SuatDienId (FK SuatDien), GheId? (FK Ghe), ChiTietDonHangId (FK ChiTietDonHang), HetHan, TrangThai
+19	Ve	Id (PK), ChiTietDonHangId? (FK ChiTietDonHang), GiuGheId? (FK GiuGhe), LoaiVeId (FK LoaiVe), SuatDienId (FK SuatDien), GheId? (FK Ghe), MaVe, MaQR, TrangThai, NgayPhatHanh, DaCheckInLuc?
+20	VeMoi	Id (PK), VeId (FK Ve), HoTenKhachMoi, Email?, SoDienThoai?, TaiKhoanNhanId? (FK TaiKhoan), MaBamNhanVe?, HanNhanVe?, DaGuiLuc?, DaNhanLuc?, TrangThai
+21	NhatKyCheckIn	Id (PK), VeId (FK Ve), NhanVienId (FK TaiKhoan), ThoiGianQuet, KetQua, HinhThuc
+22	Voucher	Id (PK), MaVoucher, SuKienId? (FK SuKien), SuatDienId? (FK SuatDien), KhuVucId? (FK KhuVuc), LoaiGiam, GiaTri, MucGiamToiDa?, GiaTriDonToiThieu, SoLuong, LuotMoiTaiKhoan, NguonTaiTro, NgayBatDau, NgayKetThuc, TrangThai
+
+- Mỗi dòng GiuGhe giữ một chỗ. Ví dụ, chọn A1 và A2 cùng loại vé tạo một dòng ChiTietDonHang có SoLuong = 2 và hai dòng GiuGhe. GheId NULL biểu thị chỗ đứng hoặc không chỉ định ghế. Kiểm tra số lượng từng loại vé, sức chứa khu vực trong SoDoChot và tổng SuatDien.SucChua, tính cả vé mời. Vé mời có giá 0 và không mở bán.
+- Giữ ghế 10 phút bằng giao dịch ngắn. Mọi thao tác chiếm hoặc nhả chỗ, kể cả phát vé mời và khôi phục đơn trả muộn, khóa cùng hàng SuatDien. Với hạn mức 10, nối DonHang của tài khoản với ChiTietDonHang rồi đếm GiuGhe DangGiu còn hạn và Ve ở trạng thái DaPhatHanh hoặc DaCheckIn trong cùng suất. Không tính vé mời, vé đã hủy/thu hồi hoặc lần giữ đã được chuyển thành vé. Giữ cụm theo nguyên tắc tất cả cùng thành công hoặc cùng hủy.
+- Khi chốt đơn, chuyển GiuGhe sang DaChot, phát Ve và chốt lượt voucher trong cùng giao dịch. Khi đơn chờ thanh toán hết hạn hoặc bị hủy, đồng bộ trạng thái DonHang, GiuGhe và SuDungVoucher trong cùng giao dịch. Tính tồn theo các dòng còn hiệu lực, kể cả chỗ không có mã ghế.
+- Dùng chỉ mục duy nhất có lọc trên (SuatDienId, GheId) cho lượt giữ đang hoạt động và một chỉ mục tương ứng cho vé còn chiếm ghế. Kiểm tra chéo hai bảng dưới cùng khóa suất diễn. Tác vụ hết hạn chỉ nhả những dòng còn giữ và HetHan đã qua, dựa trên mã dòng giữ cụ thể.
+- Duy nhất MaVe, MaQR, GiuGheId khác NULL và VeMoi.VeId. Vé mời cần email hoặc số điện thoại, có liên kết nhận vé có hạn. Chỉ liên kết tài khoản đã xác minh đúng liên hệ. Thu hồi vé mời chỉ khi chưa dùng và ghi nhật ký.
+- Check-in kiểm tra đúng suất, sự kiện hoạt động và quyền quét hoặc quyền thủ công. Cập nhật vé chưa dùng và ghi một lần thành công trong cùng giao dịch. Chỉ mục duy nhất có lọc trên VeId với kết quả thành công chặn ghi trùng. Lượt quét lại trả thời điểm thành công đầu tiên.
+
+5. Thanh toán và tài chính (8 bảng)
+
+STT	Bảng	Các trường chính
+23	SuDungVoucher	Id (PK), VoucherId (FK Voucher), DonHangId (FK DonHang), SoTienGiam, HetHanGiuLuot, DaChotLuc?, TrangThai
+24	GiaoDichThanhToan	Id (PK), DonHangId? (FK DonHang), YeuCauThueId? (FK YeuCauThue), MaDonNhaCungCap?, MaGiaoDich?, SoTienYeuCau, SoTienThucThu?, PhuongThuc, TrangThai, NgayThanhToan?, ChungTu?
+25	WebhookThanhToan	Id (PK), GiaoDichId? (FK GiaoDichThanhToan), MaSuKienWebhook, NoiDungDaLoc (JSON), ThoiGianNhan, TrangThaiXuLy
+26	YeuCauHoanTien	Id (PK), TaiKhoanId (FK TaiKhoan), GiaoDichId (FK GiaoDichThanhToan), VeId? (FK Ve), KhoaChongLap, SoTienYeuCau, SoTienDuyet?, LoaiYeuCau, LyDo, TrangThai, NgayYeuCau, NguoiDuyetId? (FK TaiKhoan), NgayDuyet?
+27	GiaoDichHoanTien	Id (PK), YeuCauHoanTienId (FK YeuCauHoanTien), KhoaChongLap, MaGiaoDichHoan?, SoTien, TrangThai, NgayXuLy?, ChungTu?
+28	HopDong	Id (PK), BTCId (FK HoSoBTC), SuKienId? (FK SuKien), LoaiPhi, TyLePhi?, PhiMoiVe?, NoiDung, NgayKy, HieuLucTu, HieuLucDen?, TrangThai
+29	DoiSoat	Id (PK), SuKienId (FK SuKien), PhienBan, TuNgay, DenNgay, TongDoanhThu, TongTienHoan, PhiNenTang, TienDieuChinh, TienBTCNhan, ChiTietDoiSoat (JSON), HanXacNhan, NguoiDuyetId? (FK TaiKhoan), NgayDuyet?, TrangThai
+30	GiaiNgan	Id (PK), DoiSoatId (FK DoiSoat), KhoaChongLap, MaGiaoDich?, SoTien, TrangThai, NgayGiaiNgan?, ChungTu?
+
+- Duy nhất Voucher.MaVoucher và SuDungVoucher.DonHangId. Khóa hàng Voucher khi kiểm tra phạm vi, hạn dùng, giá trị tối thiểu, lượt chiến dịch và lượt theo tài khoản của đơn. Lượt giữ hết hạn được trả. Đơn trả muộn phải kiểm tra lại lượt và điều kiện cấp vé theo số tiền đã chốt.
+- CHECK giao dịch thanh toán gắn đúng một đơn hàng hoặc một yêu cầu thuê. Mã đơn PayOS, mã giao dịch đã xác nhận và mã thông báo webhook có chỉ mục duy nhất phù hợp. Xác minh chữ ký, mã đơn, số tiền và mã giao dịch trước khi chốt. Khi chưa rõ kết quả thì đối soát qua PayOS, không đánh dấu thành công từ trang chuyển hướng.
+- Ghi nhận tiền và phát vé một lần. Khi đối soát tiền đến muộn, kiểm tra lại chỗ, hạn mức và lượt voucher trong giao dịch. Nếu lượt đã nhả còn khả dụng thì chốt lại SuDungVoucher thành DaSuDung, theo đúng số tiền đã chốt trên đơn. Khi không thể phục hồi thì chuyển DonHang sang DaThuTienHetCho, thông báo và tạo yêu cầu hoàn toàn bộ số tiền thực thu. Khoản thu trùng có mã ngân hàng riêng ghi ThuTrungCanHoan để giữ bằng chứng và xử lý hoàn riêng.
+- Hủy vé tự nguyện cần còn ít nhất 72 giờ, SuKien.ChoPhepTuHuyVe được bật, điều khoản đã chốt cho phép và vé chưa check-in. Mốc 72 giờ là điều kiện tối thiểu cố định. ChinhSachId tham chiếu điều khoản đã chốt. Dùng giá đã chốt khi xác định phần giá vé được hoàn, đối chiếu phần giảm và tách phí dịch vụ theo điều khoản. Hoãn/hủy sử dụng số tiền thực trả theo điều kiện được công bố. Vé đã check-in có luồng khiếu nại. Tổng tiền đã hoàn và đang chuyển phải nằm trong số tiền thực thu của giao dịch gốc, kiểm tra khi duyệt dưới khóa giao dịch.
+- Hợp đồng có đúng một cách tính phí. Hợp đồng riêng cho sự kiện được ưu tiên hơn hợp đồng chung của BTC. Cùng phạm vi không được chồng thời gian hiệu lực. Đơn lưu HopDongId và số phí chốt. Đối soát cộng số đã chốt trên các đơn, trừ tiền hoàn thành công, phí nền tảng và điều chỉnh được duyệt, đồng thời lưu căn cứ từng khoản trong ChiTietDoiSoat.
+- Đối soát sau kỳ khóa sổ, BTC xác nhận hoặc phản hồi trong 48 giờ, sau đó Quản lý hệ thống duyệt. Duy nhất (SuKienId, TuNgay, DenNgay, PhienBan). Mỗi kỳ chỉ cho một bản được phép chi trả. Duy nhất GiaiNgan.DoiSoatId và các khóa chống lặp. Giữ nguyên mã xử lý khi gửi lại cùng lệnh. Hoàn tiền và giải ngân chỉ chuyển thành công khi đã đối chiếu bằng chứng chuyển khoản.
+
+6. Quản trị và hỗ trợ (7 bảng)
+
+STT	Bảng	Các trường chính
+31	ThongBao	Id (PK), TaiKhoanId? (FK TaiKhoan), VeMoiId? (FK VeMoi), TieuDe, NoiDung, LoaiThongBao, KenhGui, TrangThaiGui, DaDoc, NgayTao, NgayGui?
+32	KhieuNai	Id (PK), TaiKhoanId (FK TaiKhoan), SuKienId? (FK SuKien), VeId? (FK Ve), YeuCauThueId? (FK YeuCauThue), TieuDe, NoiDung, TrangThai, NguoiXuLyId? (FK TaiKhoan), NgayTao, KetQuaXuLy?
+33	DanhGia	Id (PK), TaiKhoanId (FK TaiKhoan), SuKienId (FK SuKien), SoSao, BinhLuan?, NgayDanhGia, TrangThai
+34	Banner	Id (PK), TieuDe, HinhAnh, DuongDan?, ThuTu, TrangThai
+35	CauHinhHeThong	Id (PK), Khoa, GiaTri, MoTa?, NgayCapNhat, NguoiCapNhatId (FK TaiKhoan)
+36	NhatKyHeThong	Id (PK), TaiKhoanId? (FK TaiKhoan), HanhDong, DoiTuong, DoiTuongId?, ThoiGian, DuLieuThayDoi? (JSON)
+37	ChinhSach	Id (PK), TenChinhSach, NoiDung, PhienBan, NgayHieuLuc, TrangThai
+
+- Thông báo gắn đúng một người nhận qua tài khoản hoặc vé mời. Theo dõi riêng trạng thái gửi và trạng thái đã đọc. Khách mời chưa có tài khoản vẫn nhận được thông báo qua kênh đã cấu hình.
+- Chỉ người đã check-in được đánh giá. Duy nhất (TaiKhoanId, SuKienId), số sao từ 1 đến 5. Chỉ công khai đánh giá hợp lệ. Khiếu nại và phản hồi xử lý chỉ hiển thị trong phạm vi quyền.
+- Duy nhất CauHinhHeThong.Khoa và (ChinhSach.TenChinhSach, ChinhSach.PhienBan). Thay đổi quy định tạo phiên bản chính sách mới. Đơn và yêu cầu thuê giữ tham chiếu điều khoản đã chốt.
+- Nhật ký ghi thêm theo thời gian, bao gồm xét duyệt, thu hồi quyền, thay đổi cấu hình và xử lý tài chính. Lọc dữ liệu cá nhân và bí mật trước khi ghi. Khóa PayOS, SMTP và thông tin kết nối lấy từ cấu hình bí mật của môi trường.
+
+Chuyển trạng thái chính
+
+Bảng	Luồng chính
+YeuCauThue	Chờ duyệt → Chờ cọc → Đã xác nhận. Có thể từ chối khi duyệt, hết hạn khi quá hạn cọc hoặc hủy theo chính sách.
+DonHang	ChoThanhToan → DaThanhToan, HetHan hoặc DaHuy. Tiền đến muộn có thể chuyển HetHan sang DaThanhToan hoặc DaThuTienHetCho. Luồng hoàn cập nhật ChoHoanTien, HoanMotPhan hoặc DaHoanTien theo giao dịch hoàn.
+GiuGhe	Đang giữ → Đã chốt, Đã nhả hoặc Hết hạn. Chuyển Đã chốt cùng lúc phát hành vé. Chỉ khôi phục dòng hết hạn khi đối soát thanh toán trễ và kiểm tra lại tồn chỗ.
+Ve	Đã phát hành → Đã check-in, Đã hủy hoặc Đã thu hồi. Ngày hoàn tiền lấy từ giao dịch hoàn thành công.
+SuDungVoucher	Đang giữ → Đã sử dụng hoặc Đã nhả. Đã sử dụng gắn với đơn chốt thành công.
+YeuCauHoanTien	Chờ duyệt → Đã duyệt hoặc Từ chối. Đã duyệt → Đang chuyển → Hoàn tất hoặc Thất bại. Cho phép thử lại sau khi xác nhận lệnh cũ thất bại.
+DoiSoat	Chờ BTC xác nhận → Đã xác nhận hoặc Có tranh chấp. Sau khi đủ điều kiện và được quản lý duyệt, chuyển Chờ giải ngân. Chỉ hoàn tất khi giải ngân thành công.
+GiaiNgan	Chờ chuyển → Đang chuyển → Thành công hoặc Thất bại. Ghi lại lần thử và chứng từ khi đối soát.
+
+Chỉ mục tra cứu chính
+
+- PhanCongSuKien theo (TaiKhoanId, SuKienId, SuatDienId, LoaiQuyen, TrangThai) để kiểm tra quyền theo mỗi yêu cầu.
+- SuatDien theo (SuKienId, ThoiGianBatDau) và LichDatDiaDiem theo (DiaDiemId, TrangThai, BatDau, KetThuc) để tra suất và kiểm tra lịch trùng.
+- DonHang theo (SuatDienId, TaiKhoanId, TrangThai) và Ve theo (ChiTietDonHangId, SuatDienId, TrangThai) để kiểm tra hạn mức. GiuGhe theo (TrangThai, HetHan) để tìm lượt hết hạn.
+- SuDungVoucher theo (VoucherId, TrangThai, HetHanGiuLuot) để tính lượt. ThongBao theo (TaiKhoanId, DaDoc, NgayTao) để tra thông báo.
+
+Chỉ mục duy nhất có lọc quan trọng
+
+- TaiKhoan (Email) và (SoDienThoai) khi giá trị khác NULL.
+- PhanCongSuKien theo hai phạm vi với trạng thái DangHieuLuc như mục 1.
+- GiuGhe (SuatDienId, GheId) khi GheId khác NULL và TrangThai = DangGiu.
+- Ve (SuatDienId, GheId) khi GheId khác NULL và TrangThai là DaPhatHanh hoặc DaCheckIn. Ve (GiuGheId) khi GiuGheId khác NULL.
+- NhatKyCheckIn (VeId) khi KetQua = ThanhCong.
+- GiaoDichThanhToan (MaDonNhaCungCap) và (MaGiaoDich) khi khác NULL. Mỗi đơn hoặc yêu cầu thuê chỉ có một giao dịch ThanhCong.
+- DoiSoat (SuKienId, TuNgay, DenNgay) khi TrangThai là ChoGiaiNgan hoặc HoanTat.
+
+Cấu trúc JSON cho lớp nghiệp vụ
+
+SQL Server kiểm tra mỗi giá trị là đối tượng JSON. Khi ghi, lớp nghiệp vụ cần kiểm tra các khóa, kiểu và liên kết dưới đây.
+
+Cột	Cấu trúc
+TaiKhoan.QuyenQuanLy	quyen (mảng chuỗi mã quyền). Kiểm tra từng mã thuộc danh sách quyền được phép cấp.
+PhienBanSuKien.NoiDung	tieuDe (chuỗi), moTa (chuỗi), anhBia (chuỗi), suatDien (mảng đối tượng). Mỗi suất gồm id nếu đã có, diaDiemId, batDau, ketThuc, moBan, dongBan, soDo và loaiVe. soDo theo cấu trúc SoDoChot. Mỗi loại vé gồm khuVucId, nhomVe, giaVe và soLuong.
+SuatDien.SoDoChot	khuVuc (mảng). Mỗi khu gồm khuVucId, sucChua, ghe (mảng gồm gheId, maGhe và cumGheId có thể NULL). Kiểm tra đúng địa điểm và giới hạn sức chứa.
+WebhookThanhToan.NoiDungDaLoc	maDon, maGiaoDich, soTien, thoiDiem, maKetQua từ dữ liệu đã xác minh. Không lưu chữ ký, thông tin ngân hàng đầy đủ hoặc trường không cần đối soát.
+DoiSoat.ChiTietDoiSoat	donHang (mảng gồm donHangId, doanhThu, tienHoan, phiNenTang), dieuChinh (mảng gồm soTien, lyDo, nguoiDuyetId). Đối chiếu tổng với các cột tài chính.
+NhatKyHeThong.DuLieuThayDoi	truoc, sau (đối tượng hoặc NULL), lyDo (chuỗi, tùy thao tác). Chỉ lưu các trường thay đổi được phép ghi nhật ký.
+
+Đối chiếu mã nguồn
+
+Nhóm	STT	Thực thể trong Domain/Entities	Cấu hình trong Data/Configs
+Tài khoản và phân quyền	1–4	TaiKhoan.cs, NhomTaiKhoan.cs	taikhoanConfig.cs, CauHinhTaiKhoan.cs
+Sự kiện	5–8	NhomSuKien.cs	CauHinhSuKien.cs
+Địa điểm và ghế	9–14	NhomDiaDiem.cs	CauHinhDiaDiem.cs
+Đặt vé	15–22	NhomDatVe.cs	CauHinhDatVe.cs
+Tài chính	23–30	NhomTaiChinh.cs	CauHinhTaiChinh.cs
+Quản trị và hỗ trợ	31–37	NhomQuanTri.cs	CauHinhQuanTri.cs
+
+Khởi tạo
+
+- Các migration T-SQL nằm trong Data/Migrations.
+- Đặt ConnectionStrings__Qlsk trỏ đến SQL Server rồi chạy dotnet run -- --qlsk-init. Để nạp dữ liệu thử và các tài khoản demo, xem docs/frontend-standardization/11_BACKEND_FEATURES.md.
+- Kiểm tra số bảng bằng SELECT COUNT(*) FROM sys.tables WHERE is_ms_shipped = 0. Kết quả dự kiến là 37.
+- Chạy test/RangBuoc.sql trên cơ sở dữ liệu kiểm thử. Kịch bản chạy trong giao dịch và hoàn tác dữ liệu mẫu.
+
+Kết quả kiểm tra
+
+Xem chi tiết từng ca và hướng dẫn chạy lại trong báo_cáo_kiểm_thử.md.
+
+- SQL Server 2025 LocalDB đã tạo đúng 37 bảng, với 37 khóa chính tự tăng và 15 chỉ mục duy nhất có lọc. Tên cột và khả năng NULL khớp danh sách trên.
+- Kịch bản SQL đã kiểm tra vai trò mặc định, liên hệ, khóa phiên bản sự kiện, trùng phân công ở hai phạm vi, giữ trùng ghế, vé trùng ghế, check-in lặp và mã webhook lặp.
+- Khóa giao dịch liên bảng, kiểm tra cấu trúc chi tiết của JSON và các luồng thanh toán cần lớp nghiệp vụ. Kiểm thử này xác nhận ràng buộc của mô hình cơ sở dữ liệu.

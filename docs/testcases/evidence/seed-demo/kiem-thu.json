@@ -1,0 +1,1016 @@
+{
+    "date":  "2026-11-21",
+    "api":  {
+                "database":  "quanlysukien",
+                "passed":  244,
+                "checks":  {
+                               "value":  [
+                                             {
+                                                 "check":  "public: /features/home/home.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/events/events.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/events/event.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/calendar/calendar.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/venues/venues.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/venues/venue.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/tickets/tickets.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/requests/requests.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/organizer/organizer.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/account/account.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/reports/export.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/guide/guide.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/work/work.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /features/work/work-overview.html",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/banners",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/event-categories",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/event-filter-options",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/policies",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/venues",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/venues/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/sessions?from=2026-11-21T10%3A59%3A23.991479%2B00%3A00\u0026to=2026-12-21T10%3A59%3A23.991479%2B00%3A00",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/venues/1/availability?from=2026-11-21T10%3A59%3A23.991479%2B00%3A00\u0026to=2026-12-21T10%3A59%3A23.991479%2B00%3A00",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/venues/2/availability?from=2026-11-21T10%3A59%3A23.991479%2B00%3A00\u0026to=2026-12-21T10%3A59%3A23.991479%2B00%3A00",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/venues/3/availability?from=2026-11-21T10%3A59%3A23.991479%2B00%3A00\u0026to=2026-12-21T10%3A59%3A23.991479%2B00%3A00",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events/1/reviews",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events?q=%C4%90%C3%AAm+nh%E1%BA%A1c+S%C3%A0i+G%C3%B2n+%E2%80%93+Nh%E1%BB%AFng+thanh+%C3%A2m+k%E1%BA%BFt+n%E1%BB%91i",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events?category=%C3%82m+nh%E1%BA%A1c",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events?upcoming=true",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events?featured=true",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "public: /api/events?minPrice=0\u0026maxPrice=10000000",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/me/notifications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/me/notifications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/me/notifications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/3",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/5",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/7",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/venue-rentals/9",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/support-cases",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/support-cases/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/refund-requests",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/refund-requests/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/me/organizer-applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "pending-organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "pending-organizer: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "pending-organizer: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "pending-organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "pending-organizer: /api/me/organizer-applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me/notifications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/venue-rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/venue-rentals/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/venue-rentals/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/venue-rentals/6",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/venue-rentals/8",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: protected rental fields",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/support-cases",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/support-cases/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/refund-requests",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/refund-requests/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me/favorites",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me/view-history",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me/refundable-tickets",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/orders",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/orders/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/me/tickets",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/tickets/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/tickets/2/pdf",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "customer: /api/tickets/2/qr",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: login",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/me",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/capabilities",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/accounts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/accounts/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/settings",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/audit",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/audit/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/monitoring",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/payments",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/payments/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/contracts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/contracts/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/settlements",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/settlements/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/payouts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/payouts/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/dashboard",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/venues",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/venues/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/zones",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/zones/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/venue-blocks",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/venue-blocks/14",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/event-categories",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/event-categories/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/banners",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/banners/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/policies",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/admin/catalog/policies/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/venue-rentals?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/venue-rentals/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/support-cases?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/support-cases/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/refund-requests?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/refund-requests/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/1/documents/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/2/documents/3",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/3",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/3/documents/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/4/documents/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/5",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/organizer-applications/5/documents/5",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/manage/events?review=true",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports?type=applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: report rows applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=applications\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=applications\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports?type=rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: report rows rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=rentals\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=rentals\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports?type=refunds",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: report rows refunds",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=refunds\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=refunds\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports?type=settlements",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: report rows settlements",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=settlements\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=settlements\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports?type=payouts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: report rows payouts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=payouts\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "admin: /api/reports/export?type=payouts\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/venue-rentals?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/venue-rentals/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/support-cases?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/support-cases/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/refund-requests?scope=review",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/refund-requests/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/1/documents/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/2",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/2/documents/3",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/3",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/3/documents/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/4/documents/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/5",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/organizer-applications/5/documents/5",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/manage/events?review=true",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports?type=applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: report rows applications",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=applications\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=applications\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports?type=rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: report rows rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=rentals\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=rentals\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports?type=refunds",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: report rows refunds",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=refunds\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=refunds\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports?type=settlements",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: report rows settlements",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=settlements\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=settlements\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports?type=payouts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: report rows payouts",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=payouts\u0026format=xlsx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "manager: /api/reports/export?type=payouts\u0026format=docx",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/scopes",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/8/publication",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/vouchers",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/vouchers/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/versions",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/versions/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/sessions",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/sessions/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/staff-grants",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/staff-grants/4",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/manage/events/1/confirmed-rentals",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/events/1/invitations",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/events/1/invitations/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/orders?eventId=1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/attendees",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/attendees/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/check-ins",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/check-ins/13",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/ticket-types",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/sessions/1/inventory",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/events/1/invitations/options?sessionId=1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/reports?type=orders\u0026eventId=1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "organizer: /api/reports?type=checkins\u0026eventId=1\u0026sessionId=1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/manage/scopes",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/sessions/1/attendees",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/sessions/1/attendees/1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/sessions/1/check-ins",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/sessions/1/check-ins/13",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "staff: /api/reports?type=checkins\u0026eventId=1\u0026sessionId=1",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/manage/scopes",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/manage/events",
+                                                 "passed":  true
+                                             },
+                                             {
+                                                 "check":  "other-organizer: /api/manage/events/14",
+                                                 "passed":  true
+                                             }
+                                         ],
+                               "Count":  244
+                           }
+            },
+    "ui":  {
+               "database":  "QLSK_Demo",
+               "summary":  {
+                               "rendered_route_visits":  420,
+                               "distinct_routes":  208,
+                               "visits_by_role":  {
+                                                      "public":  23,
+                                                      "customer":  41,
+                                                      "pending-organizer":  18,
+                                                      "admin":  105,
+                                                      "manager":  76,
+                                                      "organizer":  81,
+                                                      "staff":  27,
+                                                      "other-organizer":  49
+                                                  },
+                               "browser_or_http_failures":  0,
+                               "failures":  [
+
+                                            ],
+                               "notes":  [
+                                             "Headless Microsoft Edge via Python Playwright, viewport 1440x1000.",
+                                             "Read-only pages and report previews; only session logins wrote application state.",
+                                             "External PayOS excluded. Admin/manager voucher denials and customer workspace denials are expected.",
+                                             "Covered advertised workspace sections with live event/session scope, event-specific organizer vouchers, and scoped report types.",
+                                             "Followed up to three representative record links per route family, including booking seat maps in all three active venues."
+                                         ]
+                           }
+           }
+}

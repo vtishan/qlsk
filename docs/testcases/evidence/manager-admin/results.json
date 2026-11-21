@@ -1,0 +1,202 @@
+[
+  {
+    "code": "QT-01",
+    "role": "Quản trị viên",
+    "steps": "Đăng nhập QA admin → Khu làm việc → lần lượt mở mọi menu nhóm Quản trị, Xét duyệt, Tài chính, Sự kiện, Tại cổng.",
+    "expected": "Từng màn hình tải được, danh mục đúng quyền, các màn cần phạm vi yêu cầu chọn sự kiện/suất.",
+    "status": "Đạt",
+    "actual": "applications, rentals, support, refunds, contracts, settlements, payouts, payments, events, versions, sessions, ticketTypes, reviews, accounts, settings, audit, monitoring, venues, zones, venueBlocks, catalog, policies"
+  },
+  {
+    "code": "QT-02",
+    "role": "Quản trị viên",
+    "steps": "Tài khoản và phân quyền → mở tài khoản fixture → Điều chỉnh quyền quản lý → chọn Thuê địa điểm và hỗ trợ → điền lý do → xác nhận.",
+    "expected": "Vai trò đổi Quản lý hệ thống, phiên cũ hết hiệu lực.",
+    "status": "Đạt",
+    "actual": "Tài khoản 64 (mgmt_accept.7662d6a3@example.test) được cấp nhóm Thuê địa điểm và hỗ trợ bằng hộp thoại."
+  },
+  {
+    "code": "QL-01",
+    "role": "Quản lý",
+    "steps": "Đăng nhập tài khoản vừa cấp quyền → mở các menu → nhập liên kết /#work/accounts.",
+    "expected": "Chỉ có menu trong nhóm thuê/hỗ trợ; liên kết quản trị bị từ chối.",
+    "status": "Đạt",
+    "actual": "Nhóm 2: rentals,support; liên kết tài khoản ngoài quyền bị chặn."
+  },
+  {
+    "code": "QL-02",
+    "role": "Quản lý",
+    "steps": "Duyệt yêu cầu thuê → Trạng thái Đã gửi → mở Thuê nghiệm thu [marker] → Quyết định thuê/Phê duyệt/lý do; người gửi mở Yêu cầu của tôi → thuê tương ứng.",
+    "expected": "Quản lý và người gửi cùng thấy Chờ cọc; cọc 30% của 1.000.000 = 300.000 ₫.",
+    "status": "Đạt",
+    "actual": "Hồ sơ thuê #21: quản lý duyệt; người gửi thấy cọc 300.000 ₫ trên giao diện."
+  },
+  {
+    "code": "QL-03",
+    "role": "Quản lý",
+    "steps": "Hỗ trợ và tranh chấp → mở yêu cầu fixture → Phản hồi và xử lý → Giải quyết → nhập lý do; người gửi mở hỗ trợ tương ứng.",
+    "expected": "Người gửi thấy phản hồi và trạng thái Đã giải quyết.",
+    "status": "Đạt",
+    "actual": "Yêu cầu hỗ trợ #13: hai phía Đã giải quyết, người gửi đọc được phản hồi."
+  },
+  {
+    "code": "QT-07",
+    "role": "Quản trị viên",
+    "steps": "Giám sát dịch vụ → đọc trạng thái; Nhật ký kiểm toán → Tìm trong trang này = assign.",
+    "expected": "Dịch vụ và nhật ký thao tác thật hiển thị.",
+    "status": "Đạt",
+    "actual": "Giám sát dịch vụ tải; nhật ký tìm assign có thao tác cấp quyền QT-02."
+  },
+  {
+    "code": "QT-08",
+    "role": "Quản trị viên",
+    "steps": "Cấu hình nghiệp vụ → Phí dịch vụ → Gửi thay đổi cấu hình → giá -1/lý do → xác nhận.",
+    "expected": "Giá âm bị từ chối, không đổi cấu hình QA.",
+    "status": "Đạt",
+    "actual": "Giá trị âm không được lưu; hộp thoại giữ nguyên để sửa."
+  },
+  {
+    "code": "QT-09",
+    "role": "Quản trị viên",
+    "steps": "Báo cáo và định dạng xuất → chọn Duyệt yêu cầu thuê → Chọn định dạng xuất → Excel (.xlsx) → Xuất báo cáo; lặp lại với Word (.docx); mở nội dung tệp tải xuống.",
+    "expected": "Các tệp mở được; tất cả dòng, số tiền và trạng thái khớp bản xem trước.",
+    "status": "Đạt",
+    "actual": "Tải thật qua Edge, mở gói OpenXML XLSX/DOCX; đối chiếu từng ô với toàn bộ 21 dòng của bản xem trước. Giữ nguyên tệp và bản xem trước tại thời điểm xuất để đối chiếu."
+  },
+  {
+    "code": "QT-10",
+    "role": "Quản trị viên",
+    "steps": "Mở Tài khoản và phân quyền → thu màn hình còn 390×844 → Tab → tải lại → Back → Forward.",
+    "expected": "Tiêu đề/điều khiển truy cập được; bàn phím có focus; điều hướng vẫn hoạt động.",
+    "status": "Đạt",
+    "actual": "Edge 390px: tiêu đề hiện; Tab đặt focus vào điều khiển; tải lại, Back và Forward hoạt động."
+  },
+  {
+    "code": "QT-03",
+    "role": "Quản trị viên",
+    "steps": "Danh mục và banner → Danh mục sự kiện → nhập tên Danh mục UI [marker], thứ tự 9 → Thêm nội dung.",
+    "expected": "Tạo và mở đúng chi tiết danh mục.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/catalog/14?resource=event-categories"
+  },
+  {
+    "code": "QT-04",
+    "role": "Quản trị viên",
+    "steps": "Địa điểm và khu vực → điền tên/địa chỉ/sức chứa 12/giá 123000/tiện ích → Thêm địa điểm.",
+    "expected": "Chi tiết địa điểm giữ đúng giá, sức chứa.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/venues/22"
+  },
+  {
+    "code": "QT-05",
+    "role": "Quản trị viên",
+    "steps": "Khu vực, ghế và cụm ghế → chọn địa điểm UI → tên khu/sức chứa 3/Ghế đánh số/Q-01,Q-02,Q-03 → Khai khu vực và sơ đồ ghế.",
+    "expected": "Khu vực và ba ghế được tạo.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/zones/28"
+  },
+  {
+    "code": "QT-06",
+    "role": "Quản trị viên",
+    "steps": "Chính sách → soạn tên/phạm vi QA/nội dung/ngày hiệu lực → Soạn phiên bản → Công bố phiên bản, lý do.",
+    "expected": "Nháp chuyển Đang áp dụng.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/policies/26"
+  },
+  {
+    "code": "QT-11",
+    "role": "Quản trị viên",
+    "steps": "Tài khoản và phân quyền → mở QA #64 → Quản lý truy cập → Khóa/lý do/xác nhận → Mở khóa → Thu hồi phiên.",
+    "expected": "Khóa rồi mở khóa thành công; thu hồi phiên không khóa tài khoản.",
+    "status": "Đạt",
+    "actual": "Tài khoản QA #64: khóa, mở khóa, thu hồi phiên bằng ba lần xác nhận; cuối cùng hoạt động."
+  },
+  {
+    "code": "QT-12",
+    "role": "Quản trị viên",
+    "steps": "Danh mục và banner → Banner → Thêm nội dung/tên/thứ tự 3 → tạo → Điều chỉnh hiển thị/Công khai → Điều chỉnh hiển thị/Ẩn.",
+    "expected": "Banner lưu đúng thông tin, chuyển Công khai rồi Đã ẩn.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/catalog/7?resource=banners; tạo, công khai rồi ẩn banner."
+  },
+  {
+    "code": "QT-13",
+    "role": "Quản trị viên",
+    "steps": "Lịch bảo trì địa điểm → Chặn lịch địa điểm → chọn địa điểm UI #22, 01/08/2027 09:00–11:00/lý do → tạo → Gỡ chặn lịch/lý do.",
+    "expected": "Lịch không khả dụng được tạo, sau gỡ không còn chặn.",
+    "status": "Đạt",
+    "actual": "http://127.0.0.1:5833/#work/venueBlocks/23; lịch bảo trì 01/08/2027 09:00–11:00 được tạo rồi gỡ."
+  },
+  {
+    "code": "QL-07",
+    "role": "Quản lý",
+    "steps": "Hai tài khoản riêng cùng mở Yêu cầu thuê mới, chọn địa điểm #22, 04/09/2027 09:00–11:00, điền thông tin và gửi. Quản lý nhóm 2 lần lượt Phê duyệt cả hai; hai người gửi tải lại chi tiết.",
+    "expected": "Chỉ một hồ sơ được duyệt giữ lịch; hồ sơ sau báo xung đột, chưa có cọc; hai phía đọc đúng trạng thái.",
+    "status": "Đạt",
+    "actual": "Hai người gửi bằng form thật hồ sơ #26, #27, địa điểm22, 04/09/2027 09:00–11:00. Quản lý nhóm2 duyệt đầu; lần duyệt sau bị từ chối và giữ dialog. Hai người gửi đọc lại lần lượt Chờ đặt cọc / Chờ duyệt. Quyết định thuê\nĐóng\nĐối tượng\nThuê Địa điểm UI bbd61119\nTrạng thái hiện tại\nChờ duyệt\nQuyết định *\nChọn quyết định\nPhê duyệt\nTừ chối\nLý do / ghi chú *\nQuyết định thuê\n\nĐịa điểm hoặc khung giờ thuê không còn khả dụng."
+  },
+  {
+    "code": "QT-16",
+    "role": "Quản trị viên",
+    "steps": "Hợp đồng phí → Lập hợp đồng → chọn BTC hồ sơ16, Phần trăm doanh thu, mức2, hiệu lực 01/01/2030–31/12/2030 → Lập hợp đồng → đọc chi tiết.",
+    "expected": "Lưu đúng BTC, phí2%, khoảng hiệu lực; không thay hợp đồng đơn cũ.",
+    "status": "Đạt",
+    "actual": "Hợp đồng8 được tạo bằng form thật; đọc đúng BTC16 Người bổ sung, phí2.00%, hiệu lực năm2030. Lần đầu nhãn hiện CoHieuLuc; đã sửa nguồn và chạy lại danh sách/chi tiết trên Release5838 tại QT-18, nay hiện Có hiệu lực."
+  },
+  {
+    "code": "QT-17",
+    "role": "Quản trị viên",
+    "steps": "Đối soát → mở kỳ6 do bộ BTC vừa lập → sau BTC xác nhận tải lại → đọc số liệu và thao tác được cung cấp.",
+    "expected": "Đọc được trạng thái BTC xác nhận và các bước duyệt/chi trả hiện có, không tự coi là đã chi trả.",
+    "status": "Đạt",
+    "actual": "Đối soát6 sau BTC phản hồi: BTC xác nhận. Nút có trên UI: Áp dụng phạm vi, Xóa bộ lọc, Duyệt đối soát"
+  },
+  {
+    "code": "QT-18",
+    "role": "Quản trị viên",
+    "steps": "Trên bản Release cập nhật5838, Hợp đồng phí → đọc dòng hợp đồng8 → mở chi tiết → đọc nhãn trạng thái và phí; mở Đối soát6 để kiểm tra luồng liên quan.",
+    "expected": "Danh sách/chi tiết hiển thị Có hiệu lực; API giữ nguyên status, bổ sung statusLabel; đối soát liên quan không đổi.",
+    "status": "Đạt",
+    "actual": "Release cập nhật trên5838: danh sách và chi tiết hợp đồng8 hiện Có hiệu lực; phí2.00% giữ nguyên; API status=CoHieuLuc vẫn giữ, thêm statusLabel. Kỳ đối soát6 vẫn BTC xác nhận và có Duyệt đối soát."
+  },
+  {
+    "code": "QL-08",
+    "role": "Quản lý",
+    "steps": "BTC có sự kiện21/bản21/suất26 đang chờ duyệt. Quản lý nhóm1 mở Duyệt sự kiện và bản sửa → lọc Sự kiện chờ duyệt → mở Handoff BTC quản lý → Quyết định phiên bản → Phê duyệt → lý do Nhóm1 duyệt chương trình hợp lệ → xác nhận. BTC mở Phiên bản sự kiện21.",
+    "expected": "Sự kiện được duyệt; BTC đọc được trạng thái và lý do của đúng quản lý.",
+    "status": "Đạt",
+    "actual": "Agent BTC chạy Edge với tài khoản manager nhóm1 reviewmanager_d00e8.ba807f38@example.test (#72). Quyết định bằng UI thật, BTC mở lại thấy Đã duyệt và đúng lý do. Bằng chứng ../btc-12-su-kien-nhom1-duyet.png, ../btc-13-quan-ly-nhom1-duyet-su-kien.png. Fixture PENDING chuẩn bị bằng API; kết quả được xác minh bằng UI cả hai phía."
+  },
+  {
+    "code": "QL-TC01",
+    "role": "Quản lý",
+    "steps": "Đăng nhập quản lý nhóm tài chính → Xét hoàn tiền → yêu cầu #12 → Quyết định hoàn → Phê duyệt → lý do Đã đối chiếu 100.000 đồng với đơn QA 36 → xác nhận. Quay về danh sách, lọc Đã duyệt rồi mở lại #12.",
+    "expected": "Hoàn #12 được duyệt 100.000 ₫, xuất hiện đúng trong bộ lọc Đã duyệt; chưa chuyển tiền thì không báo Đã hoàn.",
+    "status": "Đạt",
+    "actual": "Root đã chạy Edge với manager nhóm 3. Duyệt #12 thành công; phát hiện bộ lọc thiếu APPROVED, sửa work-sections.js và chạy lại, lọc Đã duyệt mở được đúng #12 số tiền 100.000 ₫. Bằng chứng QL-TC01-duyet-hoan.png, QL-TC01-loc-truoc-sua.png, QL-TC01-loc-da-duyet.png. Server không cung cấp thao tác chuyển tiền cho trạng thái này; chưa có giao dịch hoàn bên ngoài."
+  },
+  {
+    "code": "QT-14",
+    "role": "Quản trị viên",
+    "steps": "Mở hồ sơ thuê #19 → Quyết định thuê → Phê duyệt → lý do QA cross-role rental 19 approved; người gửi mở Yêu cầu thuê #19, thanh toán cọc mô phỏng có chữ ký rồi đối soát.",
+    "expected": "Hai bên thấy chờ cọc 300.000 ₫; chỉ xác nhận sau đối soát cọc.",
+    "status": "Đạt",
+    "actual": "Thao tác duyệt thực hiện bằng phiên admin trong Edge. Người gửi xác nhận Chờ đặt cọc 300.000 ₫, sau mô phỏng có chữ ký và đối soát chuyển Xác nhận thuê. Xem QL-04-rental19.png và biên bản người dùng ND-14."
+  },
+  {
+    "code": "QT-15",
+    "role": "Quản trị viên",
+    "steps": "Mở Hỗ trợ và tranh chấp/#12 → Phản hồi và xử lý → Giải quyết → lý do QA support 12 resolved via manager UI; người gửi mở hỗ trợ #12.",
+    "expected": "Hai phía thấy đã giải quyết và đúng nội dung phản hồi.",
+    "status": "Đạt",
+    "actual": "Thao tác xử lý bằng phiên admin trong Edge. Người gửi đã mở lại, thấy Đã giải quyết và đúng phản hồi; QL-05-support12.png và ND-15."
+  },
+  {
+    "code": "QL-06",
+    "role": "Quản lý",
+    "steps": "Tài khoản quản lý nhóm 1 mở hồ sơ BTC #15 → Quyết định hồ sơ → Yêu cầu bổ sung → nhập Bổ sung giấy tờ rõ nét → xác nhận. Người nộp mở trạng thái, chuẩn bị nộp lại và gửi hồ sơ #16. Quản lý mở #16 → Phê duyệt → Giấy tờ bổ sung hợp lệ. Người nộp tải lại trạng thái.",
+    "expected": "Người nộp thấy lý do bổ sung, nộp lại được; chỉ sau duyệt mới thấy Đã duyệt và lý do.",
+    "status": "Đạt",
+    "actual": "Agent BTC chạy Edge với tài khoản manager_group1_bb6e5.ba807f38@example.test (#68), vai trò manager nhóm 1; hai lần quyết định thật và người nộp đọc lại cả hai kết quả. Bằng chứng 10-ho-so-bo-sung-da-duyet.png, 11-quan-ly-nhom1-duyet.png trong bộ BTC."
+  }
+]

@@ -1,0 +1,57 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Khách" as G
+actor "Người dùng" as U
+actor "Ban tổ chức" as B
+actor "Nhân sự quản lý\nsự kiện" as S
+actor "Quản lý hệ thống" as M
+actor "Quản trị viên" as A
+actor "PayOS" as P
+actor "SMTP" as E
+rectangle "HỆ THỐNG QUẢN LÝ SỰ KIỆN — QLSK" {
+ usecase "Tra cứu danh mục công khai" as C
+ usecase "Xác thực và tài khoản" as AUTH
+ usecase "Đặt vé, nhận vé, hoàn vé" as T
+ usecase "Thuê địa điểm và đặt cọc" as R
+ usecase "Hồ sơ tổ chức, sự kiện,\nsuất diễn và vé mời" as EV
+ usecase "Phân công và check-in" as CH
+ usecase "Duyệt nghiệp vụ, hỗ trợ" as REV
+ usecase "Hợp đồng, đối soát, báo cáo" as F
+ usecase "Quản trị dữ liệu và quyền" as ADM
+ usecase "Tích hợp thanh toán" as PAY
+ usecase "Khôi phục / xác minh email" as MAIL
+}
+G -- C
+G -- AUTH
+U -- AUTH
+U -- C
+U -- T
+U -- R
+B -- EV
+B -- CH
+B -- F
+S -- CH
+M -- REV
+M -- F
+A -- ADM
+A -- REV
+A -- F
+P -- PAY
+E -- MAIL
+PAY ..> T : <<extend>> : đơn có phí
+PAY ..> R : <<extend>> : yêu cầu có tiền cọc
+MAIL ..> AUTH : <<extend>>
+note bottom of CH
+  Phạm vi nhân sự phụ thuộc phân công còn hiệu lực.
+  Các tài khoản đăng nhập đều có nghiệp vụ người dùng.
+  Quản lý hệ thống cần từng quyền được cấp;
+  quản trị viên có toàn bộ quyền nền tảng.
+end note
+@enduml

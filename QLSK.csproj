@@ -3,27 +3,13 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>QLSK-local-development</UserSecretsId>
-    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**;tools/**;artifacts/**;scripts/**;publish/**</DefaultItemExcludes>
+    <UserSecretsId>qlsk-local-development-803b1836</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <Content Update="appsettings.*.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-    <Content Remove="Data/Seed/**;tests/**;tools/**;artifacts/**;scripts/**;docs/**" />
-    <Compile Remove="tests/**/*.cs" />
-    <Content Remove="tests/**/*" />
-    <EmbeddedResource Remove="tests/**/*" />
-    <None Remove="tests/**/*" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="QRCoder" Version="1.7.0" />
-    <PackageReference Include="QuestPDF" Version="2025.7.4" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+    <Content Update="docs/testcases/**/*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.15" />
+    <EmbeddedResource Include="Data/Migrations/*.sql" />
+    <EmbeddedResource Include="Data/seed/*.sql;Data/seed/*.png" LogicalName="QLSK.Data.Seed.%(Filename)%(Extension)" />
+    <PackageReference Include="QRCoder" Version="1.9.0" />
   </ItemGroup>
 </Project>

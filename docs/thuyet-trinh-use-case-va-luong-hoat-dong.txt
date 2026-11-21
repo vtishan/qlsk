@@ -1,0 +1,94 @@
+HỆ THỐNG QUẢN LÝ SỰ KIỆN QLSK
+BIỂU ĐỒ USE CASE VÀ LUỒNG HOẠT ĐỘNG
+
+1. BIỂU ĐỒ USE CASE
+
+1.1. Phạm vi chức năng và tác nhân
+
+QLSK quản lý quá trình tổ chức một sự kiện từ khi lập hồ sơ, chuẩn bị địa điểm
+và lịch diễn đến khi bán vé, kiểm soát người vào cổng và đối soát doanh thu.
+Hệ thống có sáu nhóm người sử dụng.
+
+- Khách chưa đăng nhập tìm kiếm sự kiện đã công bố, xem giá vé, lịch diễn,
+  địa điểm và các khung giờ bận trước khi đăng ký tài khoản.
+- Người dùng đã đăng nhập có thể chọn ghế theo suất, đặt vé, xem vé QR/PDF
+  và gửi yêu cầu hoàn cho vé đủ điều kiện. Người dùng cũng có thể gửi yêu
+  cầu thuê địa điểm, yêu cầu hỗ trợ và hồ sơ đăng ký làm ban tổ chức.
+- Ban tổ chức (BTC) tạo sự kiện, lập suất diễn, đặt giá theo khu vực và gửi
+  phiên bản để duyệt. BTC công bố sự kiện của mình, cấp vé mời, phân công
+  nhân viên và phản hồi kết quả đối soát.
+- Nhân viên sự kiện thực hiện nhiệm vụ trong sự kiện hoặc suất được giao.
+  Quét QR, xác nhận vào cổng thủ công và xem danh sách người tham dự là ba
+  quyền riêng. BTC quyết định quyền nào có hiệu lực với từng nhân viên.
+- Quản lý hệ thống xử lý các hồ sơ thuộc nhóm quyền được cấp. Chẳng hạn,
+  quản lý nội dung duyệt hồ sơ BTC và phiên bản sự kiện, còn quản lý tài
+  chính xét yêu cầu hoàn tiền và xử lý đối soát.
+- Quản trị viên quản lý tài khoản, cấp nhóm quyền, cập nhật danh mục, địa
+  điểm, chính sách và cấu hình hệ thống. Nhật ký giúp truy lại người thực
+  hiện và nội dung thay đổi.
+
+Hai tác nhân bên ngoài là cổng thanh toán payOS và dịch vụ thư điện tử SMTP.
+payOS cung cấp thông tin giao dịch để QLSK đối chiếu tiền vé hoặc tiền cọc.
+SMTP chuyển thư xác minh địa chỉ email và thư khôi phục mật khẩu.
+
+1.2. Quan hệ giữa các ca sử dụng
+
+- Hành vi bắt buộc («include»). Trong ca “Đặt vé”, QLSK phải kiểm tra ghế
+  và hạn mức trước khi tạo đơn mới. Ở mức chi tiết có thể biểu diễn quan hệ
+  “Đặt vé” —«include»→ “Kiểm tra ghế và hạn mức”.
+- Hành vi mở rộng («extend»). Thanh toán qua payOS phát sinh khi tổng đơn
+  lớn hơn 0. Đơn có tổng bằng 0 được xác nhận và cấp vé ngay. Tương tự,
+  yêu cầu thuê có tiền cọc phát sinh bước thanh toán cọc.
+- Tiền điều kiện. Người đặt vé phải có phiên đăng nhập hợp lệ. Phiên này
+  có thể dùng cho nhiều lần đặt vé.
+
+2. LUỒNG HOẠT ĐỘNG
+
+2.1. Tạo, duyệt và công bố sự kiện lần đầu
+
+Các bên tham gia gồm BTC sở hữu sự kiện, quản lý có quyền duyệt và QLSK.
+
+Luồng chính
+1. BTC tạo bản nháp, nhập nội dung, chọn địa điểm, khai báo suất diễn, khung
+   giờ bán và giá vé theo khu vực, sau đó gửi phiên bản để xét duyệt.
+2. Quản lý xem phiên bản và ghi quyết định kèm lý do. Khi quản lý chấp thuận,
+   QLSK kiểm tra lịch và chuyển sự kiện sang “Đã duyệt · Chưa công bố”.
+3. BTC xem trước nội dung, lịch và giá vé rồi xác nhận công bố. QLSK kiểm tra
+   lại điều kiện công bố và đưa phiên bản vào danh mục khách có thể tra cứu.
+   Khách có thể đặt vé khi suất đến giờ mở bán và còn chỗ.
+
+Các nhánh xử lý
+- Quản lý từ chối. QLSK lưu lý do để BTC chỉnh sửa và gửi phiên bản mới.
+- BTC muốn sửa sau lần duyệt đầu. BTC mở lại bản nháp và phải gửi duyệt lại
+  trước khi công bố.
+- Sự kiện đã công khai có bản sửa đang chờ duyệt. Khách tiếp tục xem phiên
+  bản công khai hiện hành trong thời gian quản lý xét bản sửa.
+
+2.2. Đặt ghế, thanh toán và phát hành vé
+
+Các bên tham gia gồm người mua đã đăng nhập, QLSK và payOS đối với đơn có
+tiền phải thu. Suất được chọn phải thuộc sự kiện đã công bố và đang mở bán.
+
+Luồng chính
+1. Người mua chọn suất, loại vé và ghế, xác nhận chính sách đặt vé. Nếu có
+   mã khuyến mãi, người mua nhập mã khi gửi đơn.
+2. QLSK kiểm tra ghế còn trống, hạn mức của loại vé và sức chứa khu vực.
+   Tổng vé đã mua và ghế đang giữ của một tài khoản tối đa là 10 cho mỗi
+   suất. Nếu chọn ghế thuộc một cụm, người mua phải chọn đủ cụm.
+3. QLSK tính tổng tiền sau giảm giá và phí dịch vụ. Đối với đơn có số tiền
+   phải trả, hệ thống tạo đơn chờ thanh toán và giữ ghế trong 10 phút.
+4. Người mua thanh toán qua payOS. QLSK đối chiếu số tiền, thời điểm thanh
+   toán và mã tham chiếu. Khi khoản thu khớp, suất còn mở bán và giữ ghế
+   còn hiệu lực, hệ thống chốt ghế, phát hành vé và cung cấp mã QR cho người mua.
+
+Các nhánh xử lý
+- Hai người cùng chọn ghế A01 của một suất. QLSK khóa theo suất và kiểm tra
+  lại ghế trong giao dịch tạo đơn. Sau khi đơn đầu giữ A01 thành công, người
+  thứ hai nhận thông báo ghế đã được giữ và có thể chọn chỗ khác.
+- Người mua gửi lại cùng một yêu cầu do mạng chậm. Nếu khóa gửi đơn và nội
+  dung trùng khớp, QLSK trả về mã đơn đã tạo.
+- Tiền đã thu đúng nhưng giữ chỗ hết hiệu lực. QLSK ghi nhận khoản thu và
+  tạo yêu cầu xét hoàn. Vé chỉ được phát hành khi chỗ ngồi còn hợp lệ.
+- Thông tin thu tiền không khớp. Giao dịch chuyển sang trạng thái nghi vấn
+  để đối soát. Thông báo thanh toán gửi lặp sau khi đã cấp vé không làm
+  phát sinh thêm vé.

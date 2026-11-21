@@ -1,0 +1,43 @@
+1. Danh sách toàn bộ chức năng
+STT	Nhóm chức năng	Các chức năng chi tiết
+1	Tài khoản	Đăng ký, đăng nhập, đăng xuất, quên mật khẩu, cập nhật hồ sơ, khóa tài khoản, xem lịch sử tối đa 20 sự kiện công khai đã mở theo tài khoản
+2	Phân quyền	Phân quyền Người dùng, BTC, Quản lý sự kiện, Quản lý hệ thống, Admin; cấp và thu hồi quyền
+3	Đăng ký BTC	Gửi hồ sơ, tải giấy tờ, xét duyệt, từ chối, yêu cầu bổ sung, đăng ký lại
+4	Quản lý sự kiện	Tạo, sửa, xóa bản nháp, gửi duyệt, công khai, tạm ngừng, hoãn/hủy sự kiện. Sau khi được duyệt lần đầu, BTC xem trước nội dung, lịch suất, địa điểm và giá vé rồi chủ động công khai. BTC có thể mở lại bản nháp, giữ suất và loại vé đã nhập, sửa và gửi duyệt lại.
+5	Duyệt thay đổi sự kiện	Tạo phiên bản chỉnh sửa, xét duyệt, giữ nguyên phiên bản cũ khi chưa được duyệt
+6	Suất diễn	Tổ chức sự kiện nhiều ngày, nhiều suất, nhiều địa điểm, thời gian mở bán. Khi thêm hoặc sửa suất, BTC có thể chọn hồ sơ thuê đã xác nhận của mình để điền địa điểm và khung giờ. Suất phải nằm trọn trong khung thuê đã chọn.
+7	Địa điểm	Quản lý địa điểm, khu vực, sức chứa, tiện ích, giá thuê, lịch trống
+8	Ghế và sơ đồ	Quản lý ghế đơn, ghế đôi, cụm ghế, trạng thái ghế, sức chứa theo suất diễn
+9	Thuê địa điểm	Gửi yêu cầu thuê, duyệt giữ lịch, đặt cọc 30% trong 24 giờ, hủy thuê và hoàn cọc
+10	Loại vé	Standard, VIP, Invitation, giá vé, quyền lợi, số lượng, thời gian bán. BTC đặt giá bán theo suất và khu vực. Bản xem trước hiển thị giá vé, tiền thuê và tiền cọc thành các khoản riêng. Khách lọc sự kiện bằng khoảng giá có sẵn, lấy từ giá vé công khai.
+11	Đặt vé	Chọn suất, khu vực, ghế; giữ ghế 10 phút; tối đa 10 vé/tài khoản/suất
+12	Thanh toán	Thanh toán PayOS, QR ngân hàng, xử lý webhook, thanh toán trễ, chống giao dịch trùng
+13	Quản lý vé	Phát hành vé QR/PDF, xem vé, lịch sử đơn, trạng thái, hủy vé. Mục Vé của tôi tách vé hiện tại và lịch sử vé. Người mua mở QR, tải PDF hoặc in từng vé từ thẻ vé hiện tại.
+14	Vé mời	Nhập khách mời, gửi vé qua email/SMS, QR, thu hồi, liên kết vé với tài khoản
+15	Check-in	Quét QR, chống quét trùng, check-in thủ công, ghi nhật ký
+16	Khuyến mãi	Tạo voucher, giảm %, giảm tiền cố định, giới hạn lượt, giữ lượt 10 phút
+17	Hoàn tiền	Tự hủy trước 72 giờ theo chính sách, hoàn khi hoãn/hủy, xét duyệt và giao dịch hoàn
+18	Hợp đồng và đối soát	Phí nền tảng, hợp đồng BTC, doanh thu, khóa sổ, xác nhận đối soát, giải ngân
+19	Thông báo và hỗ trợ	Thông báo sự kiện/giao dịch, email/SMS, khiếu nại, đánh giá sau tham dự
+20	Quản trị hệ thống	Banner, danh mục, chính sách, bảo mật, nhật ký, cấu hình, sao lưu, giám sát
+
+2. Chức năng theo từng vai trò
+Vai trò	Chức năng chính
+Khách chưa đăng nhập	Xem, tìm kiếm sự kiện/địa điểm, lọc sự kiện theo khoảng giá, đăng ký và đăng nhập
+Người dùng	Xem lịch sử sự kiện đã mở, mua và quản lý vé QR/PDF, thanh toán, sử dụng voucher, check-in, đánh giá, hoàn tiền, thuê địa điểm, xin làm BTC
+Ban tổ chức	Tạo sự kiện, gắn hồ sơ thuê đã xác nhận với suất, đặt giá vé, xem trước và công khai sau duyệt, quản lý khách mời, nhân sự, khuyến mãi, doanh thu và hợp đồng
+Quản lý sự kiện	Quét QR, check-in thủ công, quản lý khách tham dự và hỗ trợ vận hành theo quyền được cấp
+Quản lý hệ thống	Duyệt BTC, duyệt sự kiện, duyệt thuê địa điểm, xử lý hoàn tiền, khiếu nại, đối soát
+Admin	Quản lý tài khoản, quyền, địa điểm, chính sách, hợp đồng, giải ngân, cấu hình và bảo mật toàn hệ thống
+
+3. Các chức năng bắt buộc phải xử lý đúng
+Các quy tắc nghiệp vụ cần kiểm tra trên lược đồ 37 bảng.
+- Giữ ghế: Không được bán trùng; hết 10 phút phải giải phóng đúng ghế.
+- Thanh toán: PayOS gửi webhook nhiều lần cũng chỉ cấp vé một lần; thanh toán trễ phải xử lý đúng.
+- Phiên bản sự kiện: Bản đang chờ duyệt không được ghi đè bản đã công khai.
+- Công khai lần đầu: Sau khi quản lý duyệt, sự kiện vẫn ở trạng thái Đã duyệt · Chưa công bố. Khách thấy sự kiện sau khi BTC công khai, và chỉ mua được vé trong thời gian bán đã cấu hình. Nếu BTC mở lại bản nháp để sửa, cần duyệt lại trước khi công khai.
+- Vé mời: Người chưa có tài khoản vẫn có thể nhận QR và tham dự.
+- Phân quyền: Nhân sự chỉ được thao tác trên sự kiện được giao và mất quyền ngay khi bị thu hồi.
+- Thuê địa điểm: Cọc 30%, hạn thanh toán 24 giờ, hoàn cọc theo mốc ngày.
+- Hoàn tiền: Phân biệt yêu cầu hoàn, duyệt hoàn, đang chuyển tiền, hoàn thành và thất bại.
+- Đối soát: Phải lưu phí theo hợp đồng tại thời điểm mua, chống giải ngân trùng.

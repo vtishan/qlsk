@@ -1,0 +1,410 @@
+PHÂN TÍCH CHỨC NĂNG VÀ THIẾT KẾ NGHIỆP VỤ
+HỆ THỐNG QUẢN LÝ VÀ TỔ CHỨC SỰ KIỆN (QLSK)
+
+Tài liệu mô tả các chức năng của hệ thống theo năm nhóm người sử dụng.
+Đây là yêu cầu đối với một hệ thống hoàn chỉnh, không phải bản đối chiếu nâng cấp.
+
+QUY ƯỚC CHUNG
+- Khách chưa đăng nhập là người truy cập công khai, không phải tài khoản có vai trò trong cơ sở dữ liệu.
+- Sau đăng ký, tài khoản mặc định là Người dùng. Người muốn trở thành Ban tổ chức (BTC) phải được xét duyệt.
+- BTC được phê duyệt có thể tạo sự kiện. Khi có sự kiện được duyệt, BTC là bên chịu trách nhiệm quản lý vận hành sự kiện đó; có thể giao quyền giới hạn theo sự kiện cho tài khoản nhân sự quản lý sự kiện.
+- Quản lý sự kiện của BTC và Quản lý hệ thống là hai phạm vi hoàn toàn khác nhau. Nhân sự quản lý sự kiện không được duyệt BTC, duyệt sự kiện hoặc xử lý dữ liệu của BTC khác.
+- Admin là cấp quản trị cao nhất; có thể giao nhiệm vụ quản trị nghiệp vụ cho Quản lý hệ thống.
+- Dữ liệu địa điểm được hệ thống quản lý sẵn bởi Admin, không tồn tại vai trò Nhà cung cấp địa điểm riêng.
+
+======================================================================
+1. KHÁCH CHƯA ĐĂNG NHẬP
+======================================================================
+
+1.1. Xem trang chủ
++ Có thể mở trang chủ, xem banner, sự kiện nổi bật, sự kiện sắp diễn ra, chủ đề, thông tin giới thiệu hệ thống, quy định và hướng dẫn.
++ Có thể xem thông tin công khai về địa điểm tổ chức sự kiện, sơ đồ tổng quan, địa chỉ, sức chứa, chi phí thuê tham khảo và lịch trống được phép công bố.
++ Có thể dùng menu, ô tìm kiếm, bộ lọc và phân trang mà không cần tài khoản.
+
+1.2. Tìm kiếm và xem sự kiện
++ Có thể xem danh sách các sự kiện đã được phê duyệt và cho phép hiển thị công khai (không hiển thị bản nháp, chờ duyệt hoặc sự kiện bị đình chỉ).
++ Có thể tìm theo tên, từ khóa, loại sự kiện, ngày tổ chức, địa điểm, khoảng giá, ban tổ chức và trạng thái còn vé.
++ Có thể xem chi tiết: tên, mô tả, hình ảnh/banner, BTC, nội dung, quy định, lịch nhiều ngày, từng suất diễn, địa điểm tương ứng, loại vé Standard/VIP, giá, thời gian bán, sơ đồ khu vực/ghế và số lượng còn khả dụng nếu được công bố.
++ Có thể xem chính sách tham dự, điều kiện hoàn/hủy và thông báo hoãn/hủy được công bố.
++ Có thể xem đánh giá hợp lệ của người từng tham gia và danh sách sự kiện liên quan.
++ Không được xem danh sách khách tham dự, vé của người khác, thông tin nội bộ, doanh thu hoặc hồ sơ xét duyệt.
+
+1.3. Xem địa điểm và nhu cầu thuê địa điểm
++ Có thể xem danh mục địa điểm do Admin thiết lập, tìm kiếm theo khu vực, sức chứa, giá thuê, tiện ích và lịch trống công khai.
++ Có thể xem quy định thuê, mức đặt cọc 30%, thời hạn thanh toán và chính sách hủy thuê.
++ Nếu muốn gửi yêu cầu thuê địa điểm, hệ thống yêu cầu đăng ký hoặc đăng nhập trước khi tạo yêu cầu chính thức.
+
+1.4. Đăng ký và đăng nhập
++ Có thể đăng ký bằng thông tin bắt buộc: họ tên, email/số điện thoại theo hình thức hệ thống hỗ trợ, mật khẩu và xác nhận điều khoản.
++ Hệ thống kiểm tra dữ liệu hợp lệ, email/số điện thoại không trùng và bảo vệ thông tin đăng nhập; có thể yêu cầu xác minh liên hệ.
++ Sau khi đăng ký thành công, tạo tài khoản Người dùng, chưa có quyền của BTC.
++ Có thể đăng nhập, yêu cầu đặt lại mật khẩu qua liên kết dùng một lần có thời hạn 30 phút, và đọc hướng dẫn bảo mật tài khoản.
++ Nếu chọn mua vé, lưu yêu thích hoặc thuê địa điểm khi chưa đăng nhập, hệ thống chuyển đến đăng nhập và quay về thao tác đang thực hiện sau khi xác thực, khi còn hợp lệ.
+
+1.5. Có nhu cầu trở thành Ban tổ chức
++ Khách phải đăng ký tài khoản Người dùng và đăng nhập trước.
++ Sau đó mới được điền hồ sơ xin làm BTC, tải lên giấy tờ hợp lệ và gửi xét duyệt; không tự trở thành BTC ngay sau đăng ký.
++ Hồ sơ có thể gồm tên tổ chức/cá nhân, đại diện, thông tin liên hệ, giấy tờ pháp lý, tài khoản ngân hàng doanh nghiệp phù hợp, thông tin thanh toán và cam kết tuân thủ quy định.
++ Hồ sơ ở trạng thái CHỜ DUYỆT; Quản lý hệ thống xử lý trong tối đa 7 ngày làm việc theo lịch ngày nghỉ áp dụng.
++ Nếu bị từ chối/yêu cầu bổ sung, người nộp được xem lý do, sửa giấy tờ và gửi lại. Chỉ sau khi được duyệt tài khoản mới có quyền BTC.
+
+1.6. Giới hạn đối với khách chưa đăng nhập
++ Không được tạo đơn đặt vé, giữ ghế, thanh toán, gửi yêu cầu hoàn tiền, quản lý vé, tạo sự kiện, yêu cầu thuê chính thức, check-in hoặc thao tác quản trị.
++ Ngoại lệ: người được BTC gửi vé mời bằng email/SMS có thể xuất trình QR tại cổng mà không cần tài khoản; việc xác minh và check-in do người có quyền thực hiện.
+
+======================================================================
+2. KHÁCH ĐÃ ĐĂNG NHẬP (VAI TRÒ NGƯỜI DÙNG)
+======================================================================
+
+2.1. Loại 1 — Người dùng chỉ có nhu cầu tìm kiếm và tham gia sự kiện
+
+A. Khám phá và quản lý thông tin cá nhân
++ Có tất cả quyền xem trang chủ, sự kiện và địa điểm công khai như khách chưa đăng nhập.
++ Có thể lọc/tìm sự kiện theo địa điểm, thời gian, loại, suất diễn, mức giá, còn vé, BTC; xem lịch, chi tiết khu vực ghế, chính sách tham gia.
++ Có thể thêm/bỏ yêu thích, xem lịch sử truy cập hoặc đề xuất sự kiện nếu chức năng này được bật.
++ Có thể cập nhật hồ sơ, email/số điện thoại theo quy trình xác minh, thay đổi mật khẩu, xem lịch sử đơn hàng và thông báo.
+
+B. Đặt và mua vé
++ Chọn một sự kiện đã duyệt, một suất diễn cụ thể, khu vực và ghế hiển thị còn trống.
++ Chọn vé Standard hoặc VIP theo giá và quyền lợi công bố. Vé mời Invitation không có trong giỏ mua công khai.
++ Hỗ trợ mua ghế đơn, ghế đôi hoặc một cụm ghế; nếu bất kỳ ghế bắt buộc nào bị giữ hoặc bán thì từ chối toàn bộ cụm và chỉ rõ ghế xung đột để người dùng chọn lại.
++ Số vé tối đa 10 cho mỗi tài khoản trên một suất diễn, tính cả vé đã thanh toán và ghế đang giữ hợp lệ. Các suất diễn khác tính hạn mức độc lập.
++ Tại thời điểm xác nhận đặt vé, hệ thống kiểm tra số lượng, giá và chính sách, khóa dữ liệu tồn kho ngắn hạn trong giao dịch SQL Server, sau đó giữ ghế đúng 10 phút và hiển thị đồng hồ đếm ngược.
++ Trong 10 phút, người khác không thể mua ghế đang giữ. Hết hạn mà chưa ghi nhận thanh toán, hệ thống tự động nhả ghế; mọi trạng thái được kiểm tra lại khi có thanh toán đến muộn.
++ Đảm bảo tổng số vé bán + số vé mời đã phân bổ không vượt sức chứa từng khu vực của từng suất diễn.
++ Hệ thống chỉ mở bán trong thời gian quy định, trước giờ suất diễn bắt đầu và khi còn tồn kho.
+
+C. Sử dụng mã giảm giá
++ Có thể nhập mã khuyến mãi tại bước thanh toán và xem số tiền được giảm, phí dịch vụ và tổng cần trả trước khi xác nhận.
++ Mã có thể giảm theo phần trăm với trần tối đa hoặc giảm số tiền trực tiếp với giá trị đơn tối thiểu.
++ Hệ thống kiểm tra ngày hiệu lực, sự kiện/suất diễn/khu vực được áp dụng, hạn mức toàn chiến dịch và hạn mức tài khoản.
++ Mỗi lần dùng hợp lệ được giữ một lượt voucher cùng thời hạn giữ ghế 10 phút. Khi thanh toán thành công, lượt được xác nhận; khi thất bại hoặc hết giờ, lượt được giải phóng.
++ Không cho tổng giảm lớn hơn phần giá trị được phép giảm; tiền phải thu là số được backend tính và chốt theo đơn.
+
+D. Thanh toán và nhận vé
++ Có thể xem lại thông tin đơn, giá từng ghế, khuyến mãi, phí và số tiền cuối cùng rồi thanh toán bằng PayOS qua mã QR động/ứng dụng ngân hàng.
++ Hệ thống xác minh chữ ký webhook, số tiền, mã đơn, mã giao dịch và tránh ghi nhận cùng một giao dịch nhiều lần.
++ Nếu mất kết nối, hệ thống truy vấn trạng thái giao dịch PayOS trước khi kết luận thành công/thất bại.
++ Nếu PayOS xác nhận thành công, đơn được ghi nhận, ghế chuyển sang đã bán, vé điện tử có QR duy nhất được phát hành và gửi thông báo/email hoặc PDF khi được hỗ trợ.
++ Nếu giao dịch đến sau khi hết giữ ghế: (1) ghế còn trống, hệ thống có thể phục hồi đơn và cấp vé trong giao dịch nguyên tử, sau khi kiểm tra quota/sức chứa; (2) ghế đã có chủ, đơn chuyển PAID_OUT_OF_STOCK và được ưu tiên hoàn 100% số tiền thực trả, đồng thời thông báo ngay.
++ Không cấp vé 2 lần nếu webhook gửi lặp; ghi nhận trường hợp nghi vấn vào hàng đợi đối soát.
+
+E. Quản lý vé và tham gia sự kiện
++ Có thể xem vé theo từng đơn, từng suất diễn, mã đặt chỗ, địa điểm, khu vực, ghế, trạng thái; tải PDF/hiển thị QR và lịch sử thanh toán.
++ Có thể xuất trình mã QR tại cửa; mỗi vé chỉ được check-in một lần cho đúng suất diễn.
++ Nếu không quét được QR, có thể yêu cầu nhân viên được cấp quyền tra cứu theo mã đặt chỗ/email/số điện thoại và hỗ trợ check-in thủ công sau xác minh.
++ Có thể nhận thông báo đổi lịch, đổi địa điểm, hoãn/hủy, cập nhật vé, giao dịch và yêu cầu hỗ trợ.
++ Có thể đánh giá sự kiện khi đủ điều kiện đã tham dự, không đánh giá trùng hoặc đánh giá thay người khác.
+
+F. Hủy vé, hoàn tiền và hỗ trợ
++ Có thể gửi yêu cầu hủy vé từ trang quản lý vé nếu BTC cho phép hoàn/hủy, còn ít nhất 72 giờ trước khi suất diễn bắt đầu, vé chưa check-in và đáp ứng chính sách đã công bố.
++ Với tự hủy hợp lệ, hoàn 100% giá vé gốc; phí dịch vụ không hoàn theo chính sách hiển thị lúc đặt, trừ khi hợp đồng/pháp luật có yêu cầu khác.
++ Khi sự kiện bị hoãn, vé tiếp tục có giá trị theo lịch mới; người không thể tham dự có thể yêu cầu hoàn 100% tổng số tiền đã trả trong thời hạn công bố.
++ Khi sự kiện bị hủy hoàn toàn, người mua được xử lý hoàn 100% tổng tiền đã trả (gồm phí dịch vụ); trạng thái vé được khóa theo quy trình hủy.
++ Vé đã check-in không được tự hoàn qua luồng khách tự hủy; khách vẫn được mở khiếu nại đặc biệt nếu có sự cố dịch vụ, để Quản lý hệ thống/Admin xử lý đúng quy định.
++ Hệ thống phân biệt duyệt hoàn, ra lệnh hoàn, chuyển tiền thành công và thất bại; có chứng từ giao dịch và lịch sử xử lý.
+
+G. Nhu cầu thuê địa điểm
++ Có thể xem địa điểm sẵn có, chọn khung giờ, gửi yêu cầu thuê cho nhu cầu tổ chức khi đáp ứng thông tin và điều kiện của hệ thống.
++ Có thể nhận phản hồi chấp thuận/từ chối, xem tình trạng giữ lịch, báo giá và các khoản cọc.
++ Sau khi Quản lý hệ thống chấp thuận giữ lịch, thanh toán cọc 30% trong 24 giờ; không thanh toán đúng hạn thì giữ lịch hết hiệu lực.
++ Có thể yêu cầu hủy thuê theo chính sách: trước ít nhất 14 ngày hoàn 80% cọc; từ 7 đến dưới 14 ngày hoàn 50%; dưới 7 ngày mất toàn bộ cọc.
++ Được theo dõi hóa đơn/chứng từ cọc, quyết định hủy, số tiền cọc hoàn và lịch sử thuê. Người thuê chưa là BTC không có quyền xuất bản sự kiện bán vé.
+
+2.2. Loại 2 — Người dùng có nhu cầu trở thành Ban tổ chức
++ Trước hết vẫn là Người dùng, có toàn bộ quyền ở mục 2.1.
++ Từ hồ sơ cá nhân, chọn “Đăng ký làm Ban tổ chức”, điền tên BTC, đại diện, thông tin pháp lý, liên hệ, thông tin nhận thanh toán và tải giấy tờ PDF/PNG/JPEG theo quy định.
++ Xác nhận trách nhiệm tổ chức, tính chính xác nội dung và điều khoản tài chính; gửi hồ sơ xét duyệt.
++ Theo dõi trạng thái: Bản nháp → Chờ duyệt → Yêu cầu bổ sung/Đã từ chối hoặc Đã duyệt. Xem lý do, bổ sung giấy tờ và gửi lại khi cần.
++ Quản lý hệ thống có trách nhiệm kiểm tra trong tối đa 7 ngày làm việc. Việc bị từ chối không làm mất quyền Người dùng thông thường.
++ Chỉ khi được phê duyệt, tài khoản có thể sử dụng chức năng Ban tổ chức và tạo hồ sơ sự kiện để gửi duyệt. Việc trở thành BTC không đồng nghĩa sự kiện do BTC tạo được tự động công khai.
+
+======================================================================
+3. BAN TỔ CHỨC (BTC)
+======================================================================
+
+3.1. Điều kiện và tài khoản
++ Là tài khoản Người dùng đã nộp và được Quản lý hệ thống duyệt hồ sơ tổ chức hợp lệ.
++ Có thể cập nhật hồ sơ BTC, người đại diện, liên hệ, tài khoản nhận giải ngân và hợp đồng trong phạm vi quy trình xác minh.
++ Có thể xem toàn bộ sự kiện của chính mình, không được xem dữ liệu nội bộ của BTC khác.
+
+3.2. Đăng ký tổ chức và quản lý hồ sơ sự kiện
++ Có thể tạo sự kiện mới dưới dạng bản nháp: tên, loại, mô tả, banner, nội dung, diễn giả/nghệ sĩ, điều khoản, chính sách vé, thời gian dự kiến và thông tin liên hệ.
++ Có thể lập sự kiện kéo dài nhiều ngày, có nhiều suất diễn tại một hoặc nhiều địa điểm do hệ thống quản lý sẵn.
++ Với từng suất diễn: chọn ngày/giờ bắt đầu-kết thúc, địa điểm, khu vực, loại ghế, sơ đồ ghế, giới hạn sức chứa, thời gian mở/đóng bán và loại vé.
++ Có thể đăng ký thuê địa điểm, theo dõi duyệt giữ lịch và thanh toán cọc trước khi sự kiện được xác nhận đủ điều kiện công khai.
++ Sau khi hoàn thiện hồ sơ, gửi sự kiện để Quản lý hệ thống xét duyệt. Chỉ sự kiện đã duyệt mới được công khai và mở bán theo điều kiện cấu hình.
++ Nếu bị từ chối, BTC được đọc lý do, chỉnh sửa và gửi lại.
+
+3.3. Chọn loại vé, giá và suất diễn
++ Có thể tạo vé Standard và VIP, quy định giá, khu vực ghế, số lượng tối đa, quyền lợi được công bố, thời gian bán và điều kiện khuyến mãi.
++ Có thể chọn loại vé mời Invitation/Complimentary, không mở bán công khai, không tính hoa hồng trên giá vé bằng 0.
++ Có thể cấu hình chính sách hoàn vé trước khi mở bán: cho phép hay không, điều kiện 72 giờ và phí dịch vụ theo quy định.
++ Có thể xem lượng vé đã bán, đang giữ, khách mời đã phân bổ, ghế còn trống theo từng session/zone; không được bán vượt sức chứa.
++ Có thể đóng bán theo quyền cho phép, nhưng việc thay đổi nội dung có ảnh hưởng người mua phải đi qua quy trình duyệt thay đổi.
+
+3.4. Quản lý khách mời
++ Có thể nhập khách mời bằng email hoặc số điện thoại, chỉ định suất diễn, khu vực, ghế, số vé và ghi chú theo phạm vi cần thiết.
++ Có thể mời cả người chưa đăng ký QLSK; hệ thống tạo mã QR duy nhất và liên kết nhận vé an toàn có thời hạn, gửi email hoặc SMS theo kênh được cấu hình.
++ Người nhận có thể dùng QR trực tiếp mà không đăng nhập hoặc đăng ký để liên kết vé vào tài khoản cá nhân; hệ thống xác minh quyền sở hữu email/số điện thoại khi liên kết.
++ Mọi vé mời đều trừ sức chứa tương ứng. Có thể thu hồi/phát lại trong điều kiện vé chưa sử dụng và có nhật ký thao tác; không tái phát một ghế đã bán cho người khác.
++ Có thể xem trạng thái đã gửi, đã nhận, đã sử dụng hoặc bị thu hồi; không được xem thông tin của khách ngoài phạm vi sự kiện mình tổ chức.
+
+3.5. Quản lý sự kiện sau phê duyệt
++ BTC trở thành bên quản lý vận hành các sự kiện do mình sở hữu và đã được duyệt; có quyền truy cập trang “Vận hành sự kiện” tương ứng.
++ Có thể xem danh sách đơn/vé, lượt bán, lượt check-in, suất diễn, tiến độ chuẩn bị, thông báo và báo cáo trong sự kiện của mình.
++ Có thể gửi bản chỉnh sửa lịch, giá, sơ đồ ghế, nội dung, banner hoặc địa điểm thành phiên bản PENDING_UPDATE; bản công khai cũ giữ nguyên đến khi Quản lý hệ thống duyệt. Từ chối sửa đổi không làm mất phiên bản đang chạy.
++ Với sửa đổi ảnh hưởng vé đã bán, hệ thống phải kiểm tra rủi ro thay đổi ghế/giá/lịch, giữ quyền lợi và thông báo cho người mua. Vi phạm nghiêm trọng có thể bị tạm khóa ngay bởi quản lý/Admin.
++ Có thể gửi yêu cầu hoãn hoặc hủy sự kiện kèm lý do; yêu cầu phải được Quản lý hệ thống duyệt, ngoại trừ quyết định đình chỉ khẩn cấp từ bên quản trị.
+
+3.6. Phân quyền nhân sự quản lý sự kiện
++ Có thể tạo hoặc mời tài khoản nhân sự qua email; xác minh danh tính cần thiết trước khi cấp quyền.
++ Có thể cấp quyền riêng cho từng sự kiện hoặc suất diễn: quét QR (checkin.scan), check-in thủ công (checkin.manual), xem danh sách người tham dự (attendees.view), xem đơn/vé, xem báo cáo, quản lý khách mời hoặc hỗ trợ nội dung nếu BTC cho phép.
++ Mặc định nhân sự không có quyền ngoài phạm vi được chỉ định, không được tự tạo vai trò quản lý hệ thống, không được cấp quyền vượt cấp.
++ BTC có thể thu hồi/chỉnh sửa quyền; hệ thống phải áp dụng ngay tại backend kể cả token cũ chưa hết hạn.
++ Có thể kiểm tra nhật ký check-in, nhật ký nhân viên thao tác và các trường hợp bất thường.
+
+3.7. Khuyến mãi, hợp đồng, thu nhập
++ Có thể tạo/đề xuất chiến dịch khuyến mãi trong phạm vi BTC theo chính sách do hệ thống cho phép: giảm theo % có mức trần hoặc giảm số tiền cố định, thời gian áp dụng, doanh thu tối thiểu, sự kiện/suất/khu vực, lượt toàn chiến dịch và lượt mỗi người.
++ Mã khuyến mãi được giữ lượt 10 phút cùng đơn; thanh toán thành công mới ghi nhận sử dụng thật.
++ Có thể xem hợp đồng phí nền tảng hiện có hiệu lực: phí % doanh thu hoặc phí cố định trên vé; hệ thống lưu bản chốt phí tại mỗi đơn để đối soát sau này không thay đổi bởi hợp đồng mới.
++ Có thể xem báo cáo doanh thu vé thành công, giảm giá, hoàn tiền, phí nền tảng, số tiền thực nhận và số tiền đã giải ngân theo suất/sự kiện.
++ Sau khi sự kiện hoàn tất và đủ kỳ khóa sổ, BTC nhận báo cáo đối soát để xác nhận hoặc phản hồi trong thời hạn quy định (mặc định 48 giờ). Không tự sửa số liệu tài chính đã chốt.
++ Có thể cập nhật tài khoản ngân hàng thụ hưởng thông qua quy trình xác minh; việc giải ngân tự động chỉ thực hiện khi đã đủ điều kiện và được bên vận hành cho phép.
+
+======================================================================
+4. QUẢN LÝ
+======================================================================
+
+4.1. QUẢN LÝ SỰ KIỆN (PHÍA BAN TỔ CHỨC)
+
+A. Bản chất và điều kiện
++ Là chức năng quản lý vận hành một sự kiện đã được duyệt, do BTC sở hữu sự kiện chịu trách nhiệm chính.
++ Khi Người dùng được duyệt làm BTC và BTC có sự kiện được duyệt, BTC được quyền quản lý sự kiện đó, không cần xét duyệt thêm một chức danh quản lý nền tảng.
++ BTC có thể phân công tài khoản con/nhân sự làm Quản lý sự kiện theo sự kiện, với quyền giới hạn do BTC trực tiếp cấp. Tài khoản con có thể chỉ quét QR hoặc được giao thêm những nghiệp vụ cụ thể.
++ Quyền quản lý sự kiện có phạm vi gắn với event_id/session_id; không phải quyền toàn hệ thống và không tự phát sinh quyền với các sự kiện của BTC khác.
+
+B. Quản lý vận hành
++ Có thể xem màn hình vận hành, lịch diễn, thông báo, tiến độ bán vé, ghế đã bán/đang giữ, danh sách khách dự kiến, khách mời, danh sách check-in theo quyền được cấp.
++ Có thể kiểm tra tình trạng vé: hợp lệ, đã dùng, đã hủy/hoàn, sai suất diễn, sai khu vực, sự kiện tạm ngừng.
++ Có thể quét mã QR tại cổng, xác nhận một lần trên từng vé của từng suất diễn; mã quét lại phải báo trạng thái đã check-in và thời gian sử dụng trước đó.
++ Có thể check-in thủ công theo mã đơn/email/số điện thoại nếu có quyền riêng, phải kiểm tra thông tin khách trước khi xác nhận.
++ Có thể ghi nhận và xử lý trường hợp vé lỗi, trùng quét, mất kết nối theo quy trình cho phép, có nhật ký người thực hiện và thời gian.
++ Có thể hỗ trợ phát vé mời, cập nhật tình trạng khách tham gia, thông báo hướng dẫn trước sự kiện, theo quyền BTC cấp.
++ Có thể xem báo cáo số lượt check-in, số ghế còn trống, hiệu suất suất diễn, sự cố cổng và lịch sử vận hành nếu được cấp quyền.
++ Nếu BTC cho phép chỉnh sửa tác nghiệp sự kiện, nhân sự chỉ được tạo đề xuất/chỉnh sửa trong phần được cấp; thay đổi cần xét duyệt vẫn phải tuân thủ luồng duyệt của Quản lý hệ thống.
+
+C. Giới hạn
++ Không được xét duyệt BTC, phê duyệt/suspend sự kiện toàn hệ thống, duyệt địa điểm, duyệt hoàn tiền của khách toàn nền tảng, chỉnh cấu hình phí hay thực hiện giải ngân.
++ Không được truy cập sự kiện hoặc đơn/vé thuộc BTC khác; không thể nâng quyền hoặc cấp lại quyền của chính mình.
++ Khi BTC thu hồi quyền, tài khoản lập tức mất quyền tương ứng. Mọi thao tác nhạy cảm phải được xác thực và ghi nhật ký.
+
+4.2. QUẢN LÝ HỆ THỐNG (QUANLY)
+
+A. Quản lý và duyệt hồ sơ Ban tổ chức
++ Xem danh sách hồ sơ BTC mới, sắp quá hạn/quá hạn 7 ngày làm việc, lịch sử bổ sung và giấy tờ.
++ Kiểm tra thông tin, yêu cầu bổ sung, phê duyệt hoặc từ chối kèm lý do; cho phép người nộp gửi lại sau từ chối.
++ Giám sát các BTC đã duyệt; đề xuất khóa/tạm dừng BTC vi phạm theo phạm vi được Admin ủy quyền.
+
+B. Duyệt và giám sát sự kiện
++ Xem sự kiện mới chờ duyệt, kiểm tra nội dung, pháp lý, banner, lịch, hợp lệ địa điểm/sức chứa, chính sách vé và thông tin người tổ chức.
++ Chấp thuận hoặc từ chối sự kiện kèm lý do; kiểm tra các bản PENDING_UPDATE, chỉ áp dụng nội dung mới sau khi phê duyệt.
++ Duyệt yêu cầu hoãn/hủy của BTC, ban hành thông báo ảnh hưởng vé và kích hoạt quy trình đổi lịch/hoàn tiền.
++ Có quyền đình chỉ khẩn cấp sự kiện có dấu hiệu lừa đảo/vi phạm nghiêm trọng, khóa công khai và bán vé, ghi nhận lý do, người thực hiện và hành động tiếp theo theo phân quyền.
+
+C. Duyệt địa điểm
++ Xem danh sách địa điểm do Admin quản lý, kiểm tra trùng lịch và sức chứa, xét duyệt yêu cầu thuê từ Người dùng/BTC.
++ Sau khi duyệt giữ lịch, phát sinh thời hạn thanh toán cọc 24 giờ, tương đương 30% tổng tiền thuê; xác nhận khi cọc đã được đối soát.
++ Khi quá hạn cọc, hủy giữ lịch và giải phóng khả dụng; kiểm tra lịch thuê xung đột, xử lý yêu cầu hủy và các mốc hoàn cọc 80%/50%/0%.
++ Xem/ghi nhận chứng từ và chuyển yêu cầu tranh chấp lên Admin khi vượt thẩm quyền.
+
+D. Quản lý giao dịch, hoàn tiền và đối soát
++ Theo dõi các thanh toán PayOS thành công, thất bại, nghi vấn, đến muộn, PAID_OUT_OF_STOCK và hàng đợi cần hoàn.
++ Duyệt trường hợp hoàn tiền ngoại lệ/giá trị lớn, đối chiếu thanh toán với chứng từ, không đánh dấu đã hoàn khi ngân hàng chưa trả thành công.
++ Xem các yêu cầu hỗ trợ, khiếu nại vé đã check-in hoặc sự kiện gián đoạn, ra quyết định có giải trình.
++ Xem hợp đồng phí với BTC, báo cáo doanh thu, khuyến mãi, hoàn tiền, phí nền tảng và số tiền thực nhận; xác nhận báo cáo đối soát trước khi chi trả.
++ Giám sát SLA, lỗi worker thanh toán, backlog webhook, lệch quỹ và những khoản chuyển tiền cần can thiệp.
+
+E. Quản lý hoạt động và giới hạn
++ Giám sát hành vi đáng ngờ, báo cáo vi phạm, sự kiện, lịch thuê và tài khoản theo quyền Admin cấp.
++ Không được tự tạo quyền Admin, tự ý sửa cấu hình bảo mật/cổng thanh toán, tự chi trả vượt quyền hoặc phê duyệt các giao dịch có xung đột lợi ích.
+
+======================================================================
+5. ADMIN (QUẢN TRỊ HỆ THỐNG)
+======================================================================
+
+5.1. Quản lý toàn bộ người dùng và phân quyền
++ Có thể xem/tìm kiếm/khóa/mở khóa tài khoản, xác minh trạng thái, đặt lại quyền, thu hồi phiên đăng nhập theo quy trình bảo mật.
++ Có thể tạo tài khoản Quản lý hệ thống, giới hạn chức năng được phép thao tác, cấp/thu hồi quyền và kiểm tra nhật ký thay đổi.
++ Có thể giám sát BTC, tài khoản con quản lý sự kiện và mối liên hệ cấp quyền; xử lý trường hợp lạm dụng quyền, ngăn truy cập trái phép giữa các đơn vị.
++ Bảo đảm năm nhóm nghiệp vụ: Người dùng, BTC, nhân sự Quản lý sự kiện, Quản lý hệ thống, Admin; khách chưa đăng nhập là truy cập công khai.
+
+5.2. Quản lý danh mục, địa điểm và chính sách
++ Tạo/sửa/ẩn các địa điểm tổ chức được nền tảng quản lý sẵn; khai báo tên, địa chỉ, giá thuê, sức chứa, khu vực, sơ đồ ghế, tiện ích và lịch không khả dụng.
++ Quản lý loại sự kiện, danh mục, nội dung trang chủ, quy định nền tảng, banner và quy tắc xuất bản.
++ Cấu hình cọc thuê 30%, hạn 24 giờ, chính sách hoàn cọc và xử lý tranh chấp; chỉ thay đổi cho giao dịch tương lai, không âm thầm sửa điều khoản đơn đã giao kết.
++ Quản lý bộ lịch ngày làm việc/ngày nghỉ và các thông báo quá hạn xét duyệt.
+
+5.3. Quản trị sự kiện và kiểm duyệt
++ Có thể theo dõi tất cả sự kiện, lịch nhiều ngày, phiên bản chờ duyệt, doanh số, tình hình check-in và khiếu nại.
++ Có quyền đình chỉ, khóa bán, gỡ bỏ sự kiện vi phạm; ghi nhận bằng chứng và nhật ký.
++ Có thể giải quyết tranh chấp, phân công quản lý hệ thống xử lý từng nhóm sự kiện và hồ sơ.
+
+5.4. Tài chính và hợp đồng
++ Quản lý hợp đồng từng BTC với thời hạn hiệu lực và công thức phí: phần trăm doanh thu hoặc phí cố định/vé.
++ Quản lý chính sách Promotion Engine của toàn hệ thống; quyết định phạm vi áp dụng, duyệt chiến dịch, chống lạm dụng, kiểm soát ngân sách giảm giá và giới hạn mã.
++ Cấu hình tài khoản nhận tiền của nền tảng, đối soát PayOS, ngân hàng nhận, quy trình hoàn/chi trả và phân quyền người lập, người duyệt, người chuyển tiền.
++ Sau khi sự kiện kết thúc và hết thời hạn khóa sổ (ví dụ 3 ngày), yêu cầu BTC xác nhận đối soát hoặc xử lý quá hạn phản hồi 48 giờ theo hợp đồng; quản lý duyệt số liệu, Admin hoặc cơ chế được phê duyệt tiến hành chuyển khoản.
++ Áp dụng công thức: TIỀN GIẢI NGÂN = DOANH THU VÉ THỰC THU - TỔNG TIỀN HOÀN - PHÍ NỀN TẢNG THEO HỢP ĐỒNG - CÁC ĐIỀU CHỈNH ĐƯỢC DUYỆT (NẾU CÓ).
++ Tự động chi trả chỉ khi ngân hàng/đối tác hỗ trợ API hợp lệ và có xác thực tài khoản nhận tiền, kiểm soát hạn mức, idempotency, phê duyệt theo chính sách; nếu không thực hiện qua chứng từ chuyển tiền thủ công.
++ Một khoản payout có mã duy nhất, báo trạng thái CHỜ DUYỆT/ĐANG CHUYỂN/THÀNH CÔNG/THẤT BẠI, không tự động ghi “đã giải ngân” khi mới gửi lệnh.
++ Không dùng trạng thái DISBURSED của từng đơn hàng để thay thế hoàn toàn trạng thái đối soát ở cấp sự kiện, vì một đơn có thể liên quan refund/điều chỉnh riêng.
++ Quản lý thuế, phí ngân hàng, đối soát cuối kỳ, log kiểm toán và xuất báo cáo theo chính sách hợp đồng.
+
+5.5. Quản lý kỹ thuật và an toàn
++ Cấu hình API/SMTP/PayOS an toàn bằng secrets và biến môi trường; quản lý domain HTTPS, Data Protection keys, backup và phục hồi.
++ Quản lý chính sách mật khẩu, token, 2FA nếu áp dụng, phân quyền tối thiểu, mã hóa thông tin nhạy cảm và giới hạn truy cập.
++ Theo dõi hệ thống email/SMS, worker giải phóng giữ ghế, worker đối soát PayOS, yêu cầu hoàn, thời hạn cọc, thông báo và giải ngân.
++ Xem dashboard sức khỏe dịch vụ, cảnh báo lỗi, nhật ký thao tác, sự cố bảo mật; sao lưu và kiểm thử phục hồi dữ liệu định kỳ.
++ Điều chỉnh cấu hình có kiểm soát phiên bản, người phê duyệt, lịch sử và khả năng khôi phục khi có lỗi.
+
+======================================================================
+6. QUY TRÌNH NGHIỆP VỤ LIÊN KẾT GIỮA CÁC NHÓM
+======================================================================
+
+BP-01. ĐĂNG KÝ TÀI KHOẢN
+Khách xem trang chủ → Đăng ký → Hệ thống xác thực dữ liệu → Tạo Người dùng → Đăng nhập.
+
+BP-02. ĐĂNG KÝ BAN TỔ CHỨC
+Người dùng → Gửi hồ sơ/giấy tờ → Quản lý hệ thống kiểm tra trong 7 ngày làm việc → Duyệt hoặc yêu cầu bổ sung/từ chối → Duyệt thành công mới mở quyền BTC.
+
+BP-03. TẠO VÀ DUYỆT SỰ KIỆN
+BTC → Tạo sự kiện → Cấu hình nhiều suất/venue/zone/seat, giá vé, chính sách → Đặt địa điểm và thực hiện điều kiện thuê → Gửi duyệt → Quản lý hệ thống kiểm tra → Phê duyệt → Công khai, mở bán.
+
+BP-04. DUYỆT THAY ĐỔI SAU CÔNG KHAI
+BTC → Tạo bản sửa PENDING_UPDATE → Bản cũ tiếp tục hiển thị/bán → Quản lý xét duyệt → Nếu duyệt thì áp phiên bản mới sau kiểm tra tác động đến người mua; nếu từ chối thì bản cũ giữ nguyên.
+
+BP-05. ĐẶT GHẾ VÀ GIỮ VÉ
+Người dùng → Chọn session, khu vực, ghế, loại vé → Kiểm tra hạn mức 10 vé và sức chứa → Giữ nguyên tử 10 phút → Tạo đơn PENDING → Đến checkout. Khi hết hạn, worker nhả hold đủ điều kiện.
+
+BP-06. ÁP MÃ GIẢM GIÁ
+Người dùng nhập voucher → Kiểm tra thời hạn/phạm vi/giá trị tối thiểu/giới hạn → Giữ một lượt sử dụng trong 10 phút → Thanh toán thành công: chuyển sang đã dùng; thất bại/hết hạn: trả lượt.
+
+BP-07. THANH TOÁN, PHÁT HÀNH VÉ
+Người dùng → Tạo thanh toán PayOS → Ngân hàng chuyển tiền → Webhook/xác minh API → Hệ thống đối soát → Cấp vé QR/PDF và ghi nhận giao dịch một lần.
+
+BP-08. THANH TOÁN ĐẾN MUỘN
+Đơn hết hạn giữ ghế → Xác nhận PayOS có tiền → Khóa đơn & kiểm tra ghế → Nếu vẫn còn: tái đặt và cấp vé; nếu đã mất: ghi PAID_OUT_OF_STOCK → Báo khách và ưu tiên hoàn 100% số tiền thực thu.
+
+BP-09. PHÁT HÀNH VÉ MỜI
+BTC nhập thông tin khách mời → Chọn session/zone/seat → Trừ tồn kho → Sinh vé QR & secure link → Gửi email/SMS → Khách dùng QR trực tiếp hoặc đăng ký để liên kết vé.
+
+BP-10. PHÂN CÔNG QUẢN LÝ SỰ KIỆN
+BTC có sự kiện → Tạo/mời nhân sự → Giao event_id và permission → Nhân sự làm việc đúng phạm vi → BTC xem audit hoặc thu hồi quyền.
+
+BP-11. CHECK-IN
+Người tham dự xuất trình QR → BTC/nhân sự có quyền quét trong đúng suất diễn → Hệ thống kiểm tra vé chưa dùng → Ghi CHECKED_IN & thời điểm. Quét lặp hoặc sai suất: từ chối, hiển thị lý do.
+
+BP-12. HỦY VÉ TỰ NGUYỆN
+Người dùng yêu cầu hủy trước >=72 giờ → Kiểm tra policy và vé chưa check-in → Tính tiền hoàn theo giá vé và phí → Duyệt tự động hoặc chuyển xét ngoại lệ → Thực hiện chuyển tiền → Xác nhận đã hoàn sau đối soát.
+
+BP-13. HOÃN/HỦY SỰ KIỆN
+BTC gửi yêu cầu → Quản lý hệ thống phê duyệt → Hoãn: thông báo lịch mới, giữ vé và mở yêu cầu hoàn 100% cho khách không tham dự; Hủy: khóa vé, hoàn 100% số tiền đã thu; có quy trình khiếu nại.
+
+BP-14. THUÊ ĐỊA ĐIỂM
+Người dùng/BTC chọn địa điểm → Gửi yêu cầu → Quản lý hệ thống duyệt giữ lịch → Cọc 30% trong 24 giờ → Đối soát cọc → Xác nhận thuê chính thức. Quá hạn: nhả lịch.
+
+BP-15. HỦY THUÊ ĐỊA ĐIỂM
+Người thuê hủy → Tính số ngày tới lịch bắt đầu → >=14 ngày hoàn 80% cọc; 7–<14 ngày hoàn 50%; <7 ngày hoàn 0% → Xác minh và chuyển khoản nếu có hoàn.
+
+BP-16. ĐỐI SOÁT VÀ CHI TRẢ
+Kết thúc sự kiện → Chờ xử lý hoàn/khiếu nại → Khóa sổ → Tính doanh thu thực thu, tiền hoàn, phí từng hợp đồng và khoản điều chỉnh → BTC xác nhận hoặc chuyển xử lý khi hết hạn 48 giờ → Quản lý duyệt → Admin/hệ thống có thẩm quyền chi trả theo API ngân hàng hoặc chứng từ → Ghi hoàn tất khi tiền thực sự thành công.
+
+BP-17. QUẢN LÝ VOUCHER VÀ HỢP ĐỒNG
+Admin/BTC được phép lập chiến dịch → Duyệt/áp dụng phạm vi → Hệ thống khóa lượt khi hold và chốt khi mua → Báo cáo chi phí khuyến mãi. Admin tạo hợp đồng phí theo thời gian; checkout lưu phiên bản phí có hiệu lực để đối soát.
+
+BP-18. HỖ TRỢ VÀ ĐÁNH GIÁ
+Người dùng gửi yêu cầu hỗ trợ/đánh giá sau tham dự → Hệ thống kiểm tra quyền và trạng thái → Quản lý/BTC phản hồi trong phạm vi → Lưu nhật ký xử lý và thông báo kết quả.
+
+======================================================================
+7. QUY TẮC DỮ LIỆU, TRẠNG THÁI VÀ KIỂM SOÁT
+======================================================================
+
+7.1. Đối tượng dữ liệu tối thiểu
+TaiKhoan; VaiTro; BanToChuc; HoSoXetDuyet; TaiLieuXacMinh; SuKien; PhienBanSuKien; SuatDien; DiaDiem; KhuVuc; Ghe; TonKhoGheSuat; LoaiVe; DatGhe/GiuGhe; DonVe; ChiTietDon; ThanhToan; Ve; CheckInLog; KhachMoi; LoiMoiEmail; NhanSuSuKien; QuyenNhanSu; Voucher; VoucherReservation; OrganizerContract; VenueBooking; VenueDeposit; RefundRequest; RefundTransaction; Settlement; SettlementEntry; Payout; Notification; SupportCase; AuditLog.
+
+7.2. Trạng thái khuyến nghị
+- Hồ sơ BTC: DRAFT, PENDING, NEEDS_INFO, APPROVED, REJECTED.
+- Sự kiện: DRAFT, PENDING, APPROVED, ACTIVE, POSTPONEMENT_REQUESTED, CANCEL_REQUESTED, SUSPENDED, CANCELLED, COMPLETED.
+- Bản sửa sự kiện: DRAFT, PENDING_UPDATE, APPROVED/APPLIED, REJECTED.
+- Ghế theo suất: AVAILABLE, HELD, BOOKED, BLOCKED; hold có expires_at và owner.
+- Đơn: PENDING_PAYMENT, PAID, EXPIRED, CANCELLED, PAID_OUT_OF_STOCK, REFUND_PENDING, REFUNDED.
+- Vé: ISSUED, CHECKED_IN, CANCELLED, REFUNDED, REVOKED.
+- Thuê địa điểm: REQUESTED, APPROVED_HOLD, AWAITING_DEPOSIT, CONFIRMED, REJECTED, EXPIRED, CANCELLED.
+- Hoàn tiền: REQUESTED, AUTO_APPROVED, MANUAL_REVIEW, PROCESSING, COMPLETED, FAILED, REJECTED.
+- Đối soát: DRAFT, ORGANIZER_CONFIRMED, MANAGER_APPROVED, PAYOUT_PENDING, PAID, DISPUTED.
+
+7.3. Ràng buộc bắt buộc
++ Chỉ giao dịch trên sự kiện đã duyệt và suất diễn còn hiệu lực.
++ Không vượt sức chứa theo từng session/zone; số vé Standard + VIP + khách mời phải <= capacity. Với bán vé theo ghế, giữ chỗ cũng chiếm tồn kho trong thời hạn còn hiệu lực.
++ Không bán hai vé có hiệu lực cho cùng session_id + seat_id; hủy/đổi ghế phải đồng bộ inventory và lưu lịch sử.
++ Không vượt 10 vé đang giữ hợp lệ + vé đã trả tiền trên mỗi tài khoản trong cùng suất diễn.
++ Không sử dụng transaction SQL Server liên tục trong 10 phút giữ ghế. Giao dịch kiểm tra/đặt giữ là ngắn; việc chờ thanh toán diễn ra bên ngoài transaction.
++ SQL Server sử dụng khóa/điều kiện đồng thời phù hợp (ví dụ UPDLOCK/HOLDLOCK hoặc điều kiện cập nhật + unique index); không mô tả FOR UPDATE là cú pháp của SQL Server.
++ PayOS webhook được xác thực chữ ký, xử lý idempotency và đối soát; chỉ kết luận giao dịch đã chuyển tiền/hoàn/chi trả dựa trên bằng chứng trạng thái thực tế.
++ Mọi thay đổi quyền nhân sự có hiệu lực ở backend ngay và được kiểm tra theo account + organizer + event/session + permission.
++ Đơn đã thanh toán giữ nguyên snapshot giá vé, giảm giá, phí dịch vụ và hợp đồng phí dùng tại thời điểm mua.
++ Phạm vi của voucher và hiệu lực hợp đồng không được mập mờ: nếu nhiều hợp đồng trùng thời gian phải có quy tắc ưu tiên hoặc ngăn chặn cấu hình.
++ Thông tin email/SĐT/giấy tờ/hồ sơ ngân hàng cần bảo vệ, hạn chế ghi log PII, có thời hạn lưu và phân quyền truy cập.
+
+7.4. Điểm cấu hình phải xác định khi nghiệm thu thực tế
++ Phí dịch vụ người mua phải trả và phí nền tảng BTC chịu cần được phân biệt; không tự động vừa không hoàn phí vừa trừ thêm 5% nếu chưa có quy tắc rõ.
++ Chính sách kết hợp nhiều voucher, ai tài trợ mức giảm và cơ sở tính hoa hồng phải được công khai và lưu trong điều khoản chiến dịch.
++ Thời hạn yêu cầu hoàn khi hoãn, lịch ngày nghỉ dùng cho SLA 7 ngày, hạn phản hồi đối soát 48 giờ và thời điểm khóa sổ N ngày cần được cấu hình có thẩm quyền.
++ Chuyển tiền tự động cần hợp đồng phù hợp với PayOS/ngân hàng, quy định thu hộ và pháp luật áp dụng. Không coi việc có API tương đương được tự động hoạt động ngay.
+
+======================================================================
+8. TIÊU CHÍ NGHIỆM THU CHÍNH
+======================================================================
+
+TC-01: Guest xem được trang chủ, sự kiện/địa điểm công khai, không xem được dữ liệu riêng.
+TC-02: Guest không thể đặt vé/thuê chính thức nếu chưa đăng nhập.
+TC-03: Đăng ký tạo Người dùng, không tự gán vai trò BTC.
+TC-04: Người dùng gửi hồ sơ BTC, xem được lý do từ chối và nộp lại.
+TC-05: BTC chưa duyệt không thể tạo sự kiện để công khai.
+TC-06: Sự kiện nhiều ngày có hai suất tại hai địa điểm khác nhau và sức chứa tách biệt.
+TC-07: Bản chỉnh sửa chờ duyệt không làm đổi nội dung sự kiện đang công khai.
+TC-08: Khi suspend, người ngoài không thể mua vé hoặc xem nội dung bị khóa.
+TC-09: Hai người tranh cùng một ghế: chỉ một người giữ thành công.
+TC-10: Một ghế trong cụm đã bị giữ: cả cụm đặt thất bại.
+TC-11: Ghế giữ đúng 10 phút, worker không nhả sai hold mới.
+TC-12: Một tài khoản có 6 vé trả tiền + 4 đang giữ không mua thêm vé ở cùng suất.
+TC-13: Các suất khác của cùng event vẫn có hạn mức 10 độc lập.
+TC-14: Không thể bán/đăng ký khách mời vượt capacity của khu vực suất diễn.
+TC-15: Voucher hết lượt/hết hạn/sai phạm vi không thể áp dụng.
+TC-16: Hai khách tranh lượt voucher cuối cùng: không sử dụng vượt limit.
+TC-17: Hold voucher hết hạn được trả lượt, giao dịch thành công chỉ tính một lần.
+TC-18: Webhook PayOS bị gửi lại không phát hành vé hai lần.
+TC-19: Thanh toán trễ khi ghế còn → cấp vé nếu còn đủ điều kiện.
+TC-20: Thanh toán trễ khi ghế hết → PAID_OUT_OF_STOCK, ưu tiên hoàn đủ tiền thực trả.
+TC-21: Vé mời được gửi cho email chưa có tài khoản và check-in trực tiếp được.
+TC-22: Vé mời liên kết vào tài khoản đúng người sau xác minh liên hệ.
+TC-23: Quét vé QR lần hai bị chặn và có timestamp lần quét đầu.
+TC-24: Nhân viên quản lý sự kiện chỉ quét được sự kiện được giao.
+TC-25: BTC thu hồi quyền → nhân viên mất quyền ngay; không thể tự cấp quyền.
+TC-26: Nhân viên quản lý sự kiện không được duyệt BTC, sự kiện, thuê địa điểm hoặc hoàn tiền toàn nền tảng.
+TC-27: Tự hủy vé trước >=72 giờ theo chính sách hợp lệ được hoàn đúng giá vé và phí.
+TC-28: Vé đã check-in không qua luồng hoàn tự động; vẫn có lối khiếu nại.
+TC-29: Hoãn sự kiện giữ vé cũ hợp lệ; hủy sự kiện hoàn đủ tiền thực thu.
+TC-30: Địa điểm đã giữ nếu không cọc 30% trong 24 giờ sẽ nhả lịch.
+TC-31: Hủy thuê theo ba mốc 15/10/5 ngày hoàn 80/50/0% cọc.
+TC-32: Đối soát lấy đúng phí theo hợp đồng đang có hiệu lực và snapshot từng đơn.
+TC-33: Payout cùng một bảng đối soát không thực hiện hai lần dù API retry.
+TC-34: Không ghi PAID cho settlement khi chuyển khoản thất bại/đang xử lý.
+TC-35: Chức năng Admin và Quản lý hệ thống bị giới hạn đúng thẩm quyền.
+TC-36: Khôi phục mật khẩu, bảo vệ tài liệu, phân quyền và nhật ký có thể kiểm tra.
+
+KẾT LUẬN
+Hệ thống có năm nhóm vai trò nghiệp vụ như mô tả. Khách chưa đăng nhập là trạng thái truy cập; người dùng có thể mua vé hoặc xin trở thành BTC; BTC tạo và quản lý sự kiện; Quản lý sự kiện là vận hành theo sự kiện của BTC và quyền được ủy quyền; Quản lý hệ thống kiểm duyệt và xử lý nghiệp vụ nền tảng; Admin quản trị toàn hệ thống. Tài liệu là cơ sở mô tả chức năng, Use Case, ERD, API, giao diện và nghiệm thu.
+
+HẾT TÀI LIỆU.

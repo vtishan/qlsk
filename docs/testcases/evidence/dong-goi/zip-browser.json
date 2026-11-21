@@ -1,0 +1,105 @@
+{
+  "zip": "1c8190aa020b625e3fc034e3b7505654adc49645e6d8bfa714814be399373cd6",
+  "files_over_http": 76,
+  "legacy": {
+    "views/account.html": {
+      "status": 301,
+      "target": "features/account/account.html"
+    },
+    "views/home.html": {
+      "status": 301,
+      "target": "features/home/home.html"
+    },
+    "views/event.html": {
+      "status": 301,
+      "target": "features/events/event.html"
+    },
+    "views/venue.html": {
+      "status": 301,
+      "target": "features/venues/venue.html"
+    },
+    "views/export.html": {
+      "status": 301,
+      "target": "features/reports/export.html"
+    },
+    "views/work-overview.html": {
+      "status": 301,
+      "target": "features/work/work-overview.html"
+    },
+    "giaodienmau.html": {
+      "status": 301,
+      "target": "giaodientest/giaodienmau.html"
+    },
+    "js/core/app.js": {
+      "status": 301,
+      "target": "app/app.js"
+    },
+    "css/pages/catalog.css": {
+      "status": 301,
+      "target": "shared/styles/catalog.css"
+    },
+    "giaodientest/images/hero.webp": {
+      "status": 301,
+      "target": "assets/images/hero.webp"
+    }
+  },
+  "prototype": {
+    "mau": {
+      "home": {
+        "title": "Tìm sự kiện.\nChọn chỗ của bạn.",
+        "textSHA256": "e5973e441dce87814c76183f76278183b916920e553db18413a8e93e991c90e6",
+        "links": 16
+      },
+      "events": {
+        "title": "Khám phá sự kiện",
+        "textSHA256": "e8e4288c3b4a78ceb386b022d713f70e3468813e109dccfd581c7a6c6af2b0be",
+        "links": 17
+      },
+      "venues": {
+        "title": "Địa điểm tổ chức",
+        "textSHA256": "5ac015c96df3ead2129edc4ad14ca2d17cf5638c4d92be4331d9e911c0bbf8e0",
+        "links": 18
+      },
+      "calendar": {
+        "title": "Lịch sự kiện",
+        "textSHA256": "ca5b4fbe8c5c1b71823d78ea48d6049c0f8caa066e6c84ca814dcd4f925241bd",
+        "links": 35
+      },
+      "guide": {
+        "title": "Hướng dẫn sử dụng VÉNUE",
+        "textSHA256": "fb3eb448dcdde281db922a507dfe035353cbf7813ee0c9e0b548ac154fb10cf4",
+        "links": 0
+      }
+    },
+    "zip": {
+      "home": {
+        "title": "Tìm sự kiện.\nChọn chỗ của bạn.",
+        "textSHA256": "e5973e441dce87814c76183f76278183b916920e553db18413a8e93e991c90e6",
+        "links": 16
+      },
+      "events": {
+        "title": "Khám phá sự kiện",
+        "textSHA256": "e8e4288c3b4a78ceb386b022d713f70e3468813e109dccfd581c7a6c6af2b0be",
+        "links": 17
+      },
+      "venues": {
+        "title": "Địa điểm tổ chức",
+        "textSHA256": "5ac015c96df3ead2129edc4ad14ca2d17cf5638c4d92be4331d9e911c0bbf8e0",
+        "links": 18
+      },
+      "calendar": {
+        "title": "Lịch sự kiện",
+        "textSHA256": "ca5b4fbe8c5c1b71823d78ea48d6049c0f8caa066e6c84ca814dcd4f925241bd",
+        "links": 35
+      },
+      "guide": {
+        "title": "Hướng dẫn sử dụng VÉNUE",
+        "textSHA256": "fb3eb448dcdde281db922a507dfe035353cbf7813ee0c9e0b548ac154fb10cf4",
+        "links": 0
+      }
+    }
+  },
+  "browser": "158.0.4370.33",
+  "page_errors": [],
+  "http_errors": []
+}

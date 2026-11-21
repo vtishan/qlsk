@@ -1,0 +1,106 @@
+{
+  "executed_at": "2026-11-21T11:44:25.608719+00:00",
+  "base": "http://127.0.0.1:5834",
+  "method": "GET only, unauthenticated, Python standard library",
+  "passed": 10,
+  "total": 10,
+  "cases": [
+    {
+      "id": "BC-01",
+      "mapped": "K-06",
+      "description": "Public guest capabilities",
+      "passed": true,
+      "observation": "Guest session; catalog.events available; token omitted from evidence."
+    },
+    {
+      "id": "BC-02",
+      "mapped": "K-01",
+      "description": "Public event listing",
+      "passed": true,
+      "observation": {
+        "count_first_page": 8,
+        "selected_id": 5
+      }
+    },
+    {
+      "id": "BC-03",
+      "mapped": "K-01",
+      "description": "Search by existing event title",
+      "passed": true,
+      "observation": {
+        "matching_count": 1
+      }
+    },
+    {
+      "id": "BC-04",
+      "mapped": "K-01",
+      "description": "Filter events by exact price",
+      "passed": true,
+      "observation": {
+        "matching_count": 3,
+        "min_price": 100000
+      }
+    },
+    {
+      "id": "BC-05",
+      "mapped": "K-02",
+      "description": "Event detail and sessions",
+      "passed": true,
+      "observation": {
+        "id": 5,
+        "sessions": 1
+      }
+    },
+    {
+      "id": "BC-06",
+      "mapped": "K-03",
+      "description": "Calendar includes selected session",
+      "passed": true,
+      "observation": {
+        "selected_session": 5,
+        "count_first_page": 13
+      }
+    },
+    {
+      "id": "BC-07",
+      "mapped": "K-04",
+      "description": "Venue listing and rental price filter",
+      "passed": true,
+      "observation": {
+        "count_first_page": 12,
+        "selected_id": 6
+      }
+    },
+    {
+      "id": "BC-08",
+      "mapped": "K-04",
+      "description": "Venue detail and seating zones",
+      "passed": true,
+      "observation": {
+        "id": 6,
+        "zones": 1
+      }
+    },
+    {
+      "id": "BC-09",
+      "mapped": "K-01",
+      "description": "Filter options are populated",
+      "passed": true,
+      "observation": {
+        "priceBands": 3,
+        "cities": 3,
+        "venues": 28,
+        "categories": 17
+      }
+    },
+    {
+      "id": "BC-10",
+      "mapped": "K-05",
+      "description": "Published public policy content",
+      "passed": true,
+      "observation": {
+        "published_policy_count_first_page": 44
+      }
+    }
+  ]
+}

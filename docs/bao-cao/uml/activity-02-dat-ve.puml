@@ -1,0 +1,25 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Đặt vé và giữ ghế
+|Người dùng|
+start
+|Người dùng|
+:Chọn suất, 1–10 ghế, chính sách và voucher tùy chọn;
+|OrderService|
+:Kiểm tra khóa idempotency, khóa sự kiện và suất diễn;
+|OrderService|
+:Giải phóng giữ chỗ hết hạn, kiểm tra lịch bán, chính sách, cụm ghế, sức chứa;
+if (Yêu cầu hợp lệ, ghế còn trống?) then (Có)
+:Tạo đơn và giữ ghế trong giao dịch;
+:Nếu đơn miễn phí: chốt đơn và phát hành vé, nếu có phí: chờ thanh toán;
+else (Không)
+:Từ chối, tải lại sơ đồ / chính sách;
+endif
+stop
+@enduml

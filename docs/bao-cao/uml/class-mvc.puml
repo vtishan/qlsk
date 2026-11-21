@@ -1,0 +1,97 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+top to bottom direction
+package "View — JavaScript SPA (trình duyệt)" {
+ class "app.js" as App <<module>>
+ class "features/events/events.js" as EventView <<module>>
+ class "features/tickets/tickets.js" as TicketView <<module>>
+ class "app/api.js" as Api <<module>> {
++apiCapabilities()
++endpoint(...segments)
++enabled(api, operation, write)
+}
+ App --> EventView
+ App --> TicketView
+ EventView --> Api
+ TicketView --> Api
+}
+package "Controller — ASP.NET Core API" {
+ class EventController
+ class TicketController
+ class AdmissionController
+ class CapabilityController
+}
+package "Model — nghiệp vụ và lưu trữ" {
+ class EventService {
++List(...)
++Detail(...)
++NeedOwner(...)
+}
+ class OrderService {
++Place(...)
++Checkout(...)
++Reconcile(...)
+}
+ class AdmissionService {
++CheckIn(...)
++Lookup(...)
+}
+ class CapabilityService {
++Get(...)
+}
+ class AppDbContext <<EF Core>>
+ class SuKien {
++Id: int
++BTCId: int
++PhienBanCongKhaiId: int?
++TrangThai: TrangThaiSuKien
+}
+ class SuatDien {
++Id: int
++SuKienId: int
++DiaDiemId: int
++SucChua: int
+}
+ class DonHang {
++Id: int
++TaiKhoanId: int
++SuatDienId: int
++TongTien: decimal
++KhoaTaoDon: string?
+}
+ class Ve {
++Id: int
++SuatDienId: int
++MaQR: string
++TrangThai: TrangThaiVe
+}
+ EventService --> AppDbContext
+ OrderService --> AppDbContext
+ AdmissionService --> AppDbContext
+ CapabilityService --> AppDbContext
+ OrderService --> EventService
+ AdmissionService --> EventService
+ AppDbContext --> SuKien : DbSet
+ AppDbContext --> SuatDien : DbSet
+ AppDbContext --> DonHang : DbSet
+ AppDbContext --> Ve : DbSet
+}
+Api ..> EventController : HTTP JSON / cookie / CSRF
+Api ..> TicketController : HTTP JSON
+Api ..> AdmissionController : HTTP JSON
+Api ..> CapabilityController : GET /api/capabilities
+EventController --> EventService
+TicketController --> OrderService
+AdmissionController --> AdmissionService
+CapabilityController --> CapabilityService
+note bottom
+  Đây là ánh xạ trách nhiệm MVC, không phải MVC Razor phía máy chủ.
+  Các liên kết DbSet biểu diễn truy cập lưu trữ, không phải kế thừa.
+end note
+@enduml

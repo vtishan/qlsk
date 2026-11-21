@@ -1,0 +1,127 @@
+{
+  "url": "http://127.0.0.1:5831; http://127.0.0.1:5835",
+  "browser": "Microsoft Edge headless; Playwright actual clicks",
+  "database": "QLSK_UI_c67acc32",
+  "results": {
+    "K-01": {
+      "status": "Đạt",
+      "observed": "Lọc rỗng, reload và Back/Forward giữ từ khóa; xóa khôi phục danh sách."
+    },
+    "K-02": {
+      "status": "Đạt",
+      "observed": "← Danh sách sự kiện\nLịch sự kiện\n\nChủ đề kiểm thử 6eaf362d · Tên kiểm thử\n\nSự kiện SQL 6eaf362d\nChọn suất để đặt vé\nChia sẻ sự kiện\nLưu yêu thích\nSuất diễn, địa điểm và giá vé\nSuất SQL\nBắt đầu\n14:25 23 thg 11, 2026\nKết thúc\n16:25 23 thg 11, 2026\nĐịa điểm\nĐịa điểm 6eaf362d\nĐịa chỉ\nĐịa chỉ kiểm thử, Hà Nội\nGiá vé và thời gian bán\nLoại vé\tGiá vé\tMở bán\tĐóng bán\nStandard\t0 ₫\t13:25 21 thg 11, 2026\t13:25 23 thg 11, 2026\nChọn khu vực và ghế\nChia sẻ suất diễn\nTải ICS\nVề sự kiện\n\nHiển thị dữ liệu từ SQL Server\n\nChương trình\n\nKiểm thử công bố\n\nBan tổ chức\nTên kiểm thử\nDanh mục\nChủ đề kiểm thử 6eaf362d\nNghệ sĩ / diễn giả\nChưa khả dụng\nĐăng nhập để lưu yêu thích\nQuy định tham dự và hoàn vé\n\nXuất trình vé\n\nVé miễn phí\n\nHướng dẫn đặt vé\nĐánh giá của người tham dự\nĐánh giá công khai\nĐiểm\tNội dung\n\n\nChưa có đánh giá đã được công bố."
+    },
+    "K-03": {
+      "status": "Đạt",
+      "observed": "Ngày 23 nhận focus; đổi tháng; calendar.ics có VEVENT."
+    },
+    "K-04": {
+      "status": "Đạt",
+      "observed": "Tìm địa điểm, mở chi tiết, bấm Xem lịch địa điểm và chọn ngày xem lịch trống."
+    },
+    "K-05": {
+      "status": "Đạt",
+      "observed": "Bấm năm tab Tổng quan/Đặt vé/Quy định/Câu hỏi thường gặp/Quyền riêng tư và mở các câu FAQ. Giới thiệu nằm ở chân trang."
+    },
+    "ND-01": {
+      "status": "Đạt",
+      "observed": "Tạo uat_user_1f9c3a48@example.test bằng form sau khi kiểm tra rỗng."
+    },
+    "ND-02": {
+      "status": "Đạt",
+      "observed": "Hiện/ẩn mật khẩu, sai mật khẩu bị từ chối, đăng nhập đúng thành công."
+    },
+    "K-06": {
+      "status": "Đạt",
+      "observed": "Sau đăng nhập quay lại http://127.0.0.1:5831/#tickets/mine"
+    },
+    "ND-03": {
+      "status": "Đạt",
+      "observed": "Tên mới Đã sửa 1f9c3a48 tồn tại sau reload."
+    },
+    "ND-07": {
+      "status": "Đạt",
+      "observed": "Thêm từ chi tiết rồi bỏ tại danh sách; danh sách rỗng đúng."
+    },
+    "ND-09": {
+      "status": "Đạt",
+      "observed": "Đơn miễn phí tickets/book/checkout/35 sau chặn trống và chọn ghế F-1."
+    },
+    "ND-10": {
+      "status": "Đạt",
+      "observed": "Vé tickets/mine/27 có QR tải được và PDF mở được, 3565 byte. Mở PDF bằng PDFium và kết xuất một trang QR; PDF hiện chỉ gồm QR, không có chữ tên/ghế."
+    },
+    "ND-13": {
+      "status": "Đạt",
+      "observed": "requests/rentals/19 tạo bằng form và nhấn hai lần."
+    },
+    "ND-15": {
+      "status": "Đạt",
+      "observed": "Người gửi đọc lại support12: Đã giải quyết, QA support 12 resolved via manager UI."
+    },
+    "ND-08": {
+      "status": "Đạt",
+      "observed": "Có thông báo quản lý duyệt thuê và giải quyết hỗ trợ; đánh dấu đọc, tải lại vẫn Đã đọc."
+    },
+    "ND-16": {
+      "status": "Đạt",
+      "observed": "Người dùng bị chặn #work/accounts; tài khoản rival mở đơn35 không thấy sự kiện/chi tiết của chủ đơn."
+    },
+    "ND-18": {
+      "status": "Đạt",
+      "observed": "375px: hồ sơ/vé/yêu cầu không tràn; Escape trả focus nút mở."
+    },
+    "K-07": {
+      "status": "Đạt",
+      "observed": "Khách 375px mở sự kiện/lịch/địa điểm/đăng nhập không tràn; focus email khi mở, Tab/Escape đóng được."
+    },
+    "ND-12": {
+      "status": "Đạt",
+      "observed": "Đơn36 trả 100.000đ simulator ký; gửi hoàn12 bằng UI; quản lý duyệt và người gửi thấy Đã duyệt, lý do Đã đối chiếu 100.000 đồng với đơn QA 36. Chưa có chuyển tiền ngân hàng."
+    },
+    "ND-14": {
+      "status": "Đạt",
+      "observed": "Quản lý duyệt rental19; người gửi thấy cọc 300.000đ; thanh toán QA có chữ ký, đối soát chuyển Xác nhận thuê."
+    },
+    "ND-05": {
+      "status": "Đạt",
+      "observed": "Gửi mã UI, nhận email SMTP nội bộ, xác nhận qua UI, hồ sơ hiện Đã xác minh email."
+    },
+    "ND-04": {
+      "status": "Đạt",
+      "observed": "Chặn xác nhận mật khẩu sai; đổi đúng; đăng xuất và đăng nhập mật khẩu mới thành công."
+    },
+    "ND-06": {
+      "status": "Đạt",
+      "observed": "Gửi mã qua SMTP nội bộ, nhập mã/mật khẩu mới và đăng nhập được; không gửi thư ngoài."
+    },
+    "ND-11": {
+      "status": "Đạt",
+      "observed": "Hai Edge context chọn cùng Ghế F-3 · Standard · Còn trống · 0 ₫; người đầu có tickets/book/checkout/39; người sau bị từ chối, vẫn ở chọn ghế."
+    },
+    "ND-17": {
+      "status": "Đạt",
+      "observed": "Thu hồi phiên QA khi form đang mở; bấm gửi hiển thị cần phiên đăng nhập, không chuyển tới hồ sơ."
+    },
+    "ND-21": {
+      "status": "Đạt",
+      "observed": "Mã INVALID_QA bị từ chối; xóa mã tạo được tickets/book/checkout/43."
+    },
+    "ND-19": {
+      "status": "Đạt",
+      "observed": "tickets/book/checkout/43 hủy qua nút Hủy giữ chỗ, reload vẫn Đã hủy."
+    },
+    "ND-20": {
+      "status": "Đạt",
+      "observed": "requests/rentals/28 hủy qua form, Đã hủy và có lý do QA hủy hồ sơ thử."
+    },
+    "ND-22": {
+      "status": "Đạt",
+      "observed": "Mã SMTP đã dùng ND-06 bị từ chối khi gửi lại trên form; không đổi mật khẩu lần hai."
+    },
+    "ND-23": {
+      "status": "Đạt",
+      "observed": "Edge 5834: mở sự kiện #5 và #6, xem lại #5, tải lại và đăng nhập ở phiên Edge sạch. Lịch sử đúng thứ tự, không trùng, riêng từng tài khoản. Khách xem sự kiện không gửi yêu cầu lưu. Lưu và bỏ yêu thích vẫn hoạt động."
+    }
+  }
+}

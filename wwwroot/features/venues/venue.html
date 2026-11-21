@@ -1,0 +1,52 @@
+<article class="stack venue-detail">
+  <nav aria-label="Đường dẫn địa điểm"><a href="#venues">← Danh sách địa điểm</a></nav>
+  <header class="venue-cover">
+    <div class="stack venue-cover-copy">
+      
+      <h1 id="venue-title" tabindex="-1">Chi tiết địa điểm</h1>
+      <p data-slot="address"></p>
+
+    </div>
+    <div class="actions" data-slot="cover-actions"></div>
+  </header>
+  <div data-slot="status"></div>
+
+  <div class="venue-detail-layout">
+    <div class="stack">
+      <figure class="venue-figure" data-slot="photo"></figure>
+      <section class="panel stack"><h2>Thông tin địa điểm</h2><dl class="venue-highlights" data-slot="highlights"></dl></section>
+      <section class="panel stack" aria-labelledby="venue-zones">
+        <h2 id="venue-zones">Khu vực và chỗ ngồi</h2>
+        <div data-slot="zones"></div>
+      </section>
+    </div>
+    <div class="stack">
+      <section class="panel stack" aria-labelledby="venue-availability">
+        <header class="venue-section-head">
+          <div class="stack">
+            <h2 id="venue-availability" tabindex="-1">Lịch địa điểm</h2>
+            <p class="muted">Các khung đã bận theo giờ Việt Nam.</p>
+          </div>
+        </header>
+        <nav aria-label="Ngày trong lịch địa điểm"><ul class="venue-days" data-slot="days"></ul></nav>
+        <div data-slot="date"></div>
+        <div data-slot="availability"></div>
+      </section>
+    <aside class="panel stack venue-rental" aria-labelledby="venue-rental">
+      <h2 id="venue-rental">Yêu cầu thuê</h2>
+      <p>Chọn địa điểm và khung giờ dự kiến để gửi hồ sơ.</p>
+      <ol class="venue-rental-steps">
+        <li>Gửi yêu cầu và chờ xét duyệt giữ lịch.</li>
+        <li>Đặt cọc 30% trong vòng 24 giờ sau khi được duyệt giữ lịch.</li>
+        <li>Theo dõi đối soát cọc và xác nhận thuê.</li>
+      </ol>
+      <div class="stack" data-slot="rental-actions"></div>
+      <a href="#guide">Hướng dẫn và chính sách thuê</a>
+    </aside>
+    </div>
+  </div>
+  <section class="stack" aria-labelledby="venue-events">
+    <h2 id="venue-events">Sự kiện sắp diễn ra tại đây</h2>
+    <div data-slot="events"></div>
+  </section>
+</article>

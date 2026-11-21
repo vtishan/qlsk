@@ -1,0 +1,20 @@
+{
+  "id": 8,
+  "label": "Hợp đồng #8",
+  "organizerName": "Người bổ sung",
+  "feeLabel": "2.00%",
+  "from": "2029-12-31T17:00:00+00:00",
+  "to": "2030-12-31T16:00:00+00:00",
+  "status": "CoHieuLuc",
+  "fields": [
+    {
+      "label": "Điều khoản",
+      "value": "Biểu phí QLSK đã được quản trị xác nhận."
+    },
+    {
+      "label": "Sự kiện riêng",
+      "value": null
+    }
+  ],
+  "statusLabel": "Có hiệu lực"
+}

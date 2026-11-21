@@ -1,0 +1,23 @@
+<div class="stack report-page">
+  <header class="report-intro">
+    <div class="stack">
+      <h1 id="report-title" tabindex="-1">Báo cáo</h1>
+      <p>Lọc dữ liệu và xuất báo cáo theo phạm vi được cấp.</p>
+    </div>
+    <a href="#work" class="button secondary">Về vận hành</a>
+  </header>
+  <section class="panel stack report-filter" aria-labelledby="report-filter-title">
+    <h2 id="report-filter-title">Phạm vi báo cáo</h2>
+    <div data-slot="filters"></div>
+  </section>
+  <section class="panel stack report-preview" aria-labelledby="report-preview-title">
+    <header class="report-preview-head">
+      <div class="stack">
+        <h2 id="report-preview-title" tabindex="-1" data-filter-results>Xem trước báo cáo</h2>
+        <p class="muted" data-slot="summary"></p>
+      </div>
+      <div data-slot="actions"></div>
+    </header>
+    <div data-slot="preview"></div>
+  </section>
+</div>

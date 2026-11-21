@@ -1,0 +1,1552 @@
+﻿[
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.CauHinhHeThong",
+        "key_name":  "FK_CauHinhHeThong_TaiKhoan_NguoiCapNhatId",
+        "col_name":  "NguoiCapNhatId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.ChiTietDonHang",
+        "key_name":  "FK_ChiTietDonHang_DonHang_DonHangId",
+        "col_name":  "DonHangId",
+        "target_name":  "dbo.DonHang",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.ChiTietDonHang",
+        "key_name":  "FK_ChiTietDonHang_LoaiVe_LoaiVeId",
+        "col_name":  "LoaiVeId",
+        "target_name":  "dbo.LoaiVe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.CumGhe",
+        "key_name":  "FK_CumGhe_KhuVuc_KhuVucId",
+        "col_name":  "KhuVucId",
+        "target_name":  "dbo.KhuVuc",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DanhGia",
+        "key_name":  "FK_DanhGia_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DanhGia",
+        "key_name":  "FK_DanhGia_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DoiSoat",
+        "key_name":  "FK_DoiSoat_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DoiSoat",
+        "key_name":  "FK_DoiSoat_TaiKhoan_NguoiDuyetId",
+        "col_name":  "NguoiDuyetId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "FK_DonHang_ChinhSach_ChinhSachId",
+        "col_name":  "ChinhSachId",
+        "target_name":  "dbo.ChinhSach",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "FK_DonHang_HopDong_HopDongId",
+        "col_name":  "HopDongId",
+        "target_name":  "dbo.HopDong",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "FK_DonHang_SuatDien_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "FK_DonHang_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ghe",
+        "key_name":  "FK_Ghe_CumGhe_CumGheId_KhuVucId",
+        "col_name":  "CumGheId",
+        "target_name":  "dbo.CumGhe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ghe",
+        "key_name":  "FK_Ghe_CumGhe_CumGheId_KhuVucId",
+        "col_name":  "KhuVucId",
+        "target_name":  "dbo.CumGhe",
+        "target_col":  "KhuVucId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ghe",
+        "key_name":  "FK_Ghe_KhuVuc_KhuVucId",
+        "col_name":  "KhuVucId",
+        "target_name":  "dbo.KhuVuc",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiaiNgan",
+        "key_name":  "FK_GiaiNgan_DoiSoat_DoiSoatId",
+        "col_name":  "DoiSoatId",
+        "target_name":  "dbo.DoiSoat",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiaoDichHoanTien",
+        "key_name":  "FK_GiaoDichHoanTien_YeuCauHoanTien_YeuCauHoanTienId",
+        "col_name":  "YeuCauHoanTienId",
+        "target_name":  "dbo.YeuCauHoanTien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiaoDichThanhToan",
+        "key_name":  "FK_GiaoDichThanhToan_DonHang_DonHangId",
+        "col_name":  "DonHangId",
+        "target_name":  "dbo.DonHang",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiaoDichThanhToan",
+        "key_name":  "FK_GiaoDichThanhToan_YeuCauThue_YeuCauThueId",
+        "col_name":  "YeuCauThueId",
+        "target_name":  "dbo.YeuCauThue",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiayToBTC",
+        "key_name":  "FK_GiayToBTC_HoSoBTC_HoSoBTCId",
+        "col_name":  "HoSoBTCId",
+        "target_name":  "dbo.HoSoBTC",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiuGhe",
+        "key_name":  "FK_GiuGhe_ChiTietDonHang_ChiTietDonHangId",
+        "col_name":  "ChiTietDonHangId",
+        "target_name":  "dbo.ChiTietDonHang",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiuGhe",
+        "key_name":  "FK_GiuGhe_Ghe_GheId",
+        "col_name":  "GheId",
+        "target_name":  "dbo.Ghe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.GiuGhe",
+        "key_name":  "FK_GiuGhe_SuatDien_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.HopDong",
+        "key_name":  "FK_HopDong_HoSoBTC_BTCId",
+        "col_name":  "BTCId",
+        "target_name":  "dbo.HoSoBTC",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.HopDong",
+        "key_name":  "FK_HopDong_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.HoSoBTC",
+        "key_name":  "FK_HoSoBTC_TaiKhoan_NguoiDuyetId",
+        "col_name":  "NguoiDuyetId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.HoSoBTC",
+        "key_name":  "FK_HoSoBTC_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "FK_KhieuNai_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "FK_KhieuNai_TaiKhoan_NguoiXuLyId",
+        "col_name":  "NguoiXuLyId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "FK_KhieuNai_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "FK_KhieuNai_Ve_VeId",
+        "col_name":  "VeId",
+        "target_name":  "dbo.Ve",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "FK_KhieuNai_YeuCauThue_YeuCauThueId",
+        "col_name":  "YeuCauThueId",
+        "target_name":  "dbo.YeuCauThue",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.KhuVuc",
+        "key_name":  "FK_KhuVuc_DiaDiem_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.DiaDiem",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "FK_LichDatDiaDiem_DiaDiem_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.DiaDiem",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "FK_LichDatDiaDiem_SuatDien_SuatDienId_DiaDiemId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "FK_LichDatDiaDiem_SuatDien_SuatDienId_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "DiaDiemId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "FK_LichDatDiaDiem_YeuCauThue_YeuCauThueId_DiaDiemId",
+        "col_name":  "YeuCauThueId",
+        "target_name":  "dbo.YeuCauThue",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "FK_LichDatDiaDiem_YeuCauThue_YeuCauThueId_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.YeuCauThue",
+        "target_col":  "DiaDiemId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LoaiVe",
+        "key_name":  "FK_LoaiVe_KhuVuc_KhuVucId",
+        "col_name":  "KhuVucId",
+        "target_name":  "dbo.KhuVuc",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.LoaiVe",
+        "key_name":  "FK_LoaiVe_SuatDien_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.NhatKyCheckIn",
+        "key_name":  "FK_NhatKyCheckIn_TaiKhoan_NhanVienId",
+        "col_name":  "NhanVienId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.NhatKyCheckIn",
+        "key_name":  "FK_NhatKyCheckIn_Ve_VeId",
+        "col_name":  "VeId",
+        "target_name":  "dbo.Ve",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.NhatKyHeThong",
+        "key_name":  "FK_NhatKyHeThong_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "FK_PhanCongSuKien_SuatDien_SuatDienId_SuKienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "FK_PhanCongSuKien_SuatDien_SuatDienId_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "SuKienId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "FK_PhanCongSuKien_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "FK_PhanCongSuKien_TaiKhoan_NguoiPhanCongId",
+        "col_name":  "NguoiPhanCongId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "FK_PhanCongSuKien_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhienBanSuKien",
+        "key_name":  "FK_PhienBanSuKien_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhienBanSuKien",
+        "key_name":  "FK_PhienBanSuKien_TaiKhoan_NguoiDuyetId",
+        "col_name":  "NguoiDuyetId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.PhienBanSuKien",
+        "key_name":  "FK_PhienBanSuKien_TaiKhoan_NguoiGuiId",
+        "col_name":  "NguoiGuiId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuatDien",
+        "key_name":  "FK_SuatDien_DiaDiem_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.DiaDiem",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuatDien",
+        "key_name":  "FK_SuatDien_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuDungVoucher",
+        "key_name":  "FK_SuDungVoucher_DonHang_DonHangId",
+        "col_name":  "DonHangId",
+        "target_name":  "dbo.DonHang",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuDungVoucher",
+        "key_name":  "FK_SuDungVoucher_Voucher_VoucherId",
+        "col_name":  "VoucherId",
+        "target_name":  "dbo.Voucher",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "FK_SuKien_DanhMucSuKien_DanhMucId",
+        "col_name":  "DanhMucId",
+        "target_name":  "dbo.DanhMucSuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "FK_SuKien_HoSoBTC_BTCId",
+        "col_name":  "BTCId",
+        "target_name":  "dbo.HoSoBTC",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "FK_SuKien_PhienBanSuKien_PhienBanCongKhaiId_Id",
+        "col_name":  "PhienBanCongKhaiId",
+        "target_name":  "dbo.PhienBanSuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "FK_SuKien_PhienBanSuKien_PhienBanCongKhaiId_Id",
+        "col_name":  "Id",
+        "target_name":  "dbo.PhienBanSuKien",
+        "target_col":  "SuKienId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.ThongBao",
+        "key_name":  "FK_ThongBao_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.ThongBao",
+        "key_name":  "FK_ThongBao_VeMoi_VeMoiId",
+        "col_name":  "VeMoiId",
+        "target_name":  "dbo.VeMoi",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_ChiTietDonHang_ChiTietDonHangId",
+        "col_name":  "ChiTietDonHangId",
+        "target_name":  "dbo.ChiTietDonHang",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_Ghe_GheId",
+        "col_name":  "GheId",
+        "target_name":  "dbo.Ghe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_GiuGhe_GiuGheId",
+        "col_name":  "GiuGheId",
+        "target_name":  "dbo.GiuGhe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_LoaiVe_LoaiVeId_SuatDienId",
+        "col_name":  "LoaiVeId",
+        "target_name":  "dbo.LoaiVe",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_LoaiVe_LoaiVeId_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.LoaiVe",
+        "target_col":  "SuatDienId",
+        "seq":  2,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "FK_Ve_SuatDien_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.VeMoi",
+        "key_name":  "FK_VeMoi_TaiKhoan_TaiKhoanNhanId",
+        "col_name":  "TaiKhoanNhanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.VeMoi",
+        "key_name":  "FK_VeMoi_Ve_VeId",
+        "col_name":  "VeId",
+        "target_name":  "dbo.Ve",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Voucher",
+        "key_name":  "FK_Voucher_KhuVuc_KhuVucId",
+        "col_name":  "KhuVucId",
+        "target_name":  "dbo.KhuVuc",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Voucher",
+        "key_name":  "FK_Voucher_SuatDien_SuatDienId",
+        "col_name":  "SuatDienId",
+        "target_name":  "dbo.SuatDien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.Voucher",
+        "key_name":  "FK_Voucher_SuKien_SuKienId",
+        "col_name":  "SuKienId",
+        "target_name":  "dbo.SuKien",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.WebhookThanhToan",
+        "key_name":  "FK_WebhookThanhToan_GiaoDichThanhToan_GiaoDichId",
+        "col_name":  "GiaoDichId",
+        "target_name":  "dbo.GiaoDichThanhToan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "FK_YeuCauHoanTien_GiaoDichThanhToan_GiaoDichId",
+        "col_name":  "GiaoDichId",
+        "target_name":  "dbo.GiaoDichThanhToan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "FK_YeuCauHoanTien_TaiKhoan_NguoiDuyetId",
+        "col_name":  "NguoiDuyetId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "FK_YeuCauHoanTien_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "FK_YeuCauHoanTien_Ve_VeId",
+        "col_name":  "VeId",
+        "target_name":  "dbo.Ve",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "FK_YeuCauThue_ChinhSach_ChinhSachId",
+        "col_name":  "ChinhSachId",
+        "target_name":  "dbo.ChinhSach",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "FK_YeuCauThue_DiaDiem_DiaDiemId",
+        "col_name":  "DiaDiemId",
+        "target_name":  "dbo.DiaDiem",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "FK_YeuCauThue_TaiKhoan_NguoiDuyetId",
+        "col_name":  "NguoiDuyetId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "FK",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "FK_YeuCauThue_TaiKhoan_TaiKhoanId",
+        "col_name":  "TaiKhoanId",
+        "target_name":  "dbo.TaiKhoan",
+        "target_col":  "Id",
+        "seq":  1,
+        "behavior":  "NO_ACTION/NO_ACTION"
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.Banner",
+        "key_name":  "PK_Banner",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.CauHinhHeThong",
+        "key_name":  "PK_CauHinhHeThong",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.ChinhSach",
+        "key_name":  "PK_ChinhSach",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.ChiTietDonHang",
+        "key_name":  "PK_ChiTietDonHang",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.CumGhe",
+        "key_name":  "PK_CumGhe",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.DanhGia",
+        "key_name":  "PK_DanhGia",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.DanhMucSuKien",
+        "key_name":  "PK_DanhMucSuKien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.DiaDiem",
+        "key_name":  "PK_DiaDiem",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.DoiSoat",
+        "key_name":  "PK_DoiSoat",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "PK_DonHang",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.Ghe",
+        "key_name":  "PK_Ghe",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.GiaiNgan",
+        "key_name":  "PK_GiaiNgan",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.GiaoDichHoanTien",
+        "key_name":  "PK_GiaoDichHoanTien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.GiaoDichThanhToan",
+        "key_name":  "PK_GiaoDichThanhToan",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.GiayToBTC",
+        "key_name":  "PK_GiayToBTC",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.GiuGhe",
+        "key_name":  "PK_GiuGhe",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.HopDong",
+        "key_name":  "PK_HopDong",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.HoSoBTC",
+        "key_name":  "PK_HoSoBTC",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "PK_KhieuNai",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.KhuVuc",
+        "key_name":  "PK_KhuVuc",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "PK_LichDatDiaDiem",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.LoaiVe",
+        "key_name":  "PK_LoaiVe",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.NhatKyCheckIn",
+        "key_name":  "PK_NhatKyCheckIn",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.NhatKyHeThong",
+        "key_name":  "PK_NhatKyHeThong",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "PK_PhanCongSuKien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.PhienBanSuKien",
+        "key_name":  "PK_PhienBanSuKien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.SuatDien",
+        "key_name":  "PK_SuatDien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.SuDungVoucher",
+        "key_name":  "PK_SuDungVoucher",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "PK_SuKien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.TaiKhoan",
+        "key_name":  "PK_TaiKhoan",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.ThongBao",
+        "key_name":  "PK_ThongBao",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.Ve",
+        "key_name":  "PK_Ve",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.VeMoi",
+        "key_name":  "PK_VeMoi",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.Voucher",
+        "key_name":  "PK_Voucher",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.WebhookThanhToan",
+        "key_name":  "PK_WebhookThanhToan",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "PK_YeuCauHoanTien",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "PK",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "PK_YeuCauThue",
+        "col_name":  "Id",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  1,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.Banner",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.CauHinhHeThong",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.ChinhSach",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.ChiTietDonHang",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.CumGhe",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.DanhGia",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.DanhMucSuKien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.DiaDiem",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.DoiSoat",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.DonHang",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.Ghe",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.GiaiNgan",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.GiaoDichHoanTien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.GiaoDichThanhToan",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.GiayToBTC",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.GiuGhe",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.HopDong",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.HoSoBTC",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.KhieuNai",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.KhuVuc",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.LichDatDiaDiem",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.LoaiVe",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.NhatKyCheckIn",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.NhatKyHeThong",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.PhanCongSuKien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.PhienBanSuKien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.SuatDien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.SuDungVoucher",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.SuKien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.TaiKhoan",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.ThongBao",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.Ve",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.VeMoi",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.Voucher",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.WebhookThanhToan",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.YeuCauHoanTien",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    },
+    {
+        "kind":  "TABLE",
+        "table_name":  "dbo.YeuCauThue",
+        "key_name":  "",
+        "col_name":  "",
+        "target_name":  "",
+        "target_col":  "",
+        "seq":  0,
+        "behavior":  ""
+    }
+]

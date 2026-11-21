@@ -1,0 +1,38 @@
+{
+  "status": "Đạt",
+  "base": "http://127.0.0.1:5834",
+  "trace": [
+    {
+      "branch": "fixture",
+      "observed": "A=5, B=6, C=7"
+    },
+    {
+      "branch": "A",
+      "observed": "Mở từ Khám phá: B trước A ['6', '5']"
+    },
+    {
+      "branch": "B",
+      "observed": "Xem A hai lần, A đầu và chỉ một bản ghi ['5', '6']"
+    },
+    {
+      "branch": "C1",
+      "observed": "Reload và Back/Forward giữ nguyên ['5', '6']"
+    },
+    {
+      "branch": "C2",
+      "observed": "Context sạch đăng nhập bằng UI vẫn thấy dữ liệu máy chủ ['5', '6']"
+    },
+    {
+      "branch": "D",
+      "observed": "Tài khoản rival không có A/B, chỉ thêm C; chính giữ nguyên ['5', '6']"
+    },
+    {
+      "branch": "E",
+      "observed": "Khách xem sự kiện không gửi mutation và không thấy lịch sử cá nhân."
+    },
+    {
+      "branch": "F",
+      "observed": "Lưu/bỏ yêu thích qua UI không xóa lịch sử xem."
+    }
+  ]
+}

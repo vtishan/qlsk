@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "status": "PASS",
+    "errors": [],
+    "checks": [
+      "prototype screenshots",
+      "no overflow",
+      "home in-place search/reload/reset/city/more",
+      "SQL-derived price bands translate min/max and persist through reload/more",
+      "calendar month/keyboard/focus/filter persists month and reload"
+    ]
+  },
+  {
+    "width": 390,
+    "status": "PASS",
+    "errors": [],
+    "checks": [
+      "prototype screenshots",
+      "no overflow",
+      "home in-place search/reload/reset/city/more",
+      "SQL-derived price bands translate min/max and persist through reload/more",
+      "calendar month/keyboard/focus/filter persists month and reload"
+    ]
+  }
+]

@@ -1,0 +1,67 @@
+﻿<section class="hero" aria-labelledby="home-title">
+  <div class="wrap hero-shell">
+    <div class="hero-content">
+      <h1 id="home-title" tabindex="-1">Tìm sự kiện.<br><span>Chọn chỗ của bạn.</span></h1>
+      <p>Từ đêm nhạc đến triển lãm, chọn trải nghiệm hợp gu và đặt vé ngay.</p>
+      <div class="actions">
+        <a class="button lime" href="#home/discover">Khám phá sự kiện</a>
+        <a class="button hero-secondary" href="#venues">Thuê địa điểm</a>
+      </div>
+    </div>
+    <div class="hero-dock">
+      <nav class="hero-shortcuts" aria-label="Tiện ích">
+        <a href="#tickets"><span aria-hidden="true">▤</span> Vé của tôi</a>
+        <a href="#requests/support/new"><span aria-hidden="true">✉</span> Nhắn hỗ trợ</a>
+        <a href="#guide/faq"><span aria-hidden="true">?</span> Hướng dẫn</a>
+      </nav>
+      <a class="hero-event" data-featured-link hidden><small>Sự kiện nổi bật</small><strong></strong></a>
+    </div>
+  </div>
+</section>
+
+<section class="home-section home-discovery" aria-labelledby="home-discover-title">
+  <div class="section-heading">
+    <h2 id="home-discover-title" tabindex="-1">Khám phá sự kiện</h2>
+    <a class="button secondary compact" href="#events">Xem tất cả</a>
+  </div>
+  <form id="home-search" class="panel home-search" role="search">
+    <label class="search-keyword"><span aria-hidden="true">⌕</span><input id="home-query" aria-label="Từ khóa" name="query" type="search" placeholder="Tìm sự kiện, nghệ sĩ, địa điểm"></label>
+    <select class="home-filter" aria-label="Thành phố" name="city"><option value="">Mọi thành phố</option><option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option></select>
+    <select class="home-filter" aria-label="Khoảng giá vé" name="price"><option value="">Mọi mức giá</option></select>
+    <button class="button" type="submit">Tìm sự kiện</button>
+  </form>
+  <nav class="quick-cities" aria-label="Chọn nhanh thành phố">
+    <a data-city="Hà Nội">Hà Nội</a><a data-city="TP. Hồ Chí Minh">TP. Hồ Chí Minh</a><a data-city="Đà Nẵng">Đà Nẵng</a>
+  </nav>
+</section>
+<section class="home-section" aria-labelledby="upcoming-title">
+  <div class="section-heading"><h2 id="upcoming-title">Sự kiện sắp diễn ra</h2><div class="actions"><a class="button secondary compact" href="#calendar">Xem lịch</a><a class="button secondary compact" href="#events?upcoming=on">Xem thêm</a></div></div>
+  <p class="notice">Danh sách sự kiện sắp diễn ra chưa khả dụng.</p>
+</section>
+<section class="home-section" aria-labelledby="themes-title">
+  <div class="section-heading"><h2 id="themes-title">Khám phá theo sở thích</h2></div>
+  <ul class="theme-list"></ul>
+</section>
+<section class="home-section trust-section">
+  <div class="section-heading"><h2>Vì sao chọn QLSK?</h2></div>
+  <div class="reason-grid">
+    <article><h3>Biết trước lịch và chi phí</h3><p>Xem giờ diễn, giá vé từng hạng và sức chứa địa điểm trước khi quyết định.</p></article>
+    <article><h3>Vé luôn trong tài khoản</h3><p>Mở mã QR khi đến cổng, tải hoặc in vé PDF từ mục Vé của tôi.</p></article>
+    <article><h3>Theo dõi yêu cầu</h3><p>Xem phản hồi của đội hỗ trợ và tình trạng hoàn vé, thuê địa điểm trong tài khoản.</p></article>
+  </div>
+</section>
+<section class="home-section host-callout" aria-labelledby="host-title">
+  <img src="/assets/images/venue.webp" alt="" loading="lazy">
+  <div><h2 id="host-title">Bạn đang lên kế hoạch tổ chức?</h2>
+    <p>Xem sức chứa, tiện ích và lịch trống để chọn địa điểm phù hợp.</p>
+    <div class="actions"><a class="button lime" href="#venues">Khám phá địa điểm</a><a class="button hero-secondary" href="#organizer" data-organizer-link>Đăng ký Ban tổ chức</a></div>
+  </div>
+</section>
+<section class="home-section home-faq" aria-labelledby="help-title">
+  <div><h2 id="help-title">Trước khi đặt vé</h2><p>Cần hỏi thêm? <a href="#requests/support/new">Nhắn đội hỗ trợ</a></p></div>
+  <div class="questions">
+    <details><summary>Tôi cần gì để đặt vé hoặc thuê địa điểm?</summary><p>Đăng nhập để chọn ghế, đặt vé hoặc gửi yêu cầu thuê.</p></details>
+    <details><summary>Tôi xem vé sau khi đặt ở đâu?</summary><p>Mở <a href="#tickets/mine">Vé của tôi</a> để xem vé đã phát hành. Mục <a href="#tickets/orders">Đơn hàng</a> cho biết trạng thái thanh toán.</p></details>
+    <details><summary>Tôi xem chính sách hoàn vé ở đâu?</summary><p>Đọc quy định trong chi tiết sự kiện hoặc <a href="#guide/rules">chính sách đã công bố</a> trước khi thanh toán.</p></details>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Máy chủ thư SMTP" as A
+rectangle "Hệ thống QLSK" {
+usecase "Gửi mã khôi phục mật khẩu" as U0
+usecase "Gửi mã xác minh email" as U1
+}
+A -- U0
+A -- U1
+@enduml

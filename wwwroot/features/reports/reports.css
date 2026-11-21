@@ -1,0 +1,42 @@
+.report-page { gap: var(--gap); }
+.report-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-radius: var(--radius);
+  padding: clamp(18px, 4vw, 34px);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.report-intro p { color: var(--muted); }
+.report-filter .filter-form { border: 0; padding: 0; }
+.report-filter .form-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+.report-filter .actions { margin: 0; }
+.report-preview-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-block-end: 12px;
+}
+.report-preview-head .stack { gap: 4px; }
+.report-preview-head h2 { margin: 0; }
+.report-preview :is(th, td) { padding-inline: 12px; }
+.report-preview th { min-width: 120px; white-space: nowrap; }
+.report-preview td { min-width: 120px; }
+.report-preview tbody tr:nth-child(even) { background: var(--canvas); }
+.report-formats .check {
+  min-height: 56px;
+  gap: 11px;
+  padding-inline: 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.report-formats .check:has(input:checked) { background: var(--soft); border-color: var(--brand); }
+.report-formats .check label { display: grid; flex: 1; padding-block: 6px; cursor: pointer; }
+.report-formats .check small { color: var(--muted); font-weight: 400; }

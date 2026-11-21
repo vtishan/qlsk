@@ -1,0 +1,25 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Check-in tại sự kiện
+|Nhân sự / BTC|
+start
+|Nhân sự / BTC|
+:Chọn suất, quét QR hoặc tra cứu thủ công;
+|AdmissionService|
+:Khóa sự kiện / suất, kiểm tra phân công và trạng thái suất;
+|AdmissionService|
+:Tìm vé đúng suất;
+if (Vé đang Đã phát hành?) then (Có)
+:Đổi vé sang Đã check-in, ghi thời điểm;
+:Thêm NhatKyCheckIn thành công, commit giao dịch;
+else (Không)
+:Trả đã check-in / vé không thuộc suất / đã hủy hoặc thu hồi;
+endif
+stop
+@enduml

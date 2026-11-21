@@ -1,49 +1,38 @@
 using System.Text.Json.Serialization;
 
+using QLSK.Domain.Enums;
+
 namespace QLSK.Domain.Entities;
 
 public class TaiKhoan
 {
-    [System.Text.Json.Serialization.JsonPropertyName("id")]
-    [System.ComponentModel.DataAnnotations.Schema.Column("Id")]
-    public int TaiKhoanId { get; set; }
-
+    public int Id { get; set; }
+    public string? Email { get; set; }
+    public string? SoDienThoai { get; set; }
     public string HoTen { get; set; } = "";
+    public string TenDangNhap { get; set; } = "";
 
-    public string Email { get; set; } = "";
-
-    [System.Text.Json.Serialization.JsonPropertyName("matKhau")]
-    [System.ComponentModel.DataAnnotations.Schema.Column("MatKhau")]
     [JsonIgnore]
     public string MatKhauBam { get; set; } = "";
 
-    public int VaiTroId { get; set; }
-
-    public bool HoatDong { get; set; } = true;
+    public VaiTroTaiKhoan VaiTro { get; set; } = VaiTroTaiKhoan.NguoiDung;
+    public TrangThaiTaiKhoan TrangThai { get; set; } = TrangThaiTaiKhoan.HoatDong;
+    public DateTime NgayTao { get; set; }
+    public DateTime? EmailXacMinhLuc { get; set; }
+    public DateTime? SoDienThoaiXacMinhLuc { get; set; }
 
     [JsonIgnore]
-    public int TokenVersion { get; set; }
+    public string? MaBamKhoiPhuc { get; set; }
 
-    public DateTime NgayTao { get; set; } = DateTime.UtcNow;
+    public DateTime? HanKhoiPhuc { get; set; }
+    public int PhienBanDangNhap { get; set; }
 
-    [System.Text.Json.Serialization.JsonPropertyName("rowVersion")]
-    [System.ComponentModel.DataAnnotations.Schema.Column("RowVersion")]
-    public byte[] PhienBanDong { get; set; } = [];
+    [JsonIgnore]
+    public string? QuyenQuanLy { get; set; }
 
-    [System.Text.Json.Serialization.JsonIgnore]
-    public VaiTro VaiTro { get; set; } = null!;
+    [JsonIgnore]
+    public int[]? SuKienYeuThich { get; set; }
 
-    [System.Text.Json.Serialization.JsonIgnore]
-    public YeuCauXacThucToChuc? YeuCauXacThuc { get; set; }
-
-    [System.Text.Json.Serialization.JsonIgnore]
-    public BanToChuc? BanToChuc { get; set; }
-
-    [System.Text.Json.Serialization.JsonPropertyName("lichSuYeuCaus")]
-    [System.Text.Json.Serialization.JsonIgnore]
-    public ICollection<LichSuYeuCauXacThucToChuc> LichSuYeuCauXacThuc { get; set; } = [];
-
-    [System.Text.Json.Serialization.JsonPropertyName("donVes")]
-    [System.Text.Json.Serialization.JsonIgnore]
-    public ICollection<DonVe> DanhSachDonVe { get; set; } = [];
+    [JsonIgnore]
+    public int[]? SuKienDaXem { get; set; }
 }

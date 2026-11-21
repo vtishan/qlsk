@@ -1,0 +1,27 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Thanh toán đơn vé
+|Người dùng|
+start
+|Người dùng|
+:Yêu cầu liên kết thanh toán;
+|OrderService|
+:Kiểm tra chủ đơn, hiệu lực, lưu ý định thanh toán;
+|PayOS|
+:Cung cấp liên kết, người dùng thanh toán;
+|OrderService|
+:Nhận webhook đã kiểm chữ ký hoặc chủ đơn yêu cầu đối soát;
+if (Khoản thu khớp và có thể chốt ghế?) then (Có)
+:Chốt giữ ghế, ghi thu thành công và phát hành vé;
+:Yêu cầu lặp không phát hành vé trùng;
+else (Không)
+:Ghi nhận nghi vấn / khoản đã thu cần hoàn theo trường hợp, không phát hành vé sai;
+endif
+stop
+@enduml

@@ -1,0 +1,258 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>QLSK – Atlas 37 bảng / 75 FK</title><style>body{font:12pt Calibri,Arial,sans-serif;color:#143247;max-width:190mm;margin:12mm auto}h1{font-size:23pt}h2{font-size:18pt}nav{columns:2}article{break-inside:avoid;margin:12mm 0;border:1px solid #afc4ce;padding:5mm}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:3mm;border-bottom:1px solid #d8e2e7}th{background:#edf4f7}.map{font-weight:bold}small{font-size:10pt} @media print{@page{size:A4;margin:12mm}nav{break-after:page}article{margin:5mm 0}a{color:inherit;text-decoration:none}}</style><h1>Tra cứu 37 bảng / 75 FK vật lý</h1><p>Nguồn: Data/Migrations/000-initial-schema.sql. Mỗi FK được liệt kê một lần ở bảng con. Dấu ? = cột cho phép NULL. FK ghép được nhóm trong [ ]; thứ tự cột nguồn tương ứng thứ tự khóa đích.</p><p>Ở hai cột bội số: số con/cha là số bản ghi con trên một cha; số cha/con là số bản ghi cha trên một con. UNIQUE lọc theo trạng thái không được xem là 1–1 toàn cục. Chỉ cột PK/FK được liệt kê.</p><nav>
+<p><a href="#Banner">Banner</a> · PDF trang 16</p>
+<p><a href="#CauHinhHeThong">CauHinhHeThong</a> · PDF trang 4</p>
+<p><a href="#ChiTietDonHang">ChiTietDonHang</a> · PDF trang 10</p>
+<p><a href="#ChinhSach">ChinhSach</a> · PDF trang 16</p>
+<p><a href="#CumGhe">CumGhe</a> · PDF trang 6</p>
+<p><a href="#DanhGia">DanhGia</a> · PDF trang 15</p>
+<p><a href="#DanhMucSuKien">DanhMucSuKien</a> · PDF trang 8</p>
+<p><a href="#DiaDiem">DiaDiem</a> · PDF trang 6</p>
+<p><a href="#DoiSoat">DoiSoat</a> · PDF trang 14</p>
+<p><a href="#DonHang">DonHang</a> · PDF trang 9</p>
+<p><a href="#Ghe">Ghe</a> · PDF trang 6</p>
+<p><a href="#GiaiNgan">GiaiNgan</a> · PDF trang 15</p>
+<p><a href="#GiaoDichHoanTien">GiaoDichHoanTien</a> · PDF trang 14</p>
+<p><a href="#GiaoDichThanhToan">GiaoDichThanhToan</a> · PDF trang 13</p>
+<p><a href="#GiayToBTC">GiayToBTC</a> · PDF trang 3</p>
+<p><a href="#GiuGhe">GiuGhe</a> · PDF trang 10</p>
+<p><a href="#HoSoBTC">HoSoBTC</a> · PDF trang 3</p>
+<p><a href="#HopDong">HopDong</a> · PDF trang 13</p>
+<p><a href="#KhieuNai">KhieuNai</a> · PDF trang 15</p>
+<p><a href="#KhuVuc">KhuVuc</a> · PDF trang 6</p>
+<p><a href="#LichDatDiaDiem">LichDatDiaDiem</a> · PDF trang 7</p>
+<p><a href="#LoaiVe">LoaiVe</a> · PDF trang 9</p>
+<p><a href="#NhatKyCheckIn">NhatKyCheckIn</a> · PDF trang 11</p>
+<p><a href="#NhatKyHeThong">NhatKyHeThong</a> · PDF trang 4</p>
+<p><a href="#PhanCongSuKien">PhanCongSuKien</a> · PDF trang 4</p>
+<p><a href="#PhienBanSuKien">PhienBanSuKien</a> · PDF trang 8</p>
+<p><a href="#SuDungVoucher">SuDungVoucher</a> · PDF trang 12</p>
+<p><a href="#SuKien">SuKien</a> · PDF trang 8</p>
+<p><a href="#SuatDien">SuatDien</a> · PDF trang 9</p>
+<p><a href="#TaiKhoan">TaiKhoan</a> · PDF trang 3</p>
+<p><a href="#ThongBao">ThongBao</a> · PDF trang 5</p>
+<p><a href="#Ve">Ve</a> · PDF trang 11</p>
+<p><a href="#VeMoi">VeMoi</a> · PDF trang 11</p>
+<p><a href="#Voucher">Voucher</a> · PDF trang 12</p>
+<p><a href="#WebhookThanhToan">WebhookThanhToan</a> · PDF trang 13</p>
+<p><a href="#YeuCauHoanTien">YeuCauHoanTien</a> · PDF trang 14</p>
+<p><a href="#YeuCauThue">YeuCauThue</a> · PDF trang 7</p>
+</nav>
+<article id="TaiKhoan"><h2>TaiKhoan</h2><p>PK: <b>Id : int · NOT NULL</b> · 0 FK đi ra</p>
+<p>Không có FK đi ra. Bảng vẫn có thể được các bảng khác tham chiếu.</p>
+</article>
+<article id="HoSoBTC"><h2>HoSoBTC</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiDuyetId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK03 · FK_HoSoBTC_TaiKhoan_NguoiDuyetId</small></td></tr>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK04 · FK_HoSoBTC_TaiKhoan_TaiKhoanId</small></td></tr>
+</tbody></table>
+</article>
+<article id="GiayToBTC"><h2>GiayToBTC</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">HoSoBTCId</td><td>0..*</td><td>1</td><td><a href="#HoSoBTC">HoSoBTC</a><br>Id</td></tr><tr><td colspan="4"><small>FK11 · FK_GiayToBTC_HoSoBTC_HoSoBTCId</small></td></tr>
+</tbody></table>
+</article>
+<article id="PhanCongSuKien"><h2>PhanCongSuKien</h2><p>PK: <b>Id : int · NOT NULL</b> · 4 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiPhanCongId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK46 · FK_PhanCongSuKien_TaiKhoan_NguoiPhanCongId</small></td></tr>
+<tr><td class="map">TaiKhoanId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK47 · FK_PhanCongSuKien_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">SuKienId</td><td>0..*</td><td>1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK48 · FK_PhanCongSuKien_SuKien_SuKienId</small></td></tr>
+<tr><td class="map">[ SuatDienId ?, SuKienId ]</td><td>0..*</td><td>0..1</td><td><a href="#SuatDien">SuatDien</a><br>[ Id, SuKienId ]</td></tr><tr><td colspan="4"><small>FK49 · FK_PhanCongSuKien_SuatDien_SuatDienId_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="CauHinhHeThong"><h2>CauHinhHeThong</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiCapNhatId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK02 · FK_CauHinhHeThong_TaiKhoan_NguoiCapNhatId</small></td></tr>
+</tbody></table>
+</article>
+<article id="NhatKyHeThong"><h2>NhatKyHeThong</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">TaiKhoanId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK05 · FK_NhatKyHeThong_TaiKhoan_TaiKhoanId</small></td></tr>
+</tbody></table>
+</article>
+<article id="ThongBao"><h2>ThongBao</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">TaiKhoanId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK74 · FK_ThongBao_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">VeMoiId ?</td><td>0..*</td><td>0..1</td><td><a href="#VeMoi">VeMoi</a><br>Id</td></tr><tr><td colspan="4"><small>FK75 · FK_ThongBao_VeMoi_VeMoiId</small></td></tr>
+</tbody></table>
+</article>
+<article id="DiaDiem"><h2>DiaDiem</h2><p>PK: <b>Id : int · NOT NULL</b> · 0 FK đi ra</p>
+<p>Không có FK đi ra. Bảng vẫn có thể được các bảng khác tham chiếu.</p>
+</article>
+<article id="KhuVuc"><h2>KhuVuc</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DiaDiemId</td><td>0..*</td><td>1</td><td><a href="#DiaDiem">DiaDiem</a><br>Id</td></tr><tr><td colspan="4"><small>FK01 · FK_KhuVuc_DiaDiem_DiaDiemId</small></td></tr>
+</tbody></table>
+</article>
+<article id="CumGhe"><h2>CumGhe</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">KhuVucId</td><td>0..*</td><td>1</td><td><a href="#KhuVuc">KhuVuc</a><br>Id</td></tr><tr><td colspan="4"><small>FK10 · FK_CumGhe_KhuVuc_KhuVucId</small></td></tr>
+</tbody></table>
+</article>
+<article id="Ghe"><h2>Ghe</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">[ CumGheId ?, KhuVucId ]</td><td>0..*</td><td>0..1</td><td><a href="#CumGhe">CumGhe</a><br>[ Id, KhuVucId ]</td></tr><tr><td colspan="4"><small>FK12 · FK_Ghe_CumGhe_CumGheId_KhuVucId</small></td></tr>
+<tr><td class="map">KhuVucId</td><td>0..*</td><td>1</td><td><a href="#KhuVuc">KhuVuc</a><br>Id</td></tr><tr><td colspan="4"><small>FK13 · FK_Ghe_KhuVuc_KhuVucId</small></td></tr>
+</tbody></table>
+</article>
+<article id="YeuCauThue"><h2>YeuCauThue</h2><p>PK: <b>Id : int · NOT NULL</b> · 4 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">ChinhSachId</td><td>0..*</td><td>1</td><td><a href="#ChinhSach">ChinhSach</a><br>Id</td></tr><tr><td colspan="4"><small>FK06 · FK_YeuCauThue_ChinhSach_ChinhSachId</small></td></tr>
+<tr><td class="map">DiaDiemId</td><td>0..*</td><td>1</td><td><a href="#DiaDiem">DiaDiem</a><br>Id</td></tr><tr><td colspan="4"><small>FK07 · FK_YeuCauThue_DiaDiem_DiaDiemId</small></td></tr>
+<tr><td class="map">NguoiDuyetId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK08 · FK_YeuCauThue_TaiKhoan_NguoiDuyetId</small></td></tr>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK09 · FK_YeuCauThue_TaiKhoan_TaiKhoanId</small></td></tr>
+</tbody></table>
+</article>
+<article id="LichDatDiaDiem"><h2>LichDatDiaDiem</h2><p>PK: <b>Id : int · NOT NULL</b> · 3 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DiaDiemId</td><td>0..*</td><td>1</td><td><a href="#DiaDiem">DiaDiem</a><br>Id</td></tr><tr><td colspan="4"><small>FK39 · FK_LichDatDiaDiem_DiaDiem_DiaDiemId</small></td></tr>
+<tr><td class="map">[ YeuCauThueId ?, DiaDiemId ]</td><td>0..*</td><td>0..1</td><td><a href="#YeuCauThue">YeuCauThue</a><br>[ Id, DiaDiemId ]</td></tr><tr><td colspan="4"><small>FK40 · FK_LichDatDiaDiem_YeuCauThue_YeuCauThueId_DiaDiemId</small></td></tr>
+<tr><td class="map">[ SuatDienId ?, DiaDiemId ]</td><td>0..*</td><td>0..1</td><td><a href="#SuatDien">SuatDien</a><br>[ Id, DiaDiemId ]</td></tr><tr><td colspan="4"><small>FK41 · FK_LichDatDiaDiem_SuatDien_SuatDienId_DiaDiemId</small></td></tr>
+</tbody></table>
+</article>
+<article id="DanhMucSuKien"><h2>DanhMucSuKien</h2><p>PK: <b>Id : int · NOT NULL</b> · 0 FK đi ra</p>
+<p>Không có FK đi ra. Bảng vẫn có thể được các bảng khác tham chiếu.</p>
+</article>
+<article id="SuKien"><h2>SuKien</h2><p>PK: <b>Id : int · NOT NULL</b> · 3 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DanhMucId</td><td>0..*</td><td>1</td><td><a href="#DanhMucSuKien">DanhMucSuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK53 · FK_SuKien_DanhMucSuKien_DanhMucId</small></td></tr>
+<tr><td class="map">BTCId</td><td>0..*</td><td>1</td><td><a href="#HoSoBTC">HoSoBTC</a><br>Id</td></tr><tr><td colspan="4"><small>FK54 · FK_SuKien_HoSoBTC_BTCId</small></td></tr>
+<tr><td class="map">[ PhienBanCongKhaiId ?, Id ]</td><td>0..1</td><td>0..1</td><td><a href="#PhienBanSuKien">PhienBanSuKien</a><br>[ Id, SuKienId ]</td></tr><tr><td colspan="4"><small>FK55 · FK_SuKien_PhienBanSuKien_PhienBanCongKhaiId_Id</small></td></tr>
+</tbody></table>
+</article>
+<article id="PhienBanSuKien"><h2>PhienBanSuKien</h2><p>PK: <b>Id : int · NOT NULL</b> · 3 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiDuyetId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK50 · FK_PhienBanSuKien_TaiKhoan_NguoiDuyetId</small></td></tr>
+<tr><td class="map">NguoiGuiId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK51 · FK_PhienBanSuKien_TaiKhoan_NguoiGuiId</small></td></tr>
+<tr><td class="map">SuKienId</td><td>0..*</td><td>1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK52 · FK_PhienBanSuKien_SuKien_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="SuatDien"><h2>SuatDien</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DiaDiemId</td><td>0..*</td><td>1</td><td><a href="#DiaDiem">DiaDiem</a><br>Id</td></tr><tr><td colspan="4"><small>FK56 · FK_SuatDien_DiaDiem_DiaDiemId</small></td></tr>
+<tr><td class="map">SuKienId</td><td>0..*</td><td>1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK57 · FK_SuatDien_SuKien_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="LoaiVe"><h2>LoaiVe</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">KhuVucId</td><td>0..*</td><td>1</td><td><a href="#KhuVuc">KhuVuc</a><br>Id</td></tr><tr><td colspan="4"><small>FK42 · FK_LoaiVe_KhuVuc_KhuVucId</small></td></tr>
+<tr><td class="map">SuatDienId</td><td>0..*</td><td>1</td><td><a href="#SuatDien">SuatDien</a><br>Id</td></tr><tr><td colspan="4"><small>FK43 · FK_LoaiVe_SuatDien_SuatDienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="DonHang"><h2>DonHang</h2><p>PK: <b>Id : int · NOT NULL</b> · 4 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">ChinhSachId</td><td>0..*</td><td>1</td><td><a href="#ChinhSach">ChinhSach</a><br>Id</td></tr><tr><td colspan="4"><small>FK21 · FK_DonHang_ChinhSach_ChinhSachId</small></td></tr>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK22 · FK_DonHang_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">HopDongId ?</td><td>0..*</td><td>0..1</td><td><a href="#HopDong">HopDong</a><br>Id</td></tr><tr><td colspan="4"><small>FK23 · FK_DonHang_HopDong_HopDongId</small></td></tr>
+<tr><td class="map">SuatDienId</td><td>0..*</td><td>1</td><td><a href="#SuatDien">SuatDien</a><br>Id</td></tr><tr><td colspan="4"><small>FK24 · FK_DonHang_SuatDien_SuatDienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="ChiTietDonHang"><h2>ChiTietDonHang</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DonHangId</td><td>0..*</td><td>1</td><td><a href="#DonHang">DonHang</a><br>Id</td></tr><tr><td colspan="4"><small>FK14 · FK_ChiTietDonHang_DonHang_DonHangId</small></td></tr>
+<tr><td class="map">LoaiVeId</td><td>0..*</td><td>1</td><td><a href="#LoaiVe">LoaiVe</a><br>Id</td></tr><tr><td colspan="4"><small>FK15 · FK_ChiTietDonHang_LoaiVe_LoaiVeId</small></td></tr>
+</tbody></table>
+</article>
+<article id="GiuGhe"><h2>GiuGhe</h2><p>PK: <b>Id : int · NOT NULL</b> · 3 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">ChiTietDonHangId</td><td>0..*</td><td>1</td><td><a href="#ChiTietDonHang">ChiTietDonHang</a><br>Id</td></tr><tr><td colspan="4"><small>FK29 · FK_GiuGhe_ChiTietDonHang_ChiTietDonHangId</small></td></tr>
+<tr><td class="map">GheId ?</td><td>0..*</td><td>0..1</td><td><a href="#Ghe">Ghe</a><br>Id</td></tr><tr><td colspan="4"><small>FK30 · FK_GiuGhe_Ghe_GheId</small></td></tr>
+<tr><td class="map">SuatDienId</td><td>0..*</td><td>1</td><td><a href="#SuatDien">SuatDien</a><br>Id</td></tr><tr><td colspan="4"><small>FK31 · FK_GiuGhe_SuatDien_SuatDienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="Ve"><h2>Ve</h2><p>PK: <b>Id : int · NOT NULL</b> · 5 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">ChiTietDonHangId ?</td><td>0..*</td><td>0..1</td><td><a href="#ChiTietDonHang">ChiTietDonHang</a><br>Id</td></tr><tr><td colspan="4"><small>FK58 · FK_Ve_ChiTietDonHang_ChiTietDonHangId</small></td></tr>
+<tr><td class="map">GheId ?</td><td>0..*</td><td>0..1</td><td><a href="#Ghe">Ghe</a><br>Id</td></tr><tr><td colspan="4"><small>FK59 · FK_Ve_Ghe_GheId</small></td></tr>
+<tr><td class="map">GiuGheId ?</td><td>0..1</td><td>0..1</td><td><a href="#GiuGhe">GiuGhe</a><br>Id</td></tr><tr><td colspan="4"><small>FK60 · FK_Ve_GiuGhe_GiuGheId</small></td></tr>
+<tr><td class="map">[ LoaiVeId, SuatDienId ]</td><td>0..*</td><td>1</td><td><a href="#LoaiVe">LoaiVe</a><br>[ Id, SuatDienId ]</td></tr><tr><td colspan="4"><small>FK61 · FK_Ve_LoaiVe_LoaiVeId_SuatDienId</small></td></tr>
+<tr><td class="map">SuatDienId</td><td>0..*</td><td>1</td><td><a href="#SuatDien">SuatDien</a><br>Id</td></tr><tr><td colspan="4"><small>FK62 · FK_Ve_SuatDien_SuatDienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="VeMoi"><h2>VeMoi</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">TaiKhoanNhanId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK66 · FK_VeMoi_TaiKhoan_TaiKhoanNhanId</small></td></tr>
+<tr><td class="map">VeId</td><td>0..1</td><td>1</td><td><a href="#Ve">Ve</a><br>Id</td></tr><tr><td colspan="4"><small>FK67 · FK_VeMoi_Ve_VeId</small></td></tr>
+</tbody></table>
+</article>
+<article id="NhatKyCheckIn"><h2>NhatKyCheckIn</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NhanVienId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK44 · FK_NhatKyCheckIn_TaiKhoan_NhanVienId</small></td></tr>
+<tr><td class="map">VeId</td><td>0..*</td><td>1</td><td><a href="#Ve">Ve</a><br>Id</td></tr><tr><td colspan="4"><small>FK45 · FK_NhatKyCheckIn_Ve_VeId</small></td></tr>
+</tbody></table>
+</article>
+<article id="Voucher"><h2>Voucher</h2><p>PK: <b>Id : int · NOT NULL</b> · 3 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">KhuVucId ?</td><td>0..*</td><td>0..1</td><td><a href="#KhuVuc">KhuVuc</a><br>Id</td></tr><tr><td colspan="4"><small>FK63 · FK_Voucher_KhuVuc_KhuVucId</small></td></tr>
+<tr><td class="map">SuKienId ?</td><td>0..*</td><td>0..1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK64 · FK_Voucher_SuKien_SuKienId</small></td></tr>
+<tr><td class="map">SuatDienId ?</td><td>0..*</td><td>0..1</td><td><a href="#SuatDien">SuatDien</a><br>Id</td></tr><tr><td colspan="4"><small>FK65 · FK_Voucher_SuatDien_SuatDienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="SuDungVoucher"><h2>SuDungVoucher</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DonHangId</td><td>0..1</td><td>1</td><td><a href="#DonHang">DonHang</a><br>Id</td></tr><tr><td colspan="4"><small>FK72 · FK_SuDungVoucher_DonHang_DonHangId</small></td></tr>
+<tr><td class="map">VoucherId</td><td>0..*</td><td>1</td><td><a href="#Voucher">Voucher</a><br>Id</td></tr><tr><td colspan="4"><small>FK73 · FK_SuDungVoucher_Voucher_VoucherId</small></td></tr>
+</tbody></table>
+</article>
+<article id="HopDong"><h2>HopDong</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">BTCId</td><td>0..*</td><td>1</td><td><a href="#HoSoBTC">HoSoBTC</a><br>Id</td></tr><tr><td colspan="4"><small>FK32 · FK_HopDong_HoSoBTC_BTCId</small></td></tr>
+<tr><td class="map">SuKienId ?</td><td>0..*</td><td>0..1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK33 · FK_HopDong_SuKien_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="GiaoDichThanhToan"><h2>GiaoDichThanhToan</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DonHangId ?</td><td>0..*</td><td>0..1</td><td><a href="#DonHang">DonHang</a><br>Id</td></tr><tr><td colspan="4"><small>FK25 · FK_GiaoDichThanhToan_DonHang_DonHangId</small></td></tr>
+<tr><td class="map">YeuCauThueId ?</td><td>0..*</td><td>0..1</td><td><a href="#YeuCauThue">YeuCauThue</a><br>Id</td></tr><tr><td colspan="4"><small>FK26 · FK_GiaoDichThanhToan_YeuCauThue_YeuCauThueId</small></td></tr>
+</tbody></table>
+</article>
+<article id="WebhookThanhToan"><h2>WebhookThanhToan</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">GiaoDichId ?</td><td>0..*</td><td>0..1</td><td><a href="#GiaoDichThanhToan">GiaoDichThanhToan</a><br>Id</td></tr><tr><td colspan="4"><small>FK27 · FK_WebhookThanhToan_GiaoDichThanhToan_GiaoDichId</small></td></tr>
+</tbody></table>
+</article>
+<article id="YeuCauHoanTien"><h2>YeuCauHoanTien</h2><p>PK: <b>Id : int · NOT NULL</b> · 4 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">GiaoDichId</td><td>0..*</td><td>1</td><td><a href="#GiaoDichThanhToan">GiaoDichThanhToan</a><br>Id</td></tr><tr><td colspan="4"><small>FK68 · FK_YeuCauHoanTien_GiaoDichThanhToan_GiaoDichId</small></td></tr>
+<tr><td class="map">NguoiDuyetId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK69 · FK_YeuCauHoanTien_TaiKhoan_NguoiDuyetId</small></td></tr>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK70 · FK_YeuCauHoanTien_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">VeId ?</td><td>0..*</td><td>0..1</td><td><a href="#Ve">Ve</a><br>Id</td></tr><tr><td colspan="4"><small>FK71 · FK_YeuCauHoanTien_Ve_VeId</small></td></tr>
+</tbody></table>
+</article>
+<article id="GiaoDichHoanTien"><h2>GiaoDichHoanTien</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">YeuCauHoanTienId</td><td>0..*</td><td>1</td><td><a href="#YeuCauHoanTien">YeuCauHoanTien</a><br>Id</td></tr><tr><td colspan="4"><small>FK28 · FK_GiaoDichHoanTien_YeuCauHoanTien_YeuCauHoanTienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="DoiSoat"><h2>DoiSoat</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiDuyetId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK18 · FK_DoiSoat_TaiKhoan_NguoiDuyetId</small></td></tr>
+<tr><td class="map">SuKienId</td><td>0..*</td><td>1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK19 · FK_DoiSoat_SuKien_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="GiaiNgan"><h2>GiaiNgan</h2><p>PK: <b>Id : int · NOT NULL</b> · 1 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">DoiSoatId</td><td>0..1</td><td>1</td><td><a href="#DoiSoat">DoiSoat</a><br>Id</td></tr><tr><td colspan="4"><small>FK20 · FK_GiaiNgan_DoiSoat_DoiSoatId</small></td></tr>
+</tbody></table>
+</article>
+<article id="KhieuNai"><h2>KhieuNai</h2><p>PK: <b>Id : int · NOT NULL</b> · 5 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">NguoiXuLyId ?</td><td>0..*</td><td>0..1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK34 · FK_KhieuNai_TaiKhoan_NguoiXuLyId</small></td></tr>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK35 · FK_KhieuNai_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">YeuCauThueId ?</td><td>0..*</td><td>0..1</td><td><a href="#YeuCauThue">YeuCauThue</a><br>Id</td></tr><tr><td colspan="4"><small>FK36 · FK_KhieuNai_YeuCauThue_YeuCauThueId</small></td></tr>
+<tr><td class="map">SuKienId ?</td><td>0..*</td><td>0..1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK37 · FK_KhieuNai_SuKien_SuKienId</small></td></tr>
+<tr><td class="map">VeId ?</td><td>0..*</td><td>0..1</td><td><a href="#Ve">Ve</a><br>Id</td></tr><tr><td colspan="4"><small>FK38 · FK_KhieuNai_Ve_VeId</small></td></tr>
+</tbody></table>
+</article>
+<article id="DanhGia"><h2>DanhGia</h2><p>PK: <b>Id : int · NOT NULL</b> · 2 FK đi ra</p>
+<table><thead><tr><th>Cột FK của bảng con</th><th>Số con/cha</th><th>Số cha/con</th><th>Khóa đích</th></tr></thead><tbody>
+<tr><td class="map">TaiKhoanId</td><td>0..*</td><td>1</td><td><a href="#TaiKhoan">TaiKhoan</a><br>Id</td></tr><tr><td colspan="4"><small>FK16 · FK_DanhGia_TaiKhoan_TaiKhoanId</small></td></tr>
+<tr><td class="map">SuKienId</td><td>0..*</td><td>1</td><td><a href="#SuKien">SuKien</a><br>Id</td></tr><tr><td colspan="4"><small>FK17 · FK_DanhGia_SuKien_SuKienId</small></td></tr>
+</tbody></table>
+</article>
+<article id="ChinhSach"><h2>ChinhSach</h2><p>PK: <b>Id : int · NOT NULL</b> · 0 FK đi ra</p>
+<p>Không có FK đi ra. Bảng vẫn có thể được các bảng khác tham chiếu.</p>
+</article>
+<article id="Banner"><h2>Banner</h2><p>PK: <b>Id : int · NOT NULL</b> · 0 FK đi ra</p>
+<p>Không có FK đi ra. Bảng vẫn có thể được các bảng khác tham chiếu.</p>
+</article>
+</html>

@@ -1,249 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width,initial-scale=1" name="viewport">
-    <meta content="#081A33" name="theme-color">
-    <meta content="QLSK · Khám phá sự kiện, đặt vé và quản lý những trải nghiệm đáng nhớ." name="description">
-    <title>QLSK — Khám phá trải nghiệm tiếp theo</title>
-    <link href="/assets/icons/favicon.svg" rel="icon">
-    <link as="font" crossorigin="" href="/assets/fonts/inter-latin-vietnamese.woff2" rel="preload" type="font/woff2">
-    <link href="/css/base.css?v=e6c1938ef8ce" rel="stylesheet">
-    <link href="/css/app.css?v=e9e417fdd5c4" rel="stylesheet">
-    <link href="/css/content.css?v=4fbad4932173" rel="stylesheet">
-    <link href="/css/responsive.css?v=b3475767c161" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151129">
+  <meta name="description" content="QLSK, cổng quản lý sự kiện, địa điểm và vé.">
+  <title>QLSK</title>
+  <link rel="stylesheet" href="shared/styles/base.css">
+  <link rel="stylesheet" href="shared/styles/layout.css">
+  <link rel="stylesheet" href="shared/styles/components.css">
+  <link rel="stylesheet" href="features/home/home.css">
+  <link rel="stylesheet" href="shared/styles/catalog.css">
+  <link rel="stylesheet" href="features/venues/venues.css">
+  <link rel="stylesheet" href="features/calendar/calendar.css">
+  <link rel="stylesheet" href="features/account/account.css">
+  <link rel="stylesheet" href="features/organizer/organizer.css">
+  <link rel="stylesheet" href="features/tickets/tickets.css">
+  <link rel="stylesheet" href="features/work/work.css">
+  <link rel="stylesheet" href="features/reports/reports.css">
+  <script type="module" src="app/app.js"></script>
 </head>
+<body>
+  <a class="skip-link" href="#main-content">Đến nội dung chính</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="wordmark" href="#home" aria-label="QLSK, trang chủ"><span aria-hidden="true">✳</span>QLSK</a>
+      <nav class="primary-nav" aria-label="Menu chính">
+        <a href="#home" aria-current="page">Trang chủ</a>
+        <a href="#events">Sự kiện</a>
+        <a href="#calendar">Lịch</a>
+        <a href="#venues">Địa điểm</a>
+        <a href="#guide">Hướng dẫn</a>
+        <a class="header-work" href="#work" hidden>Vận hành</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="header-tickets" href="#tickets" hidden>Vé của tôi</a>
+        <a class="header-notifications" href="#account/notifications" aria-label="Thông báo" hidden>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 20a2 2 0 0 0 4 0"/></svg>
+          <small class="nav-count" hidden></small>
+        </a>
+        <a class="button compact header-account" href="#account/login">Đăng nhập</a>
+        <details class="nav-account" hidden>
+          <summary class="button secondary compact">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            <span class="header-name">Tài khoản</span>
+          </summary>
+          <div class="nav-popover">
+            <a href="#account/profile">Hồ sơ cá nhân</a>
+            <a href="#account/favorites">Sự kiện yêu thích</a>
+            <a href="#account/notifications">Thông báo</a>
+            <a href="#tickets">Vé và đơn hàng</a>
+            <a href="#requests/rentals">Hồ sơ thuê địa điểm</a>
+            <a href="#requests/support">Yêu cầu hỗ trợ</a>
+            <button class="header-logout" type="button" hidden>Đăng xuất</button>
+            <p class="field-error" role="status"></p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
 
-<body class="public-page home-page" data-ui-page="index.html"><a class="skip-link chinh" href="#noi-dung">Đến nội dung
-        chính</a>
-    <div aria-label="Đang xử lý" id="spinner" role="progressbar"></div>
-    <div aria-live="polite" id="toast-wrap"></div>
-    <header class="topbar public-topbar">
-        <div class="topbar-main"><a aria-current="page" aria-label="QLSK · Trang chủ" class="logo"
-                href="/index.html"><img alt="" height="36" src="/assets/icons/logo.svg" width="36"><span
-                    class="brand-content"><span class="brand-name">QLSK<span class="brand-dot">.</span></span><span
-                        class="brand-description">Live your next moment</span></span></a>
-            <nav aria-label="Điều hướng chính" class="mainnav"><a aria-current="page" class="" href="/index.html">Khám
-                    phá</a><a class="" href="/pages/su-kien/danh-sach.html">Sự kiện</a><a class=""
-                    href="/pages/dia-diem/danh-sach.html">Địa điểm</a></nav>
-            <form action="/pages/su-kien/danh-sach.html" class="header-search" role="search"><svg aria-hidden="true"
-                    class="icon">
-                    <use href="/assets/icons/ui.svg#search"></use>
-                </svg><label class="visually-hidden" for="global-search">Tìm sự kiện</label><input id="global-search"
-                    name="q" placeholder="Tìm trải nghiệm tiếp theo…" type="search"></form>
-            <div class="customer-links"><a class="" href="/pages/don-ve/don-cua-toi.html">Đơn của tôi</a><a class=""
-                    href="/pages/ve/ve-theo-don.html">Vé của tôi</a></div>
-            <div class="userbox"><a class="phu sm workspace-entry" data-quyen="BanToChuc"
-                    href="/pages/ban-to-chuc/su-kien-cua-toi.html" style="display:none"><svg class="icon"
-                        aria-hidden="true">
-                        <use href="/assets/icons/ui.svg#grid"></use>
-                    </svg>Workspace</a><a class="phu sm workspace-entry" data-quyen="QuanLySuKien,QuanTriVien"
-                    href="/pages/quan-tri/tong-quan.html" style="display:none"><svg class="icon" aria-hidden="true">
-                        <use href="/assets/icons/ui.svg#grid"></use>
-                    </svg>Quản trị</a><button aria-label="Thông tin thông báo" class="icon-button notification-button"
-                    data-notice="" type="button"><svg aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#bell"></use>
-                    </svg></button><a aria-label="Hồ sơ của tôi" class="avatar" href="/pages/tai-khoan/thong-tin.html"
-                    id="avatar-chu">SK</a><span id="nd-user"></span><a class="phu sm" href="/pages/auth/dang-nhap.html"
-                    id="btn-dangnhap">Đăng nhập</a><a class="chinh sm" href="/pages/auth/dang-ky.html"
-                    id="btn-dangky">Đăng ký</a><button class="phu sm" hidden="" id="btn-dangxuat"
-                    onclick="dangXuatTaiKhoan()" type="button">Đăng xuất</button><button aria-controls="menu-mobile"
-                    aria-expanded="false" aria-label="Mở menu" class="icon-button" id="btn-menu" type="button"><svg
-                        aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#menu"></use>
-                    </svg></button></div>
+  <main class="main-content" id="main-content" tabindex="-1">
+    <noscript><p class="wrap notice">Bật JavaScript để mở các màn hình QLSK.</p></noscript>
+    <div id="home-view"></div>
+    <div class="wrap" id="page-view" hidden></div>
+  </main>
+  <nav class="quick-actions" aria-label="Thao tác nhanh" hidden>
+    <a class="button secondary compact quick-support" href="#requests/support/new">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4z"/><path d="M8 8h8M8 12h5"/></svg> Hỗ trợ
+    </a>
+    <a class="button compact quick-book" hidden>Chọn ghế</a>
+  </nav>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="wordmark" href="#home" aria-label="QLSK, trang chủ"><span aria-hidden="true">✳</span>QLSK</a>
+          <p>Tìm sự kiện bạn yêu thích, đặt vé và chọn không gian để tổ chức sự kiện của riêng bạn.</p>
+          <a class="button ghost" href="#organizer">Đăng ký Ban tổ chức</a>
         </div>
-        <nav aria-label="Điều hướng trên điện thoại" class="menu-mobile" hidden="" id="menu-mobile"><a
-                aria-current="page" class="" href="/index.html">Khám phá</a><a class=""
-                href="/pages/su-kien/danh-sach.html">Sự kiện</a><a class="" href="/pages/dia-diem/danh-sach.html">Địa
-                điểm</a><a class="" href="/pages/don-ve/don-cua-toi.html">Đơn của tôi</a><a class=""
-                href="/pages/ve/ve-theo-don.html">Vé của tôi</a><a class="" href="/pages/tai-khoan/thong-tin.html">Hồ
-                sơ</a><a class="" data-quyen="BanToChuc" href="/pages/ban-to-chuc/su-kien-cua-toi.html">Workspace tổ
-                chức</a><a class="" data-quyen="BanToChuc,QuanLySuKien,QuanTriVien"
-                href="/pages/ve/tra-cuu-check-in.html">Check-in</a><a class="" data-quyen="QuanLySuKien,QuanTriVien"
-                href="/pages/quan-tri/tong-quan.html">Quản trị</a><a href="/pages/auth/dang-nhap.html"
-                id="btn-dangnhap-m">Đăng nhập</a><a href="/pages/auth/dang-ky.html" id="btn-dangky-m">Đăng ký</a><button
-                class="phu" hidden="" id="btn-dangxuat-m" onclick="dangXuatTaiKhoan()" type="button">Đăng xuất</button>
+        <nav class="footer-group" aria-labelledby="footer-discovery">
+          <h2 id="footer-discovery">Khám phá</h2>
+          <ul>
+            <li><a href="#events">Tất cả sự kiện</a></li>
+            <li><a href="#calendar">Lịch sự kiện</a></li>
+            <li><a href="#venues">Địa điểm tổ chức</a></li>
+            <li><a href="#account/favorites">Sự kiện yêu thích</a></li>
+          </ul>
         </nav>
-    </header>
-    <main class="public-main" id="noi-dung">
-        <div class="thongbao" id="tb-chung" role="status" style="display:none"></div>
-        <section class="discovery-hero"><img alt="Khán giả hòa mình vào một đêm nhạc" class="discovery-bg"
-                fetchpriority="high" src="/assets/images/events/sources/music.jpg">
-            <div class="discovery-content">
-                <p class="hero-kicker"><span></span> MỘT ĐIỂM HẸN. VẠN TRẢI NGHIỆM.</p>
-                <h1>Khám phá trải nghiệm<br><em>đáng nhớ</em> quanh bạn.</h1>
-                <p class="hero-description">Âm nhạc · Công nghệ · Thể thao · Văn hóa<br>Điều tuyệt vời tiếp theo đang
-                    chờ bạn.</p>
-                <form class="hero-search" onsubmit="timSuKienTrangChu(event)"><svg aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#search"></use>
-                    </svg><label class="visually-hidden" for="sk-tukhoa-page">Tìm sự kiện, địa điểm</label><input
-                        id="sk-tukhoa-page" placeholder="Tìm sự kiện, địa điểm…" type="search"><button class="chinh"
-                        type="submit">Khám phá <svg aria-hidden="true" class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-right"></use>
-                        </svg></button></form>
-                <div class="hero-note"><svg aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#ticket"></use>
-                    </svg> Đặt vé dễ dàng <span>·</span> Trải nghiệm trọn vẹn</div>
-            </div><a class="hero-spotlight" href="/pages/su-kien/danh-sach.html" id="home-highlight" hidden=""><span
-                    class="spotlight-label">THE NEXT MOMENT</span><span class="spotlight-image"><img
-                        alt="Trải nghiệm nghệ thuật" src="/assets/images/events/sources/art.jpg"></span><span
-                    class="spotlight-content"><span class="eyebrow">Lên lịch cho điều bạn yêu</span><strong>Ra ngoài.
-                        Kết nối.<br>Tạo nên kỷ niệm.</strong><span>Khám phá sự kiện đang mở bán <svg aria-hidden="true"
-                            class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-up-right"></use>
-                        </svg></span></span></a><span class="hero-coordinate">QLSK DISCOVERY / 2026</span>
+        <nav class="footer-group" aria-labelledby="footer-booking">
+          <h2 id="footer-booking">Vé và đặt chỗ</h2>
+          <ul>
+            <li><a href="#tickets">Vé của tôi</a></li>
+            <li><a href="#tickets/orders">Lịch sử đơn hàng</a></li>
+            <li><a href="#requests/refunds">Theo dõi hoàn tiền</a></li>
+            <li><a href="#requests/rentals">Hồ sơ thuê địa điểm</a></li>
+          </ul>
+        </nav>
+        <section class="footer-group footer-support" aria-labelledby="footer-support">
+          <h2 id="footer-support">Đội hỗ trợ QLSK</h2>
+          <a class="button lime" href="#requests/support/new">Nhắn hỗ trợ</a>
+          <ul>
+            <li><a href="#requests/support">Yêu cầu hỗ trợ đã gửi</a></li>
+            <li><a href="#guide/faq">Câu hỏi thường gặp</a></li>
+          </ul>
         </section>
-        <section aria-label="Khám phá theo sở thích" class="category-section">
-            <div class="category-grid" data-home-categories="">
-                <p class="muted">Đang tải chủ đề sự kiện…</p>
-            </div>
-        </section>
-        <section class="discovery-section">
-            <div class="page-heading">
-                <div>
-                    <p class="eyebrow">KHÁM PHÁ CÙNG QLSK</p>
-                    <h2>Chọn một trải nghiệm mới</h2>
-                    <p>Những điểm hẹn thú vị cho hành trình sắp tới.</p>
-                </div>
-                <div class="page-actions"><a class="text-link" href="/pages/su-kien/danh-sach.html">Tất cả sự kiện <svg
-                            aria-hidden="true" class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-right"></use>
-                        </svg></a></div>
-            </div>
-            <div class="discovery-tabs" data-event-categories=""></div>
-            <p class="result-count" id="event-count" role="status"></p>
-            <p class="metadata-status" id="event-metadata-status" role="status"></p>
-            <div aria-live="polite" class="ev-grid" data-page-size="8" id="ds-sukien"></div>
-        </section>
-        <section class="discovery-section home-feed" data-home-feed="upcoming" hidden="">
-            <div class="page-heading">
-                <div>
-                    <h2>Sắp diễn ra</h2>
-                    <p>Đừng bỏ lỡ điểm hẹn tiếp theo.</p>
-                </div>
-                <div class="page-actions"><a class="text-link" href="/pages/su-kien/danh-sach.html">Khám phá thêm <svg
-                            aria-hidden="true" class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-right"></use>
-                        </svg></a></div>
-            </div>
-            <div class="ev-grid"></div>
-        </section>
-        <section class="discovery-section home-feed" data-home-feed="weekend" hidden="">
-            <div class="page-heading">
-                <div>
-                    <h2>Cuối tuần, đi đâu?</h2>
-                    <p>Dành thời gian cho những điều bạn thích.</p>
-                </div>
-                <div class="page-actions"><a class="text-link" href="/pages/su-kien/danh-sach.html?date=weekend">Khám
-                        phá thêm <svg aria-hidden="true" class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-right"></use>
-                        </svg></a></div>
-            </div>
-            <div class="ev-grid"></div>
-        </section>
-        <section class="discovery-section home-feed" data-home-feed="free" hidden="">
-            <div class="page-heading">
-                <div>
-                    <h2>Trải nghiệm miễn phí</h2>
-                    <p>Những kết nối mới, không cần đắn đo.</p>
-                </div>
-                <div class="page-actions"><a class="text-link" href="/pages/su-kien/danh-sach.html?price=free">Khám phá
-                        thêm <svg aria-hidden="true" class="icon">
-                            <use href="/assets/icons/ui.svg#arrow-right"></use>
-                        </svg></a></div>
-            </div>
-            <div class="ev-grid"></div>
-        </section>
-        <section class="city-section">
-            <div class="page-heading">
-                <div>
-                    <p class="eyebrow">KHÔNG GIAN SỰ KIỆN</p>
-                    <h2>Tìm nơi cho cuộc gặp tiếp theo</h2>
-                    <p>Khám phá các địa điểm hiện có trên QLSK.</p>
-                </div><a class="text-link" href="/pages/dia-diem/danh-sach.html">Tất cả địa điểm <svg class="icon"
-                        aria-hidden="true">
-                        <use href="/assets/icons/ui.svg#arrow-right"></use>
-                    </svg></a>
-            </div>
-            <div class="home-venues" id="home-venues"></div>
-        </section>
-        <section class="discovery-section" data-home-organizers="" hidden="">
-            <div class="page-heading">
-                <div>
-                    <h2>Những người tạo nên trải nghiệm</h2>
-                    <p>Kết nối với các ban tổ chức trên QLSK.</p>
-                </div>
-                <div class="page-actions"></div>
-            </div>
-            <div class="organizer-grid"></div>
-        </section>
-        <section class="organizer-callout">
-            <div>
-                <p class="eyebrow">DÀNH CHO NHÀ TỔ CHỨC</p>
-                <h2>Ý tưởng của bạn.<br>Trải nghiệm của hàng ngàn người.</h2>
-                <p>Tạo sự kiện, quản lý vé và đón khách trong một không gian làm việc.</p><a class="chinh"
-                    href="/pages/to-chuc/gui-xac-thuc.html">Bắt đầu tổ chức <svg aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#arrow-right"></use>
-                    </svg></a>
-            </div>
-            <div aria-hidden="true" class="callout-art"><span class="art-ticket"><svg aria-hidden="true" class="icon">
-                        <use href="/assets/icons/ui.svg#ticket"></use>
-                    </svg><b>MAKE IT<br>HAPPEN.</b><small>QLSK / EVENT WORKSPACE</small></span><span
-                    class="art-spark">✦</span></div>
-        </section>
-    </main>
-    <footer class="site-footer">
-        <div class="footer-grid">
-            <div class="footer-col"><a aria-current="page" aria-label="QLSK · Trang chủ" class="logo"
-                    href="/index.html"><img alt="" height="36" src="/assets/icons/logo.svg" width="36"><span
-                        class="brand-content"><span class="brand-name">QLSK<span class="brand-dot">.</span></span><span
-                            class="brand-description">Live your next moment</span></span></a>
-                <p>Mỗi sự kiện, một kết nối mới.<br>Tìm trải nghiệm tiếp theo của bạn cùng QLSK.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Khám phá</h4><a class="" href="/pages/su-kien/danh-sach.html">Tất cả sự kiện</a><a class=""
-                    href="/pages/dia-diem/danh-sach.html">Không gian tổ chức</a><a class=""
-                    href="/pages/ve/ve-theo-don.html">Vé của tôi</a>
-            </div>
-            <div class="footer-col">
-                <h4>Dành cho nhà tổ chức</h4><a class="" href="/pages/to-chuc/gui-xac-thuc.html">Trở thành nhà tổ
-                    chức</a><a class="" href="/pages/ban-to-chuc/su-kien-cua-toi.html">Workspace của tôi</a><a class=""
-                    href="/pages/ban-to-chuc/tao-su-kien.html">Tạo sự kiện</a>
-            </div>
-            <div class="footer-col">
-                <h4>Tài khoản &amp; hỗ trợ</h4><a class="" href="/pages/tai-khoan/thong-tin.html">Thông tin cá
-                    nhân</a><a class="" href="/pages/don-ve/don-cua-toi.html">Quản lý đơn vé</a><a class=""
-                    href="/pages/thanh-toan/giao-dich.html">Tra cứu giao dịch</a>
-            </div>
-        </div>
-        <div class="footer-bottom"><span>© 2026 QLSK. Kết nối những trải nghiệm.</span><span>Được tạo nên cho những
-                khoảnh khắc đáng nhớ <svg aria-hidden="true" class="icon">
-                    <use href="/assets/icons/ui.svg#sparkles"></use>
-                </svg></span></div>
-    </footer>
-    <dialog aria-labelledby="ui-drawer-title" class="detail-drawer" id="ui-drawer">
-        <div class="drawer-top"><span class="eyebrow">CHI TIẾT</span><button aria-label="Đóng chi tiết"
-                class="icon-button" data-drawer-close=""><svg aria-hidden="true" class="icon">
-                    <use href="/assets/icons/ui.svg#x"></use>
-                </svg></button></div>
-        <div id="ui-drawer-content"></div>
-    </dialog>
-    <script src="config.js?v=9a76a5541e92"></script>
-    <script src="js/api.js?v=c74cda27f714"></script>
-    <script src="js/auth.js?v=2f7943e11ec6"></script>
-    <script src="js/sukien.js?v=7352bbce0aa5"></script>
-    <script src="js/tochuc.js?v=5f792f640ec0"></script>
-    <script src="js/diadiem.js?v=bfcc9d97fad0"></script>
-    <script src="js/donve.js?v=0e70e38f1d51"></script>
-    <script src="js/checkin.js?v=0e71b3256c7f"></script>
-    <script src="js/quantri.js?v=2d21b2738261"></script>
-    <script src="js/main.js?v=6aa79b0139e4"></script>
-    <script src="js/compat-multipage.js?v=d9a3b9c2f16f"></script>
-    <script src="/assets/vendor/qrcode.js?v=79ec86f82856"></script>
-    <script src="/js/ui.js?v=39d27d1bb351"></script>
-    <div data-compat-hooks="" hidden=""><input id="sk-tukhoa" type="hidden"></div>
+      </div>
+      <div class="footer-bottom">
+        <nav aria-label="Thông tin QLSK">
+          <a href="#guide/about">Giới thiệu</a>
+          <a href="#guide/tickets">Hướng dẫn đặt vé</a>
+          <a href="#guide/rules">Quy định và chính sách</a>
+        </nav>
+        <a class="back-to-top" href="#main-content">Về đầu trang <span aria-hidden="true">↑</span></a>
+      </div>
+    </div>
+  </footer>
 </body>
-
 </html>

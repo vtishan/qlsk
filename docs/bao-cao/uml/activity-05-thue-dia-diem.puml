@@ -1,0 +1,27 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Thuê địa điểm và đặt cọc
+|Người dùng|
+start
+|Người dùng|
+:Gửi thời gian, địa điểm, quy mô và nội dung thuê;
+|RequestService|
+:Kiểm tra đầu vào và lịch địa điểm;
+|Người duyệt|
+:Xem yêu cầu, quyết định và điều kiện đặt cọc;
+if (Chấp thuận?) then (Có)
+:Tiền cọc = 0: xác nhận ngay yêu cầu và lịch;
+:Tiền cọc > 0: Chờ cọc, giữ lịch trong 24 giờ;
+:Nếu có cọc: người dùng mở PayOS, hệ thống xác minh thanh toán;
+:Đủ tiền đúng hạn và lịch hợp lệ: xác nhận, quá hạn hoặc bất thường: xử lý theo trạng thái thực tế;
+else (Không)
+:Lưu Từ chối và lý do;
+endif
+stop
+@enduml

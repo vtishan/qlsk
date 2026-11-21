@@ -1,0 +1,19 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Cổng thanh toán PayOS" as A
+rectangle "Hệ thống QLSK" {
+usecase "Tạo / phục hồi liên kết thanh toán" as U0
+usecase "Cung cấp trạng thái giao dịch" as U1
+usecase "Gửi webhook thanh toán" as U2
+}
+A -- U0
+A -- U1
+A -- U2
+@enduml

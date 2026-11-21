@@ -1,0 +1,26 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Gửi và duyệt yêu cầu hoàn tiền
+|Người dùng|
+start
+|Người dùng|
+:Chọn vé của mình và giao dịch thực thu;
+|RefundService|
+:Kiểm tra tự hủy được phép, trước suất tối thiểu 72 giờ, vé chưa check-in;
+|RefundService|
+:Khóa giao dịch, kiểm tra yêu cầu trùng và số tiền còn được hoàn;
+if (Đủ điều kiện?) then (Có)
+:Tạo yêu cầu Chờ duyệt, ghi nhận phần tiền yêu cầu;
+:Người có refunds.review xem và quyết định;
+:Ghi quyết định, việc duyệt không chứng minh tiền đã chuyển;
+else (Không)
+:Trả lỗi điều kiện / trùng / vượt số tiền, không tạo yêu cầu mới;
+endif
+stop
+@enduml

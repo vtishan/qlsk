@@ -1,0 +1,39 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  --ink: #141329;
+  --muted: #615f74;
+  --line: #e8e6f1;
+  --canvas: #f8f7fc;
+  --surface: #fff;
+  --brand: #6040dc;
+  --brand-dark: #4d2ac4;
+  --soft: #f0ebff;
+  --lime: #d9fb78;
+  --dark: #151129;
+  --radius: 18px;
+  --shadow: 0 14px 44px #26204912;
+  --gap: clamp(12px, 2vw, 22px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--canvas); color: var(--ink); line-height: 1.55; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { letter-spacing: -.042em; line-height: 1.13; }
+h1 { font-size: clamp(2.3rem, 5vw, 4.25rem); font-weight: 800; }
+h2 { font-size: clamp(1.55rem, 3vw, 2.35rem); }
+h3 { font-size: 1.18rem; letter-spacing: -.025em; }
+a { color: var(--brand-dark); text-underline-offset: .18em; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .55; }
+:is(a, button, summary, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid #886df0; outline-offset: 3px; }
+.muted { color: var(--muted); }
+:where(h1, h2, h3, p, a, dd, dt, td, th) { overflow-wrap: anywhere; }
+input, select, textarea { font: inherit; color: inherit; max-width: 100%; }
+
+img { max-width: 100%; }
+button, a, input, textarea, select { touch-action: manipulation; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}

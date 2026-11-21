@@ -1,0 +1,130 @@
+[
+  {
+    "file": "01-ho-so",
+    "title": "Hồ sơ ban tổ chức",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 3,
+    "relations": 2
+  },
+  {
+    "file": "02-cong-bo",
+    "title": "Sự kiện, phiên bản và suất diễn",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "03-dia-diem",
+    "title": "Địa điểm, khu vực và ghế",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "04-thue",
+    "title": "Yêu cầu thuê và lịch địa điểm",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "05-dat-ve",
+    "title": "Đơn hàng và chi tiết đặt vé",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "06-phat-hanh",
+    "title": "Phát hành vé, mời và check-in",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "07-thanh-toan",
+    "title": "Thanh toán, webhook và hoàn tiền",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  },
+  {
+    "file": "08-doi-soat",
+    "title": "Hợp đồng, đối soát và giải ngân",
+    "svg": [
+      700,
+      650
+    ],
+    "png": [
+      2100,
+      1950
+    ],
+    "body_font_px": 16,
+    "body_at_165mm_pt": 10.69,
+    "entities": 4,
+    "relations": 3
+  }
+]

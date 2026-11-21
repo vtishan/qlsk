@@ -1,0 +1,32 @@
+[
+  {
+    "route": "home",
+    "image": "trang-chu.png",
+    "title": "Banner SQL 6eaf362d",
+    "screenshot_at": "2026-11-21T11:46:40.566596+00:00",
+    "width": 1440,
+    "viewport_height": 960,
+    "full_page": true,
+    "page_errors": []
+  },
+  {
+    "route": "event/9",
+    "image": "chi-tiet-su-kien.png",
+    "title": "Sự kiện SQL 46ab29e4",
+    "screenshot_at": "2026-11-21T11:46:40.971905+00:00",
+    "width": 1440,
+    "viewport_height": 960,
+    "full_page": true,
+    "page_errors": []
+  },
+  {
+    "route": "venues",
+    "image": "danh-sach-dia-diem.png",
+    "title": "Địa điểm tổ chức",
+    "screenshot_at": "2026-11-21T11:46:41.354113+00:00",
+    "width": 1440,
+    "viewport_height": 960,
+    "full_page": true,
+    "page_errors": []
+  }
+]

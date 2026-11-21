@@ -1,0 +1,2 @@
+﻿Database: QLSK_UI_c67acc32
+Đạt kiểm thử ràng buộc 37 bảng.

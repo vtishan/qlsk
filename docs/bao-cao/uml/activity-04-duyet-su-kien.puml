@@ -1,0 +1,25 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Tạo, duyệt và công bố sự kiện
+|Ban tổ chức|
+start
+|Ban tổ chức|
+:Tạo sự kiện, phiên bản, suất và loại vé;
+|Ban tổ chức|
+:Gửi phiên bản, hệ thống kiểm tra điều kiện;
+|Người duyệt|
+:Đọc hồ sơ và nhập quyết định, lý do;
+if (Phiên bản được duyệt?) then (Có)
+:Ghi phiên bản được duyệt;
+:Với tạo mới: ban tổ chức công bố khi đủ điều kiện, với thay đổi: áp dụng theo loại yêu cầu;
+else (Không)
+:Ghi từ chối và lý do, ban tổ chức tạo phiên bản sửa đổi;
+endif
+stop
+@enduml

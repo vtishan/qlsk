@@ -1,0 +1,31 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Quản lý hệ thống" as A
+rectangle "Hệ thống QLSK" {
+usecase "Duyệt hồ sơ tổ chức" as U0
+usecase "Duyệt phiên bản sự kiện" as U1
+usecase "Đình chỉ / hoàn tất sự kiện" as U2
+usecase "Duyệt yêu cầu thuê địa điểm" as U3
+usecase "Xử lý hỗ trợ / khiếu nại" as U4
+usecase "Duyệt yêu cầu hoàn tiền" as U5
+usecase "Xem giao dịch tài chính" as U6
+usecase "Lập / duyệt bảng đối soát" as U7
+usecase "Giám sát và xuất báo cáo" as U8
+}
+A -- U0
+A -- U1
+A -- U2
+A -- U3
+A -- U4
+A -- U5
+A -- U6
+A -- U7
+A -- U8
+@enduml

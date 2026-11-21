@@ -1,0 +1,3 @@
+﻿SQL finance + reports: existing receipts, scoped contracts, export XLSX and DOCX validated.
+Real SQL Server: auth and CSRF, catalog and policy, organizer file/approval, rental conflict/deposit/cancel, support, event publication and calendar, favorite, idempotent booking, QR/PDF and repeated check-in OK
+Edge: Desktop, tablet, mobile, QLSK venue/calendar/rentals/reports and both prototype URLs OK

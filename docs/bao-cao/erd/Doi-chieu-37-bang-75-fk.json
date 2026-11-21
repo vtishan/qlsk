@@ -1,0 +1,1614 @@
+{
+  "source": "Data/Migrations/000-initial-schema.sql",
+  "sourceSha256": "875170e21eb9361943f85ace39f808cb17614e5d6f911ae1508348a948741f0e",
+  "tableCount": 37,
+  "foreignKeyCount": 75,
+  "compositeForeignKeyCount": 6,
+  "pdfPages": 16,
+  "tables": [
+    {
+      "name": "TaiKhoan",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 3,
+      "foreignKeys": []
+    },
+    {
+      "name": "HoSoBTC",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 3,
+      "foreignKeys": [
+        {
+          "constraint": "FK_HoSoBTC_TaiKhoan_NguoiDuyetId",
+          "columns": [
+            "NguoiDuyetId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiDuyetId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "HoSoBTC",
+          "relationId": "FK03"
+        },
+        {
+          "constraint": "FK_HoSoBTC_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "HoSoBTC",
+          "relationId": "FK04"
+        }
+      ]
+    },
+    {
+      "name": "GiayToBTC",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 3,
+      "foreignKeys": [
+        {
+          "constraint": "FK_GiayToBTC_HoSoBTC_HoSoBTCId",
+          "columns": [
+            "HoSoBTCId"
+          ],
+          "target": "HoSoBTC",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiayToBTC",
+          "relationId": "FK11"
+        }
+      ]
+    },
+    {
+      "name": "PhanCongSuKien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 4,
+      "foreignKeys": [
+        {
+          "constraint": "FK_PhanCongSuKien_TaiKhoan_NguoiPhanCongId",
+          "columns": [
+            "NguoiPhanCongId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhanCongSuKien",
+          "relationId": "FK46"
+        },
+        {
+          "constraint": "FK_PhanCongSuKien_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "TaiKhoanId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhanCongSuKien",
+          "relationId": "FK47"
+        },
+        {
+          "constraint": "FK_PhanCongSuKien_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhanCongSuKien",
+          "relationId": "FK48"
+        },
+        {
+          "constraint": "FK_PhanCongSuKien_SuatDien_SuatDienId_SuKienId",
+          "columns": [
+            "SuatDienId",
+            "SuKienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id",
+            "SuKienId"
+          ],
+          "nullableColumns": [
+            "SuatDienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhanCongSuKien",
+          "relationId": "FK49"
+        }
+      ]
+    },
+    {
+      "name": "CauHinhHeThong",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 4,
+      "foreignKeys": [
+        {
+          "constraint": "FK_CauHinhHeThong_TaiKhoan_NguoiCapNhatId",
+          "columns": [
+            "NguoiCapNhatId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "CauHinhHeThong",
+          "relationId": "FK02"
+        }
+      ]
+    },
+    {
+      "name": "NhatKyHeThong",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 4,
+      "foreignKeys": [
+        {
+          "constraint": "FK_NhatKyHeThong_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "TaiKhoanId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "NhatKyHeThong",
+          "relationId": "FK05"
+        }
+      ]
+    },
+    {
+      "name": "ThongBao",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 5,
+      "foreignKeys": [
+        {
+          "constraint": "FK_ThongBao_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "TaiKhoanId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "ThongBao",
+          "relationId": "FK74"
+        },
+        {
+          "constraint": "FK_ThongBao_VeMoi_VeMoiId",
+          "columns": [
+            "VeMoiId"
+          ],
+          "target": "VeMoi",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "VeMoiId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "ThongBao",
+          "relationId": "FK75"
+        }
+      ]
+    },
+    {
+      "name": "DiaDiem",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 6,
+      "foreignKeys": []
+    },
+    {
+      "name": "KhuVuc",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 6,
+      "foreignKeys": [
+        {
+          "constraint": "FK_KhuVuc_DiaDiem_DiaDiemId",
+          "columns": [
+            "DiaDiemId"
+          ],
+          "target": "DiaDiem",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhuVuc",
+          "relationId": "FK01"
+        }
+      ]
+    },
+    {
+      "name": "CumGhe",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 6,
+      "foreignKeys": [
+        {
+          "constraint": "FK_CumGhe_KhuVuc_KhuVucId",
+          "columns": [
+            "KhuVucId"
+          ],
+          "target": "KhuVuc",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "CumGhe",
+          "relationId": "FK10"
+        }
+      ]
+    },
+    {
+      "name": "Ghe",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 6,
+      "foreignKeys": [
+        {
+          "constraint": "FK_Ghe_CumGhe_CumGheId_KhuVucId",
+          "columns": [
+            "CumGheId",
+            "KhuVucId"
+          ],
+          "target": "CumGhe",
+          "targetColumns": [
+            "Id",
+            "KhuVucId"
+          ],
+          "nullableColumns": [
+            "CumGheId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ghe",
+          "relationId": "FK12"
+        },
+        {
+          "constraint": "FK_Ghe_KhuVuc_KhuVucId",
+          "columns": [
+            "KhuVucId"
+          ],
+          "target": "KhuVuc",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ghe",
+          "relationId": "FK13"
+        }
+      ]
+    },
+    {
+      "name": "YeuCauThue",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 7,
+      "foreignKeys": [
+        {
+          "constraint": "FK_YeuCauThue_ChinhSach_ChinhSachId",
+          "columns": [
+            "ChinhSachId"
+          ],
+          "target": "ChinhSach",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauThue",
+          "relationId": "FK06"
+        },
+        {
+          "constraint": "FK_YeuCauThue_DiaDiem_DiaDiemId",
+          "columns": [
+            "DiaDiemId"
+          ],
+          "target": "DiaDiem",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauThue",
+          "relationId": "FK07"
+        },
+        {
+          "constraint": "FK_YeuCauThue_TaiKhoan_NguoiDuyetId",
+          "columns": [
+            "NguoiDuyetId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiDuyetId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauThue",
+          "relationId": "FK08"
+        },
+        {
+          "constraint": "FK_YeuCauThue_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauThue",
+          "relationId": "FK09"
+        }
+      ]
+    },
+    {
+      "name": "LichDatDiaDiem",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 7,
+      "foreignKeys": [
+        {
+          "constraint": "FK_LichDatDiaDiem_DiaDiem_DiaDiemId",
+          "columns": [
+            "DiaDiemId"
+          ],
+          "target": "DiaDiem",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "LichDatDiaDiem",
+          "relationId": "FK39"
+        },
+        {
+          "constraint": "FK_LichDatDiaDiem_YeuCauThue_YeuCauThueId_DiaDiemId",
+          "columns": [
+            "YeuCauThueId",
+            "DiaDiemId"
+          ],
+          "target": "YeuCauThue",
+          "targetColumns": [
+            "Id",
+            "DiaDiemId"
+          ],
+          "nullableColumns": [
+            "YeuCauThueId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "LichDatDiaDiem",
+          "relationId": "FK40"
+        },
+        {
+          "constraint": "FK_LichDatDiaDiem_SuatDien_SuatDienId_DiaDiemId",
+          "columns": [
+            "SuatDienId",
+            "DiaDiemId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id",
+            "DiaDiemId"
+          ],
+          "nullableColumns": [
+            "SuatDienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "LichDatDiaDiem",
+          "relationId": "FK41"
+        }
+      ]
+    },
+    {
+      "name": "DanhMucSuKien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 8,
+      "foreignKeys": []
+    },
+    {
+      "name": "SuKien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 8,
+      "foreignKeys": [
+        {
+          "constraint": "FK_SuKien_DanhMucSuKien_DanhMucId",
+          "columns": [
+            "DanhMucId"
+          ],
+          "target": "DanhMucSuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "SuKien",
+          "relationId": "FK53"
+        },
+        {
+          "constraint": "FK_SuKien_HoSoBTC_BTCId",
+          "columns": [
+            "BTCId"
+          ],
+          "target": "HoSoBTC",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "SuKien",
+          "relationId": "FK54"
+        },
+        {
+          "constraint": "FK_SuKien_PhienBanSuKien_PhienBanCongKhaiId_Id",
+          "columns": [
+            "PhienBanCongKhaiId",
+            "Id"
+          ],
+          "target": "PhienBanSuKien",
+          "targetColumns": [
+            "Id",
+            "SuKienId"
+          ],
+          "nullableColumns": [
+            "PhienBanCongKhaiId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "PK",
+          "childCardinality": "0..1",
+          "source": "SuKien",
+          "relationId": "FK55"
+        }
+      ]
+    },
+    {
+      "name": "PhienBanSuKien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 8,
+      "foreignKeys": [
+        {
+          "constraint": "FK_PhienBanSuKien_TaiKhoan_NguoiDuyetId",
+          "columns": [
+            "NguoiDuyetId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiDuyetId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhienBanSuKien",
+          "relationId": "FK50"
+        },
+        {
+          "constraint": "FK_PhienBanSuKien_TaiKhoan_NguoiGuiId",
+          "columns": [
+            "NguoiGuiId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhienBanSuKien",
+          "relationId": "FK51"
+        },
+        {
+          "constraint": "FK_PhienBanSuKien_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "PhienBanSuKien",
+          "relationId": "FK52"
+        }
+      ]
+    },
+    {
+      "name": "SuatDien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 9,
+      "foreignKeys": [
+        {
+          "constraint": "FK_SuatDien_DiaDiem_DiaDiemId",
+          "columns": [
+            "DiaDiemId"
+          ],
+          "target": "DiaDiem",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "SuatDien",
+          "relationId": "FK56"
+        },
+        {
+          "constraint": "FK_SuatDien_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "SuatDien",
+          "relationId": "FK57"
+        }
+      ]
+    },
+    {
+      "name": "LoaiVe",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 9,
+      "foreignKeys": [
+        {
+          "constraint": "FK_LoaiVe_KhuVuc_KhuVucId",
+          "columns": [
+            "KhuVucId"
+          ],
+          "target": "KhuVuc",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "LoaiVe",
+          "relationId": "FK42"
+        },
+        {
+          "constraint": "FK_LoaiVe_SuatDien_SuatDienId",
+          "columns": [
+            "SuatDienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "LoaiVe",
+          "relationId": "FK43"
+        }
+      ]
+    },
+    {
+      "name": "DonHang",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 9,
+      "foreignKeys": [
+        {
+          "constraint": "FK_DonHang_ChinhSach_ChinhSachId",
+          "columns": [
+            "ChinhSachId"
+          ],
+          "target": "ChinhSach",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DonHang",
+          "relationId": "FK21"
+        },
+        {
+          "constraint": "FK_DonHang_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DonHang",
+          "relationId": "FK22"
+        },
+        {
+          "constraint": "FK_DonHang_HopDong_HopDongId",
+          "columns": [
+            "HopDongId"
+          ],
+          "target": "HopDong",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "HopDongId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DonHang",
+          "relationId": "FK23"
+        },
+        {
+          "constraint": "FK_DonHang_SuatDien_SuatDienId",
+          "columns": [
+            "SuatDienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DonHang",
+          "relationId": "FK24"
+        }
+      ]
+    },
+    {
+      "name": "ChiTietDonHang",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 10,
+      "foreignKeys": [
+        {
+          "constraint": "FK_ChiTietDonHang_DonHang_DonHangId",
+          "columns": [
+            "DonHangId"
+          ],
+          "target": "DonHang",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "ChiTietDonHang",
+          "relationId": "FK14"
+        },
+        {
+          "constraint": "FK_ChiTietDonHang_LoaiVe_LoaiVeId",
+          "columns": [
+            "LoaiVeId"
+          ],
+          "target": "LoaiVe",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "ChiTietDonHang",
+          "relationId": "FK15"
+        }
+      ]
+    },
+    {
+      "name": "GiuGhe",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 10,
+      "foreignKeys": [
+        {
+          "constraint": "FK_GiuGhe_ChiTietDonHang_ChiTietDonHangId",
+          "columns": [
+            "ChiTietDonHangId"
+          ],
+          "target": "ChiTietDonHang",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiuGhe",
+          "relationId": "FK29"
+        },
+        {
+          "constraint": "FK_GiuGhe_Ghe_GheId",
+          "columns": [
+            "GheId"
+          ],
+          "target": "Ghe",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "GheId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiuGhe",
+          "relationId": "FK30"
+        },
+        {
+          "constraint": "FK_GiuGhe_SuatDien_SuatDienId",
+          "columns": [
+            "SuatDienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiuGhe",
+          "relationId": "FK31"
+        }
+      ]
+    },
+    {
+      "name": "Ve",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 11,
+      "foreignKeys": [
+        {
+          "constraint": "FK_Ve_ChiTietDonHang_ChiTietDonHangId",
+          "columns": [
+            "ChiTietDonHangId"
+          ],
+          "target": "ChiTietDonHang",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "ChiTietDonHangId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ve",
+          "relationId": "FK58"
+        },
+        {
+          "constraint": "FK_Ve_Ghe_GheId",
+          "columns": [
+            "GheId"
+          ],
+          "target": "Ghe",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "GheId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ve",
+          "relationId": "FK59"
+        },
+        {
+          "constraint": "FK_Ve_GiuGhe_GiuGheId",
+          "columns": [
+            "GiuGheId"
+          ],
+          "target": "GiuGhe",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "GiuGheId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "IX_Ve_GiuGhe",
+          "childCardinality": "0..1",
+          "source": "Ve",
+          "relationId": "FK60"
+        },
+        {
+          "constraint": "FK_Ve_LoaiVe_LoaiVeId_SuatDienId",
+          "columns": [
+            "LoaiVeId",
+            "SuatDienId"
+          ],
+          "target": "LoaiVe",
+          "targetColumns": [
+            "Id",
+            "SuatDienId"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ve",
+          "relationId": "FK61"
+        },
+        {
+          "constraint": "FK_Ve_SuatDien_SuatDienId",
+          "columns": [
+            "SuatDienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Ve",
+          "relationId": "FK62"
+        }
+      ]
+    },
+    {
+      "name": "VeMoi",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 11,
+      "foreignKeys": [
+        {
+          "constraint": "FK_VeMoi_TaiKhoan_TaiKhoanNhanId",
+          "columns": [
+            "TaiKhoanNhanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "TaiKhoanNhanId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "VeMoi",
+          "relationId": "FK66"
+        },
+        {
+          "constraint": "FK_VeMoi_Ve_VeId",
+          "columns": [
+            "VeId"
+          ],
+          "target": "Ve",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "IX_VeMoi_Ve",
+          "childCardinality": "0..1",
+          "source": "VeMoi",
+          "relationId": "FK67"
+        }
+      ]
+    },
+    {
+      "name": "NhatKyCheckIn",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 11,
+      "foreignKeys": [
+        {
+          "constraint": "FK_NhatKyCheckIn_TaiKhoan_NhanVienId",
+          "columns": [
+            "NhanVienId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "NhatKyCheckIn",
+          "relationId": "FK44"
+        },
+        {
+          "constraint": "FK_NhatKyCheckIn_Ve_VeId",
+          "columns": [
+            "VeId"
+          ],
+          "target": "Ve",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "NhatKyCheckIn",
+          "relationId": "FK45"
+        }
+      ]
+    },
+    {
+      "name": "Voucher",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 12,
+      "foreignKeys": [
+        {
+          "constraint": "FK_Voucher_KhuVuc_KhuVucId",
+          "columns": [
+            "KhuVucId"
+          ],
+          "target": "KhuVuc",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "KhuVucId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Voucher",
+          "relationId": "FK63"
+        },
+        {
+          "constraint": "FK_Voucher_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "SuKienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Voucher",
+          "relationId": "FK64"
+        },
+        {
+          "constraint": "FK_Voucher_SuatDien_SuatDienId",
+          "columns": [
+            "SuatDienId"
+          ],
+          "target": "SuatDien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "SuatDienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "Voucher",
+          "relationId": "FK65"
+        }
+      ]
+    },
+    {
+      "name": "SuDungVoucher",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 12,
+      "foreignKeys": [
+        {
+          "constraint": "FK_SuDungVoucher_DonHang_DonHangId",
+          "columns": [
+            "DonHangId"
+          ],
+          "target": "DonHang",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "IX_SuDungVoucher_DonHang",
+          "childCardinality": "0..1",
+          "source": "SuDungVoucher",
+          "relationId": "FK72"
+        },
+        {
+          "constraint": "FK_SuDungVoucher_Voucher_VoucherId",
+          "columns": [
+            "VoucherId"
+          ],
+          "target": "Voucher",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "SuDungVoucher",
+          "relationId": "FK73"
+        }
+      ]
+    },
+    {
+      "name": "HopDong",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 13,
+      "foreignKeys": [
+        {
+          "constraint": "FK_HopDong_HoSoBTC_BTCId",
+          "columns": [
+            "BTCId"
+          ],
+          "target": "HoSoBTC",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "HopDong",
+          "relationId": "FK32"
+        },
+        {
+          "constraint": "FK_HopDong_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "SuKienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "HopDong",
+          "relationId": "FK33"
+        }
+      ]
+    },
+    {
+      "name": "GiaoDichThanhToan",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 13,
+      "foreignKeys": [
+        {
+          "constraint": "FK_GiaoDichThanhToan_DonHang_DonHangId",
+          "columns": [
+            "DonHangId"
+          ],
+          "target": "DonHang",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "DonHangId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiaoDichThanhToan",
+          "relationId": "FK25"
+        },
+        {
+          "constraint": "FK_GiaoDichThanhToan_YeuCauThue_YeuCauThueId",
+          "columns": [
+            "YeuCauThueId"
+          ],
+          "target": "YeuCauThue",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "YeuCauThueId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiaoDichThanhToan",
+          "relationId": "FK26"
+        }
+      ]
+    },
+    {
+      "name": "WebhookThanhToan",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 13,
+      "foreignKeys": [
+        {
+          "constraint": "FK_WebhookThanhToan_GiaoDichThanhToan_GiaoDichId",
+          "columns": [
+            "GiaoDichId"
+          ],
+          "target": "GiaoDichThanhToan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "GiaoDichId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "WebhookThanhToan",
+          "relationId": "FK27"
+        }
+      ]
+    },
+    {
+      "name": "YeuCauHoanTien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 14,
+      "foreignKeys": [
+        {
+          "constraint": "FK_YeuCauHoanTien_GiaoDichThanhToan_GiaoDichId",
+          "columns": [
+            "GiaoDichId"
+          ],
+          "target": "GiaoDichThanhToan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauHoanTien",
+          "relationId": "FK68"
+        },
+        {
+          "constraint": "FK_YeuCauHoanTien_TaiKhoan_NguoiDuyetId",
+          "columns": [
+            "NguoiDuyetId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiDuyetId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauHoanTien",
+          "relationId": "FK69"
+        },
+        {
+          "constraint": "FK_YeuCauHoanTien_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauHoanTien",
+          "relationId": "FK70"
+        },
+        {
+          "constraint": "FK_YeuCauHoanTien_Ve_VeId",
+          "columns": [
+            "VeId"
+          ],
+          "target": "Ve",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "VeId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "YeuCauHoanTien",
+          "relationId": "FK71"
+        }
+      ]
+    },
+    {
+      "name": "GiaoDichHoanTien",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 14,
+      "foreignKeys": [
+        {
+          "constraint": "FK_GiaoDichHoanTien_YeuCauHoanTien_YeuCauHoanTienId",
+          "columns": [
+            "YeuCauHoanTienId"
+          ],
+          "target": "YeuCauHoanTien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "GiaoDichHoanTien",
+          "relationId": "FK28"
+        }
+      ]
+    },
+    {
+      "name": "DoiSoat",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 14,
+      "foreignKeys": [
+        {
+          "constraint": "FK_DoiSoat_TaiKhoan_NguoiDuyetId",
+          "columns": [
+            "NguoiDuyetId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiDuyetId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DoiSoat",
+          "relationId": "FK18"
+        },
+        {
+          "constraint": "FK_DoiSoat_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DoiSoat",
+          "relationId": "FK19"
+        }
+      ]
+    },
+    {
+      "name": "GiaiNgan",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 15,
+      "foreignKeys": [
+        {
+          "constraint": "FK_GiaiNgan_DoiSoat_DoiSoatId",
+          "columns": [
+            "DoiSoatId"
+          ],
+          "target": "DoiSoat",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "IX_GiaiNgan_DoiSoat",
+          "childCardinality": "0..1",
+          "source": "GiaiNgan",
+          "relationId": "FK20"
+        }
+      ]
+    },
+    {
+      "name": "KhieuNai",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 15,
+      "foreignKeys": [
+        {
+          "constraint": "FK_KhieuNai_TaiKhoan_NguoiXuLyId",
+          "columns": [
+            "NguoiXuLyId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "NguoiXuLyId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhieuNai",
+          "relationId": "FK34"
+        },
+        {
+          "constraint": "FK_KhieuNai_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhieuNai",
+          "relationId": "FK35"
+        },
+        {
+          "constraint": "FK_KhieuNai_YeuCauThue_YeuCauThueId",
+          "columns": [
+            "YeuCauThueId"
+          ],
+          "target": "YeuCauThue",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "YeuCauThueId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhieuNai",
+          "relationId": "FK36"
+        },
+        {
+          "constraint": "FK_KhieuNai_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "SuKienId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhieuNai",
+          "relationId": "FK37"
+        },
+        {
+          "constraint": "FK_KhieuNai_Ve_VeId",
+          "columns": [
+            "VeId"
+          ],
+          "target": "Ve",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [
+            "VeId"
+          ],
+          "parentCardinality": "0..1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "KhieuNai",
+          "relationId": "FK38"
+        }
+      ]
+    },
+    {
+      "name": "DanhGia",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 15,
+      "foreignKeys": [
+        {
+          "constraint": "FK_DanhGia_TaiKhoan_TaiKhoanId",
+          "columns": [
+            "TaiKhoanId"
+          ],
+          "target": "TaiKhoan",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DanhGia",
+          "relationId": "FK16"
+        },
+        {
+          "constraint": "FK_DanhGia_SuKien_SuKienId",
+          "columns": [
+            "SuKienId"
+          ],
+          "target": "SuKien",
+          "targetColumns": [
+            "Id"
+          ],
+          "nullableColumns": [],
+          "parentCardinality": "1",
+          "childCardinalityBasis": "Không có khóa duy nhất toàn cục trên tập cột FK",
+          "childCardinality": "0..*",
+          "source": "DanhGia",
+          "relationId": "FK17"
+        }
+      ]
+    },
+    {
+      "name": "ChinhSach",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 16,
+      "foreignKeys": []
+    },
+    {
+      "name": "Banner",
+      "primaryKey": [
+        "Id"
+      ],
+      "pdfPage": 16,
+      "foreignKeys": []
+    }
+  ]
+}

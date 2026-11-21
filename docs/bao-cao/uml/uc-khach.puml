@@ -1,0 +1,21 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Khách chưa đăng nhập" as A
+rectangle "Hệ thống QLSK" {
+usecase "Tra cứu sự kiện, suất diễn" as U0
+usecase "Tra cứu địa điểm và lịch" as U1
+usecase "Đăng ký, đăng nhập" as U2
+usecase "Yêu cầu đặt lại mật khẩu" as U3
+}
+A -- U0
+A -- U1
+A -- U2
+A -- U3
+@enduml

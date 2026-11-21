@@ -1,0 +1,97 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+hide methods
+class TaiKhoan {
+Id: int
+VaiTro: VaiTroTaiKhoan
+}
+class HoSoBTC {
+Id: int
+TaiKhoanId: int
+}
+class SuKien {
+Id: int
+BTCId: int
+PhienBanCongKhaiId: int?
+}
+class PhienBanSuKien {
+Id: int
+SuKienId: int
+SoPhienBan: int
+}
+class SuatDien {
+Id: int
+SuKienId: int
+DiaDiemId: int
+}
+class LoaiVe {
+Id: int
+SuatDienId: int
+KhuVucId: int
+}
+class DonHang {
+Id: int
+TaiKhoanId: int
+SuatDienId: int
+}
+class ChiTietDonHang {
+Id: int
+DonHangId: int
+LoaiVeId: int
+}
+class GiuGhe {
+Id: int
+ChiTietDonHangId: int
+GheId: int?
+}
+class Ve {
+Id: int
+ChiTietDonHangId: int?
+SuatDienId: int
+GheId: int?
+}
+class NhatKyCheckIn {
+Id: int
+VeId: int
+NhanVienId: int
+}
+class DiaDiem {
+Id: int
+}
+class KhuVuc {
+Id: int
+DiaDiemId: int
+}
+class Ghe {
+Id: int
+KhuVucId: int
+}
+TaiKhoan "1" -- "0..*" HoSoBTC
+HoSoBTC "1" -- "0..*" SuKien
+SuKien "1" -- "0..*" PhienBanSuKien
+SuKien "1" -- "0..*" SuatDien
+DiaDiem "1" -- "0..*" SuatDien
+DiaDiem "1" -- "0..*" KhuVuc
+KhuVuc "1" -- "0..*" Ghe
+SuatDien "1" -- "0..*" LoaiVe
+TaiKhoan "1" -- "0..*" DonHang
+SuatDien "1" -- "0..*" DonHang
+DonHang "1" -- "0..*" ChiTietDonHang
+LoaiVe "1" -- "0..*" ChiTietDonHang
+ChiTietDonHang "1" -- "0..*" GiuGhe
+ChiTietDonHang "0..1" -- "0..*" Ve
+SuatDien "1" -- "0..*" Ve
+Ghe "0..1" -- "0..*" Ve
+Ve "1" -- "0..*" NhatKyCheckIn
+TaiKhoan "1" -- "0..*" NhatKyCheckIn : nhân viên
+note bottom
+  Sơ đồ rút gọn theo khóa ngoại thực tế; mỗi ghế có thể gắn nhiều vé
+  ở các suất khác nhau. Vé mời có thể không có chi tiết đơn hàng.
+end note
+@enduml

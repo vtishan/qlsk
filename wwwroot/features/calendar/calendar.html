@@ -1,0 +1,30 @@
+<div class="stack calendar-page">
+  <header class="calendar-intro">
+    <div class="stack">
+      <h1 tabindex="-1">Lịch sự kiện</h1>
+      <p>Chọn ngày để xem từng suất theo giờ Việt Nam.</p>
+    </div>
+    <a href="#events" class="button secondary">Xem danh sách sự kiện</a>
+  </header>
+  <div class="calendar-filters" data-slot="filters"></div>
+  <div class="calendar-layout">
+    <section class="panel stack calendar-month" aria-labelledby="calendar-month">
+      <header class="calendar-panel-head">
+        <div class="calendar-month-heading"><h2 id="calendar-month" tabindex="-1"></h2><div data-slot="today"></div></div>
+        <nav class="calendar-controls" aria-label="Chuyển tháng" data-slot="months"></nav>
+      </header>
+      <div class="calendar-days" role="group" aria-labelledby="calendar-month" data-slot="days"></div>
+    </section>
+    <section class="panel stack calendar-agenda" aria-labelledby="calendar-agenda">
+      <header class="calendar-panel-head">
+        <div class="stack">
+          <h2 id="calendar-agenda" tabindex="-1" data-filter-results></h2>
+          <p class="muted" data-slot="count"></p>
+        </div>
+        <div data-slot="clear"></div>
+      </header>
+      <div data-slot="sessions"></div>
+      <nav class="pagination actions" aria-label="Trang lịch" data-slot="pagination"></nav>
+    </section>
+  </div>
+</div>

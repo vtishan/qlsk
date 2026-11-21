@@ -1,0 +1,21 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+left to right direction
+actor "Nhân sự quản lý sự kiện" as A
+rectangle "Hệ thống QLSK" {
+usecase "Quét QR check-in" as U0
+usecase "Tra cứu / check-in thủ công" as U1
+usecase "Xem người tham dự" as U2
+usecase "Xem nhật ký và báo cáo check-in" as U3
+}
+A -- U0
+A -- U1
+A -- U2
+A -- U3
+@enduml

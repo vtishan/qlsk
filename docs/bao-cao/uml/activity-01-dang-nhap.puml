@@ -1,0 +1,23 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam dpi 140
+skinparam backgroundColor white
+skinparam wrapWidth 210
+skinparam maxMessageSize 90
+title Đăng nhập
+|Người dùng|
+start
+|Người dùng|
+:Nhập email hoặc số điện thoại và mật khẩu;
+|API|
+:Kiểm tra tài khoản, mật khẩu và trạng thái;
+if (Thông tin hợp lệ và tài khoản hoạt động?) then (Có)
+:Cấp cookie phiên đăng nhập;
+:Đọc capabilities và hiển thị chức năng được phép;
+else (Không)
+:Trả lỗi xác thực, không tạo phiên;
+endif
+stop
+@enduml

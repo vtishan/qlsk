@@ -1,0 +1,36 @@
+# 01 · Khảo sát dự án QLSK
+
+Phạm vi là `C:\IT_01\qlsk`. Đường dẫn trong bộ báo cáo này tính từ dự án đó. Ngày xác minh 21/11/2026. **VERIFIED** là có bằng chứng trực tiếp từ source, DDL hoặc chạy thử. **DOCUMENTED** là yêu cầu hoặc kết quả đã ghi trong tài liệu. **PROPOSED** là đề xuất. **UNKNOWN** là còn thiếu nguồn xác minh.
+
+| Thành phần | Đường dẫn | Chức năng | Tình trạng | Phụ thuộc |
+|---|---|---|---|---|
+| Host và routing | [Program.cs](../../Program.cs#L1), [QLSK.csproj](../../QLSK.csproj) | ASP.NET Core Web .NET 10, middleware chọn tệp mặc định và phục vụ static files | VERIFIED | ASP.NET Core, thư mục `wwwroot` |
+| HTML mẫu | [giaodienmau.html](../../wwwroot/giaodientest/giaodienmau.html#L10) | Shell SPA, điều hướng hash, dialog, trình diễn tài khoản, thuê, vé, vận hành | VERIFIED mô phỏng | Hai script inline, bảy script ngoài, DOM, dữ liệu nội bộ |
+| CSS mẫu | [venue.css](../../wwwroot/giaodientest/css/venue.css#L1), [base.css](../../wwwroot/giaodientest/css/base.css#L1) | Tokens, layout, modal, danh sách, lịch, vé, responsive | VERIFIED | Thứ tự cascade inline rồi file ngoài |
+| JavaScript mẫu | [giaodientest](../../wwwroot/giaodientest) | Trang chủ, lịch, hồ sơ BTC, yêu cầu, vé, vận hành, xuất | VERIFIED mô phỏng | Biến global, APIs trình duyệt |
+| Ảnh mẫu | [images](../../wwwroot/assets/images) | 14 ảnh WebP, ảnh địa điểm có thông tin nguồn trong `venuePhotos` | VERIFIED | [venue-home.js](../../wwwroot/giaodientest/js/venue-home.js#L9) |
+| API, xác thực, DTO, service, repository | [Program.cs](../../Program.cs), `Features/`, `Common/`, `appsettings*.json` | Không tìm thấy file hoặc đăng ký xử lý tương ứng | VERIFIED theo source | Host phục vụ tệp tĩnh |
+| Mô hình database | [Data/AppDbContext.cs](../../Data/AppDbContext.cs#L8), [Data/Configs](../../Data/Configs), [Domain](../../Domain) | 37 DbSet, entity/enum chia sáu nhóm, EF Core SQL Server 10.0.14 | VERIFIED từ source và DDL | SQL Server, EF Core |
+| Migrations, seed và kết nối | `Data/Migrations/`, `Data/seed/`, `Program.cs` | Không tìm thấy migration, snapshot, file seed, đăng ký DbContext hoặc chuỗi kết nối cho host | VERIFIED từ cây file và source | Database triển khai UNKNOWN |
+| Kiểm thử SQL | [RangBuoc.sql](../../test/RangBuoc.sql#L1) | Kiểm tra danh mục và ràng buộc SQL trong giao dịch | VERIFIED source, DOCUMENTED kết quả lịch sử | Schema kiểm thử độc lập |
+| Tài liệu | [bảng.txt](../bảng.txt), [so_do_erd.md](../so_do_erd.md), [anh_erd](../anh_erd), [chức_năng.txt](../chức_năng.txt), [noidung.txt](../noidung.txt), [bc_01_sql.md](../bc_01_sql.md) | Thiết kế, nghiệp vụ, 7 ảnh ERD, biên bản kiểm thử SQL | DOCUMENTED | Đối chiếu ở báo cáo 04–09 |
+| Bản nén | `wwwroot.zip` cạnh `QLSK.csproj` | Có HTML mẫu, CSS, bảy JS và ảnh đặt ở cấp gốc trong archive | VERIFIED qua danh mục ZIP | Nguồn tham khảo đóng gói |
+
+## Phân chia chức năng và phụ thuộc của bản mẫu
+
+| Tệp và symbol | Nghiệp vụ / xử lý UI | Bằng chứng |
+|---|---|---|
+| `venue-home.js`, `filteredEvents`, `homeView`, `venueListView` | Lọc danh mục từ `db`, tìm kiếm, địa điểm, ảnh, liên kết chỉ đường, FAQ | [venue-home.js:51](../../wwwroot/giaodientest/js/venue-home.js#L51) |
+| `venue-calendar.js`, `calendarView`, `exportSessionCalendar` | Sắp suất theo ngày giao khoảng, điều hướng lịch, chia sẻ, tạo ICS cục bộ | [venue-calendar.js:44](../../wwwroot/giaodientest/js/venue-calendar.js#L44) |
+| `venue-organizer.js`, `organizerFormMarkup`, `organizerStorage`, `bindOrganizerForm` | Nhánh hồ sơ cá nhân/tổ chức, kiểm tra tệp, preview, sử dụng IndexedDB | [venue-organizer.js:98](../../wwwroot/giaodientest/js/venue-organizer.js#L98) · [lưu hồ sơ:239](../../wwwroot/giaodientest/js/venue-organizer.js#L239) |
+| `venue-requests.js`, `rentalForm`, `refundAllocations`, `refundForm` | UI thuê và hoàn tiền, tính phương án hoàn từ đơn cục bộ | [venue-requests.js:3](../../wwwroot/giaodientest/js/venue-requests.js#L3) · [hoàn:116](../../wwwroot/giaodientest/js/venue-requests.js#L116) |
+| `venue-tickets.js`, `reviewProblem`, `customerTickets`, `chooseView` | Vé cá nhân, điều kiện đánh giá, chọn suất, khu và ghế | [venue-tickets.js:1](../../wwwroot/giaodientest/js/venue-tickets.js#L1) · [chọn ghế:78](../../wwwroot/giaodientest/js/venue-tickets.js#L78) |
+| `venue-work.js`, `workView`, `adminOverview`, `initWorkTools` | Bảng tác nghiệp theo vai trò, lọc DOM, hàng đợi và thao tác phân công mẫu | [venue-work.js:30](../../wwwroot/giaodientest/js/venue-work.js#L30) · [lọc:309](../../wwwroot/giaodientest/js/venue-work.js#L309) |
+| `venue-export.js`, `downloadTicketPdf`, `excelReport`, `wordReport` | PDF, XLSX, DOCX, in trong trình duyệt; tập dữ liệu báo cáo lấy từ DOM qua `workReportSections` | [venue-export.js:30](../../wwwroot/giaodientest/js/venue-export.js#L30) · [venue-work.js:332](../../wwwroot/giaodientest/js/venue-work.js#L332) |
+| `giaodienmau.html`, `startingData`, `load`, `save`, `actions`, `formHandlers` | Trộn seed, local state, nghiệp vụ, render, trình bày và event delegation | [khởi tạo:107](../../wwwroot/giaodientest/js/app.js#L107) · [event handlers:2543](../../wwwroot/giaodientest/js/app.js#L2543) |
+
+- **File** `giaodientest/giaodienmau.html`. **Symbol** `startingData`, `load`, `save`, `setAuth`, `sendMock`, `confirmPayment`, `transaction`. **Phát hiện** dữ liệu, phiên, thông báo và kết quả thanh toán là cục bộ. Web Locks hỗ trợ đồng bộ một origin của trình duyệt. **Đề xuất** chuyển quyết định nghiệp vụ sang service và giao dịch phía máy chủ khi có backend. [Lưu trữ:173](../../wwwroot/giaodientest/js/app.js#L173) · [Thanh toán:328](../../wwwroot/giaodientest/js/app.js#L328) · [Giao dịch trình duyệt:3004](../../wwwroot/giaodientest/js/app.js#L3004)
+- **File** `giaodientest/giaodienmau.html`. **Symbol** `header`, `footer`, `render`, `actions`. **Phát hiện** header/footer tái render và các script cùng đọc `db`, `account`, `ic` và helper từ scope global. Selector và breakpoint CSS giao nhau, ví dụ `.nav`, `.wrap`, `.hero` và `.event-grid`. **Đề xuất** dùng shell semantic chung và import ES module cho phần giao diện chính thức. [Thứ tự script:18](../../wwwroot/giaodientest/giaodienmau.html#L18) · [Layout:503](../../wwwroot/giaodientest/js/app.js#L503) · [Render:1269](../../wwwroot/giaodientest/js/app.js#L1269) · [Responsive mẫu](../../wwwroot/giaodientest/css/venue.css#L403)
+- **File** `giaodientest/giaodienmau.html`. **Symbol** `isUploadedCover`, `publicEvent`, `performScan`, `demoSwitcher`. **Phát hiện** bản mẫu dùng ID chuỗi, ngày epoch, mã role tiếng Anh, tải ảnh dạng data URL, chuyển vai trò và phạm vi tác nghiệp ở browser. **Đề xuất** hợp đồng DTO với ID số, ngày có múi giờ, quyền từ server và ánh xạ trạng thái tường minh. [Hiển thị sự kiện:243](../../wwwroot/giaodientest/js/app.js#L243) · [Ảnh:492](../../wwwroot/giaodientest/js/app.js#L492) · [Check-in:2046](../../wwwroot/giaodientest/js/app.js#L2046) · [Vai trò:2492](../../wwwroot/giaodientest/js/app.js#L2492)
+
+Tập file được rà soát gồm `Program.cs`, `QLSK.csproj`, `.gitignore`, thư mục `giaodientest`, toàn bộ `AppDbContext`, 7 tệp cấu hình EF, 7 tệp entity, 6 tệp enum, SQL kiểm thử và các tài liệu liệt kê trên. `bin/` và `obj/` là đầu ra build. Giao diện công khai dùng chung header/footer, còn các trang tài khoản và vận hành dùng chung sidebar.
